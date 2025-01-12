@@ -1,4 +1,4 @@
-package com.anonymous.BoltiKitabain
+package com.existencing.BoltiKitabain
 
 import android.app.Application
 import android.content.res.Configuration

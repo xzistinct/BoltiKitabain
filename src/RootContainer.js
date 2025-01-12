@@ -8,6 +8,11 @@ import {
   Jost_600SemiBold,
   Jost_500Medium,
 } from "@expo-google-fonts/jost";
+import {
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_700Bold,
+} from "@expo-google-fonts/roboto";
 import * as SplashScreen from "expo-splash-screen";
 
 import store from "./state/reduxStore";
@@ -19,6 +24,7 @@ import { StatusBar, Text } from "react-native";
 import RootNavigator from "./app/RootNavigator";
 
 import font from "./constants/fonts";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,6 +35,9 @@ const StateContainer = () => {
     Jost_400Regular,
     Jost_500Medium,
     Jost_600SemiBold,
+    Roboto_400Regular,
+    Roboto_500Medium,
+    Roboto_700Bold,
   });
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -39,7 +48,8 @@ const StateContainer = () => {
   );
 
   useEffect(() => {
-    if ((fontsLoaded || fontsErr) && authInitialized === true) {
+    if ((fontsLoaded || fontsErr) && authInitialized) {
+      SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontsErr, authInitialized]);
 
@@ -58,7 +68,9 @@ const StateContainer = () => {
 function RootContainer() {
   return (
     <Provider store={store}>
-      <StateContainer />
+      <SafeAreaView style={{ flex: 1 }}>
+        <StateContainer />
+      </SafeAreaView>
     </Provider>
   );
 }

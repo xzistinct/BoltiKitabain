@@ -1,4 +1,4 @@
-export const fonts = ["Jost"] as const;
+export const fonts = ["Jost", "Roboto"] as const;
 
 type font = (typeof fonts)[number];
 
@@ -16,7 +16,18 @@ export const fontWeights = [
 
 type fontWeight = (typeof fontWeights)[number];
 
-export default function font(
+export const loadedFonts = [
+  getFont("Jost", "Regular"),
+  getFont("Jost", "Medium"),
+  getFont("Jost", "SemiBold"),
+  getFont("Roboto", "Medium"),
+  getFont("Roboto", "Regular"),
+  getFont("Roboto", "Bold"),
+];
+
+export type tLoadedFonts = (typeof loadedFonts)[number];
+
+function getFont(
   fontType: font,
   fontWeight: fontWeight,
   italic: boolean = false
@@ -30,4 +41,18 @@ export default function font(
   return `${fontType}_${(index + 1) * 100}${fontWeight}${
     italic ? "_Italic" : ""
   }`;
+}
+
+export default function font(
+  fontType: font,
+  fontWeight: fontWeight,
+  italic: boolean = false
+): string {
+  const selectedFont = getFont(fontType, fontWeight, italic);
+
+  if (loadedFonts.indexOf(selectedFont) === -1) {
+    throw new Error(`Font ${selectedFont} not loaded`);
+  }
+
+  return selectedFont;
 }

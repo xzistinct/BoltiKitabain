@@ -1,4 +1,4 @@
-package com.anonymous.BoltiKitabain
+package com.existencing.BoltiKitabain
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

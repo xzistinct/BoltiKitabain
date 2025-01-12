@@ -16,7 +16,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.BoltiKitabain"
+      "package": "com.existencing.BoltiKitabain"
     },
     "web": {
       "favicon": "./assets/favicon.png"

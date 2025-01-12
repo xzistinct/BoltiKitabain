@@ -17,6 +17,10 @@ import AngleRight from "@/components/angleRight";
 import { BABYBLUE } from "@/constants/colors";
 import { useNavigation } from "@react-navigation/native";
 
+import font from "@/constants/fonts";
+import ArrowButton from "@/components/ArrowButton";
+import { ONBOARDINGNEXTCSS } from "@/constants/styles";
+
 export default function CreateAccount() {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
@@ -96,19 +100,19 @@ export default function CreateAccount() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{
-        flex: 1,
-        alignItems: "center",
-        backgroundColor: "white",
-        width: width,
-        height: 2 * height,
-      }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      enabled
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <Text>Hello</Text>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <>
+        <KeyboardAvoidingView
+          style={{
+            flex: 1,
+            alignItems: "center",
+            width: width,
+            height: 2 * height,
+          }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          enabled
+        >
           <View
             style={{
               marginTop: 15 * (height / 100),
@@ -117,7 +121,7 @@ export default function CreateAccount() {
           >
             <Text
               style={{
-                fontFamily: "Jost-SemiBold",
+                fontFamily: font("Jost", "SemiBold"),
                 fontSize: 11.5 * (width / 100),
                 textAlign: "center",
                 lineHeight: 12.5 * (width / 100),
@@ -141,7 +145,7 @@ export default function CreateAccount() {
               <View style={{ width: width }}>
                 <Text
                   style={{
-                    fontFamily: "Jost-Regular",
+                    fontFamily: font("Jost", "Regular"),
                     fontSize: !phoneNumberHeaderErr ? 25 : 15,
                     color: !phoneNumberHeaderErr ? "black" : "red",
                     width: 50 * (width / 100),
@@ -164,7 +168,7 @@ export default function CreateAccount() {
                 >
                   <Text
                     style={{
-                      fontFamily: "Jost-Regular",
+                      fontFamily: font("Jost", "Regular"),
                       fontSize: 20,
                       color: "black",
                       marginRight: 81 * (width / 100),
@@ -224,7 +228,7 @@ export default function CreateAccount() {
                   marginLeft: 22 * (width / 100),
                   fontSize: !passwordHeaderErr ? 25 : 15,
                   color: !passwordHeaderErr ? "black" : "red",
-                  fontFamily: "Jost-Regular",
+                  fontFamily: font("Jost", "Regular"),
                 }}
               >
                 {passwordHeader}
@@ -260,7 +264,7 @@ export default function CreateAccount() {
                   marginLeft: 22 * (width / 100),
                   fontSize: !retypePasswordHeaderErr ? 25 : 15,
                   color: !retypePasswordHeaderErr ? "black" : "red",
-                  fontFamily: "Jost-Regular",
+                  fontFamily: font("Jost", "Regular"),
                 }}
               >
                 {retypePasswordHeader}
@@ -289,39 +293,14 @@ export default function CreateAccount() {
               </View>
             </View>
           </View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: BABYBLUE,
-              width: 35 * (width / 100),
-              height: 6.5 * (height / 100),
-              borderRadius: 15,
-              position: "absolute",
-              bottom: 10 * (height / 100),
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+          <ArrowButton
+            content="Create"
             onPress={handleNext}
-          >
-            <Text
-              style={{
-                fontFamily: "Jost-Medium",
-                color: "white",
-                position: "relative",
-                right: 10,
-                fontSize: 25,
-              }}
-            >
-              Create
-            </Text>
-            <AngleRight
-              color={"white"}
-              style={{ position: "absolute", right: 10, width: 20, height: 20 }}
-            />
-          </TouchableOpacity>
-        </>
+            font={ONBOARDINGNEXTCSS.font}
+            style={ONBOARDINGNEXTCSS.style(width, height)}
+          />
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

@@ -8,10 +8,15 @@ import {
 
 import React, { useState } from "react";
 
+import Constants from "expo-constants";
+
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE, GREY } from "@/constants/colors";
 
 import AngleRight from "@/components/angleRight";
+import { ONBOARDINGNEXTCSS } from "@/constants/styles";
+import ArrowButton from "@/components/ArrowButton";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const genres = [
   "Sci-fi",
@@ -58,10 +63,11 @@ export default function InterestedGenres() {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         width: width,
         height: height,
+        flex: 1,
         backgroundColor: "white",
       }}
     >
@@ -176,38 +182,12 @@ export default function InterestedGenres() {
             )}
         </ScrollView>
       </View>
-      <TouchableOpacity
-        style={{
-          backgroundColor: BABYBLUE,
-          width: 35 * (width / 100),
-          height: 6.5 * (height / 100),
-          borderRadius: 15,
-          left: 32.5 * (width / 100),
-          position: "absolute",
-          bottom: 10 * (height / 100),
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+      <ArrowButton
+        content="Next"
         onPress={handleNext}
-      >
-        <Text
-          style={{
-            fontFamily: "Jost-Medium",
-            color: "white",
-            position: "relative",
-            right: 10,
-            fontSize: 25,
-          }}
-        >
-          Next
-        </Text>
-        <AngleRight
-          color={"white"}
-          style={{ position: "absolute", right: 10, width: 20, height: 20 }}
-        />
-      </TouchableOpacity>
-    </View>
+        font={ONBOARDINGNEXTCSS.font}
+        style={ONBOARDINGNEXTCSS.style(width, height)}
+      />
+    </SafeAreaView>
   );
 }

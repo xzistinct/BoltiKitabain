@@ -12,18 +12,18 @@ import { useSelector } from "react-redux";
 
 import { BABYBLUE, MAGENTA, GREY, LIGHTGREY } from "@/constants/colors";
 import { useNavigation } from "@react-navigation/native";
+import font from "@/constants/fonts";
 
 function Welcome() {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
   return (
-    <SafeAreaView
+    <View
       style={{
-        width: width,
-        height: height,
         backgroundColor: "white",
         flex: 1,
         alignItems: "center",
+        position: "relative",
       }}
     >
       <Image
@@ -52,7 +52,7 @@ function Welcome() {
         style={{
           fontSize: 11 * (width / 100),
           lineHeight: 14 * (width / 100),
-          fontFamily: "Jost_600SemiBold",
+          fontFamily: font("Jost", "SemiBold"),
           marginTop: 0,
         }}
       >
@@ -77,7 +77,7 @@ function Welcome() {
             style={{
               color: "white",
               fontSize: 5 * (width / 100),
-              fontFamily: "Jost_500Medium",
+              fontFamily: font("Jost", "Medium"),
               textAlign: "center",
               marginVertical: "auto",
             }}
@@ -101,7 +101,7 @@ function Welcome() {
             style={{
               color: "white",
               fontSize: 5 * (width / 100),
-              fontFamily: "Jost_500Medium",
+              fontFamily: font("Jost", "Medium"),
               textAlign: "center",
               marginVertical: "auto",
             }}
@@ -138,7 +138,7 @@ function Welcome() {
           style={{ width: 10 * (width / 100), height: 10 * (width / 100) }}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
