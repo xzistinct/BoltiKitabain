@@ -13,29 +13,33 @@ import BasicInfo from "./routes/BasicInfo/BasicInfo";
 import InterestedGenres from "./routes/InterestedGenres/InterestedGenres";
 import CreateAccount from "./routes/CreateAccount/CreateAccount";
 import RecommendedBook from "./routes/RecommendedBook/RecommendedBook";
+import SignIn from "./routes/SignIn/SignIn";
 
 const Stack = createNativeStackNavigator();
 
-const Loading = () => {
-  return <Text>Loading</Text>;
-};
-
 function RootNavigator() {
   const dispatch = useDispatch();
+  const isGuest = useSelector((state) => state.auth.isGuest);
+  const token = useSelector((state) => state.auth.token);
 
-  const successfulLogin = false;
-
+  console.log(isGuest, token);
   return (
     <>
       <Stack.Navigator
-        screenOptions={{ headerShown: false, navigationBarColor: "white" }}
-        initialRouteName={successfulLogin ? "Home" : "Welcome"}
+        screenOptions={{
+          headerShown: false,
+          navigationBarColor: "white",
+          statusBarBackgroundColor: "white",
+          statusBarStyle: "dark",
+        }}
+        initialRouteName={isGuest || token ? "Home" : "Welcome"}
       >
-        {successfulLogin ? (
+        {isGuest || token ? (
           <Stack.Screen name="Home" component={Home} />
         ) : (
           <>
             <Stack.Screen name="Welcome" component={Welcome} />
+            <Stack.Screen name="SignIn" component={SignIn} />
             <Stack.Screen name="BasicInfo" component={BasicInfo} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
             <Stack.Screen
@@ -45,7 +49,6 @@ function RootNavigator() {
             <Stack.Screen name="RecommendedBook" component={RecommendedBook} />
           </>
         )}
-        <Stack.Screen name="Loading" component={Loading} />
       </Stack.Navigator>
     </>
   );

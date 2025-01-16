@@ -1,13 +1,10 @@
 import {
   Image,
-  StatusBar,
   Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import { useSelector } from "react-redux";
 
 import { BABYBLUE, MAGENTA, GREY, LIGHTGREY } from "@/constants/colors";
@@ -17,6 +14,7 @@ import font from "@/constants/fonts";
 function Welcome() {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
+
   return (
     <View
       style={{
@@ -27,7 +25,7 @@ function Welcome() {
       }}
     >
       <Image
-        source={require("../../../assets/images/book.png")}
+        source={require("@/assets/images/book.png")}
         style={{
           marginHorizontal: "auto",
           marginTop: 10 * (height / 100),
@@ -70,7 +68,7 @@ function Welcome() {
             borderRadius: 3 * (width / 100),
           }}
           onPress={() =>
-            navigation.navigate("BasicInfo", { navigateTo: "InterestedGenres" })
+            navigation.navigate("BasicInfo", { userType: "Guest" })
           }
         >
           <Text
@@ -94,7 +92,7 @@ function Welcome() {
             borderRadius: 3 * (width / 100),
           }}
           onPress={() =>
-            navigation.navigate("BasicInfo", { navigateTo: "CreateAccount" })
+            navigation.navigate("BasicInfo", { userType: "Authorized" })
           }
         >
           <Text
@@ -109,18 +107,20 @@ function Welcome() {
             Create an account
           </Text>
         </TouchableOpacity>
-        <Text
-          style={{
-            marginTop: 1.75 * (height / 100),
-            fontSize: 15,
-            width: 47.5 * (width / 100),
-            marginHorizontal: "auto",
-            textAlign: "center",
-            textDecorationLine: "underline",
-          }}
-        >
-          Already have an account? Sign in
-        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+          <Text
+            style={{
+              marginTop: 1.75 * (height / 100),
+              fontSize: 15,
+              width: 47.5 * (width / 100),
+              marginHorizontal: "auto",
+              textAlign: "center",
+              textDecorationLine: "underline",
+            }}
+          >
+            Already have an account? Sign in
+          </Text>
+        </TouchableOpacity>
       </View>
       <View
         style={{

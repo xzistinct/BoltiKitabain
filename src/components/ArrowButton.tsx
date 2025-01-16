@@ -6,7 +6,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-import AngleRight from "./angleRight";
+import AngleRight from "./AngleRight";
 
 import { BABYBLUE } from "@/constants/colors";
 
@@ -15,29 +15,54 @@ export default function ArrowButton({
   content,
   font,
   style,
+  arrowSize,
+  textSize,
+  textColor,
 }: {
   onPress: () => void;
-  content: string;
-  font: string;
+  content?: string;
+  font?: string | undefined;
   style: StyleProp<ViewStyle>;
+  arrowSize: number;
+  textSize?: number;
+  textColor?: string;
 }) {
   const { width, height } = useWindowDimensions();
   return (
-    <TouchableOpacity style={style} onPress={onPress}>
+    <TouchableOpacity
+      style={{
+        //@ts-ignore
+        ...style,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onPress={onPress}
+    >
       <Text
         style={{
-          fontFamily: "Jost_400Regular",
-          color: "white",
+          fontFamily: font,
+          color: textColor,
           position: "relative",
           right: 10,
-          fontSize: 25,
+          fontSize: textSize,
         }}
       >
         {content}
       </Text>
       <AngleRight
         color={"white"}
-        style={{ position: "absolute", right: 10, width: 20, height: 20 }}
+        style={
+          content
+            ? {
+                position: "absolute",
+                right: 10,
+                width: arrowSize,
+                height: arrowSize,
+              }
+            : { width: arrowSize, height: arrowSize, marginHorizontal: "auto" }
+        }
       />
     </TouchableOpacity>
   );

@@ -4,6 +4,8 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  StyleProp,
+  TextStyle,
 } from "react-native";
 
 import React, { useState } from "react";
@@ -13,35 +15,11 @@ import Constants from "expo-constants";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE, GREY } from "@/constants/colors";
 
-import AngleRight from "@/components/angleRight";
-import { ONBOARDINGNEXTCSS } from "@/constants/styles";
+import { ONBOARDINGNEXTCSS, SCREENHEADER } from "@/constants/styles";
 import ArrowButton from "@/components/ArrowButton";
-import { SafeAreaView } from "react-native-safe-area-context";
+import font from "@/constants/fonts";
 
-export const genres = [
-  "Sci-fi",
-  "Historical",
-  "Poetry",
-  "Fantasy",
-  "Self help",
-  "Action",
-  "Romantic",
-  "Horror",
-  "Memoir",
-  "Narrative",
-  "Thriller",
-  "Novel",
-  "Drama",
-  "Humor",
-  "Adventure",
-  "Dystopian",
-  "Mystery",
-  "Short stories",
-  "Young adult",
-  "Indie",
-  "Crime",
-  "Informative",
-] as const;
+import { genres } from "@/constants/bookGenres";
 
 export default function InterestedGenres() {
   const { width, height } = useWindowDimensions();
@@ -62,8 +40,14 @@ export default function InterestedGenres() {
     navigation.navigate("RecommendedBook");
   };
 
+  const genreTextStyle: StyleProp<TextStyle> = {
+    color: "white",
+    fontSize: 3 * (height / 100),
+    fontFamily: font("Jost", "Regular"),
+  };
+
   return (
-    <SafeAreaView
+    <View
       style={{
         width: width,
         height: height,
@@ -71,31 +55,27 @@ export default function InterestedGenres() {
         backgroundColor: "white",
       }}
     >
-      <>
-        <Text
-          style={{
-            fontFamily: "Jost-SemiBold",
-            fontSize: 11.5 * (width / 100),
-            marginTop: 10 * (height / 100),
-            marginLeft: 10 * (width / 100),
-            lineHeight: 12.75 * (width / 100),
-          }}
-        >
+      <View style={{ marginLeft: 10 * (width / 100) }}>
+        <Text style={SCREENHEADER.textStyle(width, height)}>
           Which genres interest you?
         </Text>
         <Text
           style={{
             width: 65 * (width / 100),
-            marginLeft: 10 * (width / 100),
+
             fontSize: 15,
           }}
         >
           Help us recommend audiobooks you'll enjoy
         </Text>
-      </>
+      </View>
 
       <View
-        style={{ height: 40 * (height / 100), marginTop: 4 * (height / 100) }}
+        style={{
+          height: (height > 700 ? 45 : 37.5) * (height / 100),
+
+          marginTop: 4 * (height / 100),
+        }}
       >
         {err && (
           <Text
@@ -105,6 +85,7 @@ export default function InterestedGenres() {
               fontSize: 15,
               position: "absolute",
               top: -2 * (height / 100),
+              width: width,
             }}
           >
             {err}
@@ -139,15 +120,7 @@ export default function InterestedGenres() {
                 borderRadius: 10,
               }}
             >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 20,
-                  fontFamily: "Jost-Medium",
-                }}
-              >
-                {genre}
-              </Text>
+              <Text style={genreTextStyle}>{genre}</Text>
             </TouchableOpacity>
           ))}
           {Array.from(genres)
@@ -168,15 +141,7 @@ export default function InterestedGenres() {
                       borderRadius: 10,
                     }}
                   >
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: 20,
-                        fontFamily: "Jost-Medium",
-                      }}
-                    >
-                      {genre}
-                    </Text>
+                    <Text style={genreTextStyle}>{genre}</Text>
                   </TouchableOpacity>
                 )
             )}
@@ -187,7 +152,10 @@ export default function InterestedGenres() {
         onPress={handleNext}
         font={ONBOARDINGNEXTCSS.font}
         style={ONBOARDINGNEXTCSS.style(width, height)}
+        arrowSize={ONBOARDINGNEXTCSS.arrowSize}
+        textSize={ONBOARDINGNEXTCSS.fontSize}
+        textColor={ONBOARDINGNEXTCSS.textColor}
       />
-    </SafeAreaView>
+    </View>
   );
 }

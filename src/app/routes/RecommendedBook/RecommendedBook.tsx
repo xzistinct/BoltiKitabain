@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { GREY, BABYBLUE } from "@/constants/colors";
+import font from "@/constants/fonts";
+import { SCREENHEADER } from "@/constants/styles";
 
 export default function RecommendedBook() {
   const { width, height } = useWindowDimensions();
@@ -18,23 +20,16 @@ export default function RecommendedBook() {
         backgroundColor: "white",
       }}
     >
-      <View>
-        <Text
-          style={{
-            fontFamily: "Jost-SemiBold",
-            fontSize: 10 * (width / 100),
-            marginTop: 10 * (height / 100),
-          }}
-        >
-          Heres a book we think you'll enjoy
-        </Text>
-      </View>
+      <Text style={SCREENHEADER.textStyle(width, height)}>
+        Heres a book we think you'll enjoy
+      </Text>
+
       <View>
         <View
           style={{
             marginTop: 5 * (height / 100),
-            width: 70 * (width / 100),
-            height: 45 * (height / 100),
+            width: (height > 700 ? 60 : 50) * (width / 100),
+            height: (height > 700 ? 45 : 37.5) * (height / 100),
             backgroundColor: GREY,
             borderRadius: 5,
           }}
@@ -54,7 +49,11 @@ export default function RecommendedBook() {
       >
         <TouchableOpacity>
           <Text
-            style={{ color: GREY, fontSize: 20, fontFamily: "Jost-Medium" }}
+            style={{
+              color: GREY,
+              fontSize: 20,
+              fontFamily: font("Jost", "Medium"),
+            }}
           >
             Skip
           </Text>
@@ -63,6 +62,8 @@ export default function RecommendedBook() {
           style={{
             backgroundColor: BABYBLUE,
             width: 35 * (width / 100),
+            minWidth: 150,
+            paddingHorizontal: 4 * (width / 100),
             paddingVertical: 1 * (height / 100),
 
             borderRadius: 15,
@@ -77,7 +78,7 @@ export default function RecommendedBook() {
             style={{
               color: "white",
               fontSize: 20,
-              fontFamily: "Jost-Medium",
+              fontFamily: font("Jost", "Medium"),
               textAlign: "center",
             }}
           >

@@ -1,0 +1,21 @@
+import { genres } from "./bookGenres";
+
+export type loginAttemptMessage =
+  | "success"
+  | "Invalid credentials"
+  | "unknown error";
+
+export type tUserInformation = {
+  name: string | null;
+  dob: string | null;
+  gender: boolean | null;
+  currentlyReadingList: Array<string>;
+  readingList: Array<string>;
+  interestedGenres: Array<tGenres>;
+};
+
+export type tGenres = Array<(typeof genres)[number]>;
+
+export type dispatchLoginAttempMessage =
+  | loginAttemptMessage
+  | "failed to store credentials";

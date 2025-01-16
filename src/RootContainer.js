@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 
 import { useFonts } from "expo-font";
 import {
@@ -18,6 +18,8 @@ import * as SplashScreen from "expo-splash-screen";
 import store from "./state/reduxStore";
 import { Provider, useDispatch } from "react-redux";
 import { initAuth } from "./state/redux-slices/authSlice";
+
+import * as NavigationBar from "expo-navigation-bar";
 
 import { StatusBar, Text } from "react-native";
 
@@ -57,19 +59,16 @@ const StateContainer = () => {
     return null;
   }
 
-  return (
-    <NavigationContainer>
-      <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
-      <RootNavigator />
-    </NavigationContainer>
-  );
+  return <RootNavigator />;
 };
 
 function RootContainer() {
   return (
     <Provider store={store}>
       <SafeAreaView style={{ flex: 1 }}>
-        <StateContainer />
+        <NavigationContainer>
+          <StateContainer />
+        </NavigationContainer>
       </SafeAreaView>
     </Provider>
   );

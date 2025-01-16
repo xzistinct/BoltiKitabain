@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  SafeAreaView,
   Text,
   KeyboardAvoidingView,
   useWindowDimensions,
@@ -12,36 +11,33 @@ import {
   Platform,
 } from "react-native";
 
-import AngleRight from "@/components/angleRight";
-
 import { BABYBLUE } from "@/constants/colors";
 import { useNavigation } from "@react-navigation/native";
 
 import font from "@/constants/fonts";
 import ArrowButton from "@/components/ArrowButton";
-import { ONBOARDINGNEXTCSS } from "@/constants/styles";
+import {
+  INPUTHEADER,
+  ONBOARDINGNEXTCSS,
+  SCREENHEADER,
+} from "@/constants/styles";
+import DualText from "@/components/DualText";
+import NumberPad from "@/components/NumberPad";
 
 export default function CreateAccount() {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
 
-  const ogPhoneNumberHeader = "Phone Number";
-  const [phoneNumberHeader, changePhoneNumberHeader] =
-    useState<string>(ogPhoneNumberHeader);
-  const [phoneNumberHeaderErr, setPhoneNumberHeaderErr] =
-    useState<boolean>(false);
+  const [phoneNumberHeaderDual, changePhoneNumberHeaderDual] = useState<
+    string | null
+  >(null);
+  const [passwordHeaderDual, changePasswordHeaderDual] = useState<
+    string | null
+  >(null);
 
-  const ogPasswordHeader = "Password";
-  const [passwordHeader, changePasswordHeader] =
-    useState<string>(ogPasswordHeader);
-  const [passwordHeaderErr, setPasswordHeaderErr] = useState<boolean>(false);
-
-  const ogRetypePasswordHeader = "Retype Password";
-  const [retypePasswordHeader, changeRetypePasswordHeader] = useState<string>(
-    ogRetypePasswordHeader
-  );
-  const [retypePasswordHeaderErr, setRetypePasswordHeaderErr] =
-    useState<boolean>(false);
+  const [retypePasswordHeaderDual, changeRetypePasswordHeaderDual] = useState<
+    string | null
+  >(null);
 
   const [phoneNumber, setPhoneNumber] = useState<Array<number | null>>(
     Array(10).fill(null)
@@ -49,46 +45,24 @@ export default function CreateAccount() {
   const [password, setPassword] = useState<string | null>(null);
   const [retypePassword, setRetypePassword] = useState<string | null>(null);
 
-  const phoneNumberInputs: Array<TextInput | null> = Array(10).fill(null);
-
-  const handlePhoneNumberChange = (index: number, value: string) => {
-    const newPhoneNumber = [...phoneNumber];
-    setPhoneNumberHeaderErr(false);
-    changePhoneNumberHeader(ogPhoneNumberHeader);
-    if (value === "") {
-      newPhoneNumber[index] = null;
-      setPhoneNumber(newPhoneNumber);
-      return;
-    }
-    if (isNaN(parseInt(value))) {
-      return;
-    }
-    newPhoneNumber[index] = parseInt(value);
-
-    setPhoneNumber(newPhoneNumber);
-
-    if (value && index < phoneNumber.length - 1) {
-      phoneNumberInputs[index + 1]?.focus();
-    }
+  const handlePhoneNumberChange = () => {
+    changePhoneNumberHeaderDual(null);
   };
 
   const handleNext = () => {
     let err = false;
     if (phoneNumber.includes(null)) {
-      setPhoneNumberHeaderErr(true);
-      changePhoneNumberHeader("Please fill out phone number");
+      changePhoneNumberHeaderDual("Please fill out phone number");
       err = true;
     }
 
     if (password === null || password.length < 8) {
-      setPasswordHeaderErr(true);
-      changePasswordHeader("Password must be at least 8 characters");
+      changePasswordHeaderDual("Password must be at least 8 characters");
       err = true;
     }
 
     if (retypePassword === null || retypePassword !== password) {
-      setRetypePasswordHeaderErr(true);
-      changeRetypePasswordHeader("Passwords do not match");
+      changeRetypePasswordHeaderDual("Passwords do not match");
       err = true;
     }
 
@@ -99,63 +73,53 @@ export default function CreateAccount() {
     navigation.navigate("InterestedGenres");
   };
 
+  console.log(height);
+  console.log(useWindowDimensions().scale);
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <Text>Hello</Text>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={{
             flex: 1,
             alignItems: "center",
             width: width,
-            height: 2 * height,
+            height: height,
           }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           enabled
         >
-          <View
+          <Text
             style={{
-              marginTop: 15 * (height / 100),
-              width: 75 * (width / 100),
+              //@ts-ignore
+              ...SCREENHEADER.textStyle(width, height),
+
+              textAlign: "center",
             }}
           >
-            <Text
-              style={{
-                fontFamily: font("Jost", "SemiBold"),
-                fontSize: 11.5 * (width / 100),
-                textAlign: "center",
-                lineHeight: 12.5 * (width / 100),
-              }}
-            >
-              Create your account
-            </Text>
-            <Text
-              style={{
-                textAlign: "center",
-                marginHorizontal: 3 * (width / 100),
-                paddingHorizontal: 10,
-              }}
-            >
-              Access more audiobooks with a library card & engage with the
-              community
-            </Text>
-          </View>
-          <View>
-            <View style={{ marginTop: 3 * (height / 100) }}>
-              <View style={{ width: width }}>
-                <Text
-                  style={{
-                    fontFamily: font("Jost", "Regular"),
-                    fontSize: !phoneNumberHeaderErr ? 25 : 15,
-                    color: !phoneNumberHeaderErr ? "black" : "red",
-                    width: 50 * (width / 100),
-                    marginLeft: 22 * (width / 100),
+            Create account
+          </Text>
+          <Text
+            style={{
+              textAlign: "center",
+              marginHorizontal: "auto",
 
-                    paddingBottom: 0,
-                  }}
-                >
-                  {phoneNumberHeader}
-                </Text>
+              width: 55 * (width / 100),
+            }}
+          >
+            Access more audiobooks with a library card & engage with the
+            community
+          </Text>
+
+          <View>
+            <View style={{ marginTop: 5 * (height / 100) }}>
+              <View style={{ width: width }}>
+                <DualText
+                  originalContent="Phone Number"
+                  dualContent={phoneNumberHeaderDual}
+                  style={INPUTHEADER.textStyle(width, height)}
+                  dualStyle={INPUTHEADER.dualTextStyle()}
+                />
                 <View
                   style={{
                     display: "flex",
@@ -187,52 +151,22 @@ export default function CreateAccount() {
                       flexDirection: "row",
                     }}
                   >
-                    {phoneNumber.map((num, index) => (
-                      <TextInput
-                        key={index}
-                        style={{
-                          borderBottomWidth: 1,
-                          color: "black",
-                          marginRight: 5,
-                          width: 5 * (width / 100),
-                          paddingVertical: 0,
-                          fontSize: 20,
-                        }}
-                        maxLength={1}
-                        keyboardType="numeric"
-                        value={num !== null ? num.toString() : ""}
-                        ref={(input) => {
-                          phoneNumberInputs[index] = input;
-                        }}
-                        onChangeText={(value) => {
-                          handlePhoneNumberChange(index, value);
-                        }}
-                        onKeyPress={({ nativeEvent: { key: keyValue } }) => {
-                          if (
-                            keyValue === "Backspace" &&
-                            num === null &&
-                            index > 0
-                          ) {
-                            phoneNumberInputs[index - 1]?.focus();
-                          }
-                        }}
-                      />
-                    ))}
+                    <NumberPad
+                      numbers={phoneNumber}
+                      setNumbers={setPhoneNumber}
+                      onChangeNumber={handlePhoneNumberChange}
+                    />
                   </View>
                 </View>
               </View>
             </View>
             <View style={{ marginTop: 3 * (height / 100), width: width }}>
-              <Text
-                style={{
-                  marginLeft: 22 * (width / 100),
-                  fontSize: !passwordHeaderErr ? 25 : 15,
-                  color: !passwordHeaderErr ? "black" : "red",
-                  fontFamily: font("Jost", "Regular"),
-                }}
-              >
-                {passwordHeader}
-              </Text>
+              <DualText
+                originalContent="Password"
+                dualContent={passwordHeaderDual}
+                style={INPUTHEADER.textStyle(width, height)}
+                dualStyle={INPUTHEADER.dualTextStyle()}
+              />
               <View style={{ marginLeft: 22 * (width / 100) }}>
                 <TextInput
                   style={{
@@ -249,8 +183,7 @@ export default function CreateAccount() {
                   }}
                   secureTextEntry={true}
                   onChangeText={(value) => {
-                    setPasswordHeaderErr(false);
-                    changePasswordHeader(ogPasswordHeader);
+                    changePasswordHeaderDual(null);
                     setPassword(value);
                   }}
                   placeholder="8 characters or more"
@@ -259,16 +192,12 @@ export default function CreateAccount() {
               </View>
             </View>
             <View style={{ marginTop: 3 * (height / 100), width: width }}>
-              <Text
-                style={{
-                  marginLeft: 22 * (width / 100),
-                  fontSize: !retypePasswordHeaderErr ? 25 : 15,
-                  color: !retypePasswordHeaderErr ? "black" : "red",
-                  fontFamily: font("Jost", "Regular"),
-                }}
-              >
-                {retypePasswordHeader}
-              </Text>
+              <DualText
+                originalContent="Retype Password"
+                dualContent={retypePasswordHeaderDual}
+                style={INPUTHEADER.textStyle(width, height)}
+                dualStyle={INPUTHEADER.dualTextStyle()}
+              />
               <View style={{ marginLeft: 22 * (width / 100) }}>
                 <TextInput
                   style={{
@@ -285,8 +214,7 @@ export default function CreateAccount() {
                   }}
                   secureTextEntry={true}
                   onChangeText={(value) => {
-                    setRetypePasswordHeaderErr(false);
-                    changeRetypePasswordHeader(ogRetypePasswordHeader);
+                    changeRetypePasswordHeaderDual(null);
                     setRetypePassword(value);
                   }}
                 />
@@ -298,9 +226,12 @@ export default function CreateAccount() {
             onPress={handleNext}
             font={ONBOARDINGNEXTCSS.font}
             style={ONBOARDINGNEXTCSS.style(width, height)}
+            arrowSize={ONBOARDINGNEXTCSS.arrowSize}
+            textSize={ONBOARDINGNEXTCSS.fontSize}
+            textColor={ONBOARDINGNEXTCSS.textColor}
           />
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -12,11 +12,12 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.existencing.BoltiKitabain",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.existencing.BoltiKitabain"
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/favicon.png"
