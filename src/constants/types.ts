@@ -14,8 +14,18 @@ export type tUserInformation = {
   interestedGenres: Array<tGenres>;
 };
 
-export type tGenres = Array<(typeof genres)[number]>;
+export type tGenres = (typeof genres)[number];
 
 export type dispatchLoginAttempMessage =
   | loginAttemptMessage
   | "failed to store credentials";
+
+export type book = {
+  name: string;
+  image: string;
+  author: string;
+  genre: string;
+  rating: number;
+  description: string;
+  id: string;
+};

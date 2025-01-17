@@ -4,6 +4,8 @@ export const MAGENTA = "#D954FF";
 
 export const VERYLIGHTGREY = "#F0F0F0";
 
+export const LIGHTERGREY = "#DDDDDD";
+
 export const LIGHTGREY = "#CECECE";
 
 export const GREY = "#A9A9A9";

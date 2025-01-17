@@ -1,4 +1,5 @@
-import { LIGHTBROWN } from "@/constants/colors";
+import { GREY, LIGHTBROWN } from "@/constants/colors";
+import { book } from "@/constants/types";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -6,6 +7,9 @@ import {
   useWindowDimensions,
   View,
   Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 
 const SHELFBOTTOM = () => {
@@ -28,7 +32,15 @@ const SHELFBOTTOM = () => {
   );
 };
 
-export default function Shelf() {
+export default function Shelf({
+  books,
+  behaviour,
+  emptyMessage,
+}: {
+  books: book[] | null;
+  behaviour: "Open" | "Modal";
+  emptyMessage: string;
+}) {
   const { width, height } = useWindowDimensions();
 
   return (
@@ -36,33 +48,69 @@ export default function Shelf() {
       style={{
         flex: 1,
         backgroundColor: "white",
-        width: width,
-        height: height,
+        width: 90 * (width / 100),
+        marginHorizontal: "auto",
       }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView>
-          <View
-            style={{
-              width: "90%",
-              height: 2 * (height / 100),
-              backgroundColor: LIGHTBROWN,
-              borderRadius: 5,
-              marginHorizontal: "auto",
-            }}
+      <View
+        style={{
+          paddingHorizontal: 5 * (width / 100),
+          marginBottom: 0.5 * (height / 100),
+          height: 20 * (height / 100),
+        }}
+      >
+        {books !== null && books.length > 1 ? (
+          <FlatList
+            horizontal
+            data={books}
+            style={{ width: "100%" }}
+            renderItem={(item) => (
+              <TouchableOpacity
+                style={{
+                  width: 30 * (width / 100),
+                  height: 20 * (height / 100),
+                  backgroundColor: GREY,
+                  marginRight: 5 * (width / 100),
+                }}
+                onPress={() => {
+                  if (behaviour === "Open") {
+                    // Open the book
+                  }
+                }}
+              ></TouchableOpacity>
+            )}
           />
-          <View
+        ) : (
+          <Text
             style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-around",
+              fontSize: 5 * (width / 100),
+              textAlign: "center",
+              marginVertical: "auto",
             }}
           >
-            <SHELFBOTTOM />
-            <SHELFBOTTOM />
-          </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+            {emptyMessage}
+          </Text>
+        )}
+      </View>
+      <View
+        style={{
+          width: "100%",
+          height: 2 * (height / 100),
+          backgroundColor: LIGHTBROWN,
+          borderRadius: 5,
+          marginHorizontal: "auto",
+        }}
+      />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-around",
+        }}
+      >
+        <SHELFBOTTOM />
+        <SHELFBOTTOM />
+      </View>
     </View>
   );
 }

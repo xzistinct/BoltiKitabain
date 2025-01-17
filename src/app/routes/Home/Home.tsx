@@ -1,0 +1,143 @@
+import {
+  DARKERGREY,
+  DARKGREY,
+  GREY,
+  LIGHTGREY,
+  LIGHTERGREY,
+  VERYLIGHTGREY,
+} from "@/constants/colors";
+import font from "@/constants/fonts";
+import {
+  Text,
+  View,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  useWindowDimensions,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  StyleProp,
+  TextStyle,
+} from "react-native";
+
+import { ScrollView } from "react-native-gesture-handler";
+
+import Shelf from "./Shelf";
+import { useState } from "react";
+import HomeTab from "./HomeTab";
+import DiscoverTab from "./DiscoverTab";
+
+const tabs = ["Home", "Discover"] as const;
+
+type tTabs = (typeof tabs)[number];
+
+const NAVBAR = ({
+  currentTab,
+  setCurrentTab,
+}: {
+  currentTab: tTabs;
+  setCurrentTab: React.Dispatch<React.SetStateAction<tTabs>>;
+}) => {
+  const { width, height } = useWindowDimensions();
+  const NAVBARTEXTSTYLE: StyleProp<TextStyle> = {
+    fontSize: 3 * (height / 100),
+    fontFamily: font("Jost", "Regular"),
+    paddingHorizontal: 4 * (width / 100),
+    paddingVertical: 0.75 * (height / 100),
+    color: DARKGREY,
+    borderRadius: 5,
+  };
+  return (
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: 65 * (width / 100),
+
+        marginHorizontal: "auto",
+      }}
+    >
+      {tabs.map((item, index) => (
+        <TouchableOpacity onPress={() => setCurrentTab(item)} key={index}>
+          <Text
+            style={
+              currentTab === item
+                ? {
+                    ...NAVBARTEXTSTYLE,
+                    backgroundColor: LIGHTERGREY,
+                    fontFamily: font("Jost", "Medium"),
+                  }
+                : NAVBARTEXTSTYLE
+            }
+          >
+            {item}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
+
+function Home() {
+  const { width, height } = useWindowDimensions();
+
+  const [currentTab, setCurrentTab] = useState<tTabs>("Home");
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={{
+            flex: 1,
+            alignItems: "center",
+            width: width,
+            height: 2 * height,
+          }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          enabled
+        >
+          <View
+            style={{
+              display: "flex",
+              marginTop: 5 * (height / 100),
+              flexDirection: "row",
+              width: 90 * (width / 100),
+              marginHorizontal: "auto",
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("@/assets/images/book.png")}
+              style={{ width: 17 * (width / 100), height: 17 * (width / 100) }}
+            />
+            <TextInput
+              style={{
+                borderBottomColor: DARKGREY,
+                borderBottomWidth: 1,
+                width: 60 * (width / 100),
+                fontSize: 20,
+                color: "black",
+                fontFamily: font("Jost", "Regular"),
+                paddingLeft: 3 * (width / 100),
+                justifyContent: "flex-end",
+              }}
+              placeholder="Search the catalogue"
+              placeholderTextColor={GREY}
+            />
+          </View>
+
+          <ScrollView scrollEnabled={true} style={{ flex: 1, width: width }}>
+            <NAVBAR currentTab={currentTab} setCurrentTab={setCurrentTab} />
+            <View>{currentTab === "Home" ? <HomeTab /> : <DiscoverTab />}</View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </View>
+  );
+}
+
+export default Home;

@@ -20,6 +20,7 @@ import ArrowButton from "@/components/ArrowButton";
 import font from "@/constants/fonts";
 
 import { genres } from "@/constants/bookGenres";
+import { tGenres } from "@/constants/types";
 
 export default function InterestedGenres() {
   const { width, height } = useWindowDimensions();
@@ -27,9 +28,9 @@ export default function InterestedGenres() {
 
   const [err, setErr] = useState<string | null>(null);
 
-  const [selectedGenres, setSelectedGenres] = useState<
-    Array<(typeof genres)[number]>
-  >([]);
+  const [selectedGenres, setSelectedGenres] = useState<Array<tGenres | null>>(
+    []
+  );
 
   const handleNext = () => {
     if (selectedGenres.length === 0) {

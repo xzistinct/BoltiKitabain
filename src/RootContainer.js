@@ -27,6 +27,7 @@ import RootNavigator from "./app/RootNavigator";
 
 import font from "./constants/fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -64,13 +65,15 @@ const StateContainer = () => {
 
 function RootContainer() {
   return (
-    <Provider store={store}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <NavigationContainer>
-          <StateContainer />
-        </NavigationContainer>
-      </SafeAreaView>
-    </Provider>
+    <GestureHandlerRootView>
+      <Provider store={store}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <NavigationContainer>
+            <StateContainer />
+          </NavigationContainer>
+        </SafeAreaView>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 
