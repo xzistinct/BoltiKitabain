@@ -130,7 +130,11 @@ function Home() {
             />
           </View>
 
-          <ScrollView scrollEnabled={true} style={{ flex: 1, width: width }}>
+          <ScrollView
+            scrollEnabled={true}
+            style={{ flex: 1, width: width }}
+            removeClippedSubviews={true}
+          >
             <NAVBAR currentTab={currentTab} setCurrentTab={setCurrentTab} />
             <View>{currentTab === "Home" ? <HomeTab /> : <DiscoverTab />}</View>
           </ScrollView>

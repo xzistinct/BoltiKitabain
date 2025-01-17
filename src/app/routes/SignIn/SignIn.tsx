@@ -95,11 +95,14 @@ export default function SignIn() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           enabled
         >
+          <View
+            style={{ marginTop: (height > 700 ? 10 : 7.5) * (height / 100) }}
+          />
           <Image
             source={require("@/assets/images/book.png")}
             style={{
               marginHorizontal: "auto",
-              marginTop: 10 * (height / 100),
+
               width: 30 * (width / 100),
               height: 30 * (width / 100),
             }}

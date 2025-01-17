@@ -2,8 +2,17 @@ import { useState } from "react";
 
 import { genres } from "@/constants/bookGenres";
 import { tGenres, book } from "@/constants/types";
-import { View, Text, useWindowDimensions } from "react-native";
+import {
+  View,
+  Text,
+  useWindowDimensions,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import font from "@/constants/fonts";
+
+import Carousel from "react-native-reanimated-carousel";
+import { useSharedValue } from "react-native-reanimated";
 
 export default function DiscoverTab() {
   const { width, height } = useWindowDimensions();
@@ -13,18 +22,47 @@ export default function DiscoverTab() {
     book[] | null
   >();
 
+  const CarouselStyle: StyleProp<ViewStyle> = {
+    width: 85 * (width / 100),
+    height: 10 * (height / 100),
+    marginHorizontal: "auto",
+  };
+
+  const progress = useSharedValue<number>(0);
+
   return (
     <View>
       <View>
         <View>
-          <Text
-            style={{
-              fontSize: 5 * (height / 100),
-              fontFamily: font("Jost", "Regular"),
+          <Carousel
+            data={Array.from(genres)}
+            windowSize={1}
+            height={CarouselStyle.height}
+            loop={true}
+            snapEnabled={true}
+            width={CarouselStyle.width}
+            style={CarouselStyle}
+            mode="parallax"
+            modeConfig={{
+              parallaxScrollingScale: 0.9,
+              parallaxScrollingOffset: 50 * (width / 100),
+              parallaxAdjacentItemScale: 0.5,
             }}
-          >
-            {currentGenre}
-          </Text>
+            renderItem={({ item, index }) => (
+              <View style={{ display: "flex", alignItems: "center" }}>
+                <Text
+                  style={{
+                    fontSize: 7 * (height / 100),
+                    fontFamily: font("Jost", "Regular"),
+
+                    backgroundColor: "white",
+                  }}
+                >
+                  {item}
+                </Text>
+              </View>
+            )}
+          />
         </View>
       </View>
       <View></View>
