@@ -26,6 +26,8 @@ export type book = {
   author: string;
   genre: string;
   rating: number;
+  length: number;
   description: string;
   id: string;
+  tags: string[];
 };

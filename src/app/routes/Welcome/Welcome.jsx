@@ -11,6 +11,13 @@ import { BABYBLUE, MAGENTA, GREY, LIGHTGREY } from "@/constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import font from "@/constants/fonts";
 
+export const SCREENTOPMARGIN = () => {
+  const { height } = useWindowDimensions();
+  return (
+    <View style={{ marginTop: (height > 700 ? 15 : 7.5) * (height / 100) }} />
+  );
+};
+
 function Welcome() {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
@@ -24,11 +31,12 @@ function Welcome() {
         position: "relative",
       }}
     >
+      <SCREENTOPMARGIN />
       <Image
         source={require("@/assets/images/book.png")}
         style={{
           marginHorizontal: "auto",
-          marginTop: 10 * (height / 100),
+
           width: 30 * (width / 100),
           height: 30 * (width / 100),
         }}

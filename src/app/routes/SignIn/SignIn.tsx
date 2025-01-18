@@ -27,6 +27,7 @@ import { useDispatch } from "react-redux";
 import { login } from "@/state/redux-slices/authSlice";
 import NumberPad from "@/components/NumberPad";
 import DualText from "@/components/DualText";
+import { SCREENTOPMARGIN } from "../Welcome/Welcome";
 
 export default function SignIn() {
   const { width, height } = useWindowDimensions();
@@ -95,9 +96,7 @@ export default function SignIn() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           enabled
         >
-          <View
-            style={{ marginTop: (height > 700 ? 10 : 7.5) * (height / 100) }}
-          />
+          <SCREENTOPMARGIN />
           <Image
             source={require("@/assets/images/book.png")}
             style={{

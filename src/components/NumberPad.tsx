@@ -57,8 +57,9 @@ export default function NumberPad({
             color: "black",
             marginRight: 5,
             width: 5 * (width / 100),
-            paddingVertical: 0,
+
             fontSize: 20,
+            height: 25,
             textAlign: "center",
           }}
           keyboardType="numeric"

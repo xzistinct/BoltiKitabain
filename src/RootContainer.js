@@ -29,6 +29,13 @@ import font from "./constants/fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
+
+configureReanimatedLogger({ level: ReanimatedLogLevel.INFO, strict: false });
+
 SplashScreen.preventAutoHideAsync();
 
 const StateContainer = () => {
