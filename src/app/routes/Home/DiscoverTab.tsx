@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { genres } from "@/constants/bookGenres";
+import { genres } from "@/constants/books";
 import { tGenres, book } from "@/constants/types";
 import {
   View,
@@ -11,6 +11,9 @@ import {
   FlatList,
   Modal,
   StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import font from "@/constants/fonts";
 
@@ -28,6 +31,8 @@ import { Dropdown } from "react-native-element-dropdown";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import BookModal from "@/components/BookModal";
+import { SecondsToTime } from "@/helpers/SecondsToTime";
+import Chip from "@/components/Chip";
 
 const Filter = () => {
   const { width, height } = useWindowDimensions();
@@ -95,7 +100,7 @@ const Filter = () => {
   );
 };
 
-export default function DiscoverTab() {
+export default function DiscoverTab({}: {}) {
   const { width, height } = useWindowDimensions();
   const [currentGenre, setCurrentGenre] = useState<tGenres>(genres[0]);
 
@@ -103,49 +108,119 @@ export default function DiscoverTab() {
     book[] | null
   >(getBooksInGenre(currentGenre, 10));
 
+  const [selectedBook, setSelectedBook] = useState<book | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const CarouselStyle: StyleProp<ViewStyle> = {
     width: 85 * (width / 100),
     height: 10 * (height / 100),
     marginHorizontal: "auto",
   };
   const renderBook = (item: book, index: number) => {
-    console.log(index);
+    const bookLength = SecondsToTime(item.length);
+
     return (
-      <View
-        key={item.name + item.id}
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedBook(item);
+          setModalVisible(true);
+        }}
+        key={index}
         style={{
           width: 85 * (width / 100),
           height: 11 * (height / 100),
           backgroundColor: VERYLIGHTGREY,
           marginHorizontal: "auto",
           marginBottom: 2 * (height / 100),
-          borderRadius: 4 * (width / 100),
-          display: "flex",
-          flexDirection: "row",
-          paddingHorizontal: 3 * (width / 100),
-          paddingVertical: 2 * (height / 100),
+          borderRadius: 2 * (width / 100),
+
+          paddingHorizontal: 4 * (width / 100),
+          paddingVertical: 1 * (height / 100),
         }}
       >
-        <View>
-          <Text
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            height: "50%",
+          }}
+        >
+          <View style={{ width: "100%", height: "100%" }}>
+            <ScrollView horizontal>
+              <TouchableWithoutFeedback>
+                <View style={{}}>
+                  <Text
+                    style={{
+                      color: BABYBLUE,
+                      fontFamily: font("Jost", "Regular"),
+                      fontSize: 2.75 * (height / 100),
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+            </ScrollView>
+          </View>
+        </View>
+        <View
+          style={{
+            height: "50%",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <View
             style={{
-              color: BABYBLUE,
-              fontFamily: font("Jost", "Regular"),
-              fontSize: 2.75 * (height / 100),
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              width: 55 * (width / 100),
+              height: "100%",
             }}
           >
-            {item.name}
+            <ScrollView horizontal>
+              <TouchableWithoutFeedback>
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  {item.tags.map((tag, index) => (
+                    <Chip
+                      content={tag}
+                      key={index}
+                      textStyle={{}}
+                      style={{
+                        marginLeft: 2 * (width / 100),
+                        paddingVertical: 0.3 * (height / 100),
+                      }}
+                    />
+                  ))}
+                </View>
+              </TouchableWithoutFeedback>
+            </ScrollView>
+          </View>
+          <Text
+            style={{
+              fontFamily: font("Jost", "Regular"),
+              fontSize: 2.2 * (height / 100),
+            }}
+          >
+            {" "}
+            {("0" + bookLength.hours).slice(-2)}:
+            {("0" + bookLength.minutes).slice(-2)}:
+            {("0" + bookLength.seconds).slice(-2)}
           </Text>
-          <Text style={{ color: DARKERGREY }}>{item.author}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
   return (
-    <View>
-      <View>
-        <View>
+    <>
+      <View style={{ width: width }}>
+        <View style={{ height: CarouselStyle.height }}>
           <Carousel
             data={Array.from(genres)}
             windowSize={1}
@@ -182,14 +257,14 @@ export default function DiscoverTab() {
             )}
           />
         </View>
+        <View>
+          <Filter />
+        </View>
+        <View>
+          {booksInSelectedGenre !== null &&
+            booksInSelectedGenre.map(renderBook)}
+        </View>
       </View>
-      <View>
-        <Filter />
-      </View>
-      <View>
-        {booksInSelectedGenre !== null && booksInSelectedGenre.map(renderBook)}
-      </View>
-      <BookModal />
-    </View>
+    </>
   );
 }

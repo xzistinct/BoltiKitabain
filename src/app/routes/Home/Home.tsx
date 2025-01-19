@@ -28,6 +28,8 @@ import Shelf from "./Shelf";
 import { useState } from "react";
 import HomeTab from "./HomeTab";
 import DiscoverTab from "./DiscoverTab";
+import { getBooksInGenre } from "@/helpers/GetBooks";
+import BookModal from "@/components/BookModal";
 
 const tabs = ["Home", "Discover"] as const;
 
@@ -87,7 +89,14 @@ function Home() {
   const [currentTab, setCurrentTab] = useState<tTabs>("Home");
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+        width: width,
+        height: height,
+      }}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={{

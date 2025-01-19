@@ -13,6 +13,12 @@ import {
   Roboto_500Medium,
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
+
+import {
+  OpenSans_400Regular,
+  OpenSans_500Medium,
+} from "@expo-google-fonts/open-sans";
+
 import * as SplashScreen from "expo-splash-screen";
 
 import store from "./state/reduxStore";
@@ -48,6 +54,8 @@ const StateContainer = () => {
     Roboto_400Regular,
     Roboto_500Medium,
     Roboto_700Bold,
+    OpenSans_400Regular,
+    OpenSans_500Medium,
   });
   const [authInitialized, setAuthInitialized] = useState(false);
 

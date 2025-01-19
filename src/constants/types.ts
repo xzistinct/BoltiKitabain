@@ -1,4 +1,4 @@
-import { genres } from "./bookGenres";
+import { genres } from "./books";
 
 export type loginAttemptMessage =
   | "success"

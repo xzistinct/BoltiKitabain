@@ -1,4 +1,4 @@
-export const fonts = ["Jost", "Roboto"] as const;
+export const fonts = ["Jost", "Roboto", "OpenSans"] as const;
 
 type font = (typeof fonts)[number];
 
@@ -23,6 +23,8 @@ export const loadedFonts = [
   getFont("Roboto", "Medium"),
   getFont("Roboto", "Regular"),
   getFont("Roboto", "Bold"),
+  getFont("OpenSans", "Regular"),
+  getFont("OpenSans", "Medium"),
 ];
 
 export type tLoadedFonts = (typeof loadedFonts)[number];

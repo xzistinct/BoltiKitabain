@@ -35,7 +35,7 @@ export const INPUTHEADER: {
       fontSize: 25,
       fontFamily: font("Jost", "Regular"),
       color: "black",
-      width: 50 * (width / 100),
+      width: 75 * (width / 100),
       marginLeft: 22 * (width / 100),
       height: 32,
       paddingBottom: 0,

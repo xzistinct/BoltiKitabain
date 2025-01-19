@@ -19,7 +19,7 @@ import { ONBOARDINGNEXTCSS, SCREENHEADER } from "@/constants/styles";
 import ArrowButton from "@/components/ArrowButton";
 import font from "@/constants/fonts";
 
-import { genres } from "@/constants/bookGenres";
+import { genres } from "@/constants/books";
 import { tGenres } from "@/constants/types";
 
 export default function InterestedGenres() {

@@ -73,9 +73,6 @@ export default function CreateAccount() {
     navigation.navigate("InterestedGenres");
   };
 
-  console.log(height);
-  console.log(useWindowDimensions().scale);
-
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

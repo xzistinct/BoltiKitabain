@@ -22,3 +22,5 @@ export const genres = [
   "Crime",
   "Informative",
 ] as const;
+
+export const bookImageRatio = 1.5;
