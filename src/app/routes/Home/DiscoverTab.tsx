@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { genres } from "@/constants/books";
 import { tGenres, book } from "@/constants/types";
@@ -109,21 +109,24 @@ export default function DiscoverTab({}: {}) {
   >(getBooksInGenre(currentGenre, 10));
 
   const [selectedBook, setSelectedBook] = useState<book | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const CarouselStyle: StyleProp<ViewStyle> = {
     width: 85 * (width / 100),
     height: 10 * (height / 100),
     marginHorizontal: "auto",
   };
+
   const renderBook = (item: book, index: number) => {
     const bookLength = SecondsToTime(item.length);
 
     return (
       <TouchableOpacity
         onPress={() => {
-          setSelectedBook(item);
+          console.log("Hello");
+
           setModalVisible(true);
+          setSelectedBook(item);
         }}
         key={index}
         style={{
@@ -265,6 +268,11 @@ export default function DiscoverTab({}: {}) {
             booksInSelectedGenre.map(renderBook)}
         </View>
       </View>
+      <BookModal
+        book={selectedBook}
+        setModalVisible={setModalVisible}
+        modalVisible={modalVisible}
+      />
     </>
   );
 }

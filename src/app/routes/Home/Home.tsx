@@ -56,7 +56,7 @@ const NAVBAR = ({
       style={{
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-around",
+
         width: 65 * (width / 100),
 
         marginHorizontal: "auto",
