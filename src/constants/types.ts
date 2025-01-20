@@ -1,4 +1,4 @@
-import { genres } from "./books";
+import { bookSortBy, genres } from "./books";
 
 export type loginAttemptMessage =
   | "success"
@@ -31,3 +31,5 @@ export type book = {
   id: string;
   tags: string[];
 };
+
+export type tBookSortBy = (typeof bookSortBy)[number];

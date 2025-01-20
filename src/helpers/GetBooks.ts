@@ -1,4 +1,4 @@
-import { book, tGenres } from "@/constants/types";
+import { book, tBookSortBy, tGenres } from "@/constants/types";
 
 export function getBooksInGenre(genre: tGenres, num: number): Array<book> {
   const data: Array<book> = [];
@@ -20,7 +20,15 @@ export function getBooksInGenre(genre: tGenres, num: number): Array<book> {
   return data;
 }
 
-// export function getBooks(start: number, end: number, params: {
-//   genre?: tGenres,
-//   sortBy: ""
-// })
+export function getBooks(
+  {
+    start = 0,
+    sortBy = "Most Popular",
+  }: {
+    start: number;
+    end: number;
+    genre?: tGenres;
+    sortBy: tBookSortBy;
+  },
+  callback: (book: book, err: boolean) => void
+): void {}

@@ -10,7 +10,6 @@ import {
   loginAttemptMessage,
   tUserInformation,
 } from "@/constants/types";
-import { user } from "../user";
 
 // Define the initial state using that type
 const initialState: {
@@ -27,15 +26,18 @@ const initialState: {
 
 let initialized = false;
 
-export const authSlice = createSlice({
-  name: "auth",
+export const userSlice = createSlice({
+  name: "user",
   initialState,
   reducers: {
-    initAuth: (
+    initializeUser: (
       state,
       action: { payload: (isGuest: boolean, isLoggedIn: boolean) => void }
     ) => {
       (async () => {
+        if (initialized) {
+          throw new Error("authSlice already initialized");
+        }
         initialized = true;
         if ((await AsyncStorage.getItem("IsGuest")) === "true") {
           state.isGuest = true;
@@ -48,7 +50,7 @@ export const authSlice = createSlice({
           action.payload(false, false);
           return;
         }
-        const attempt = authLogin(username, password);
+        const attempt = await authLogin(username, password);
         if (!attempt.success) {
           action.payload(false, false);
           return;
@@ -77,28 +79,32 @@ export const authSlice = createSlice({
         };
       }
     ) => {
-      if (!initialized) {
-        throw new Error("authSlice not initialized");
-      }
+      (async () => {
+        if (!initialized) {
+          throw new Error("authSlice not initialized");
+        }
 
-      if (state.isGuest || state.token) {
-        throw new Error("Already authenticated");
-      }
-      const attempt = authLogin(
-        action.payload.username,
-        action.payload.password
-      );
+        if (state.isGuest || state.token) {
+          throw new Error("Already authenticated");
+        }
+        const attempt = await authLogin(
+          action.payload.username,
+          action.payload.password
+        );
+        if (!attempt.success || !attempt.token) {
+          action.payload.callback(attempt.message);
+          return;
+        }
 
-      if (!attempt.success) {
+        console.log("Hello");
+
+        state.username = null;
+        state.token = null;
+
+        console.log("hi");
+
         action.payload.callback(attempt.message);
-        return;
-      }
-
-      state.username = action.payload.username;
-      state.token = attempt.token;
-      state.isGuest = false;
-
-      action.payload.callback(attempt.message);
+      })();
     },
     createAccount: (
       state,
@@ -147,6 +153,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { logout, login, initAuth } = authSlice.actions;
+export const { logout, login, initializeUser } = userSlice.actions;
 
-export default authSlice.reducer;
+export default userSlice.reducer;

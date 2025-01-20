@@ -19,12 +19,13 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { login } from "@/state/redux-slices/authSlice";
+import { login } from "@/state/redux-slices/userSlice";
 import NumberPad from "@/components/NumberPad";
 import DualText from "@/components/DualText";
 import { SCREENTOPMARGIN } from "../Welcome/Welcome";
@@ -35,6 +36,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
 
   const [loginErr, setLoginErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [phoneNumberHeaderDual, changePhoneNumberHeaderDual] = useState<
     string | null
@@ -49,8 +51,12 @@ export default function SignIn() {
   );
   const [password, setPassword] = useState<string | null>(null);
 
+  //@ts-ignore
+  const token = useSelector((state) => state.user.token);
+
   const handleNext = () => {
     setLoginErr(null);
+    setLoading(true);
     let err = false;
     if (phoneNumber.includes(null)) {
       changePhoneNumberHeaderDual("Please fill out phone number");
@@ -72,6 +78,8 @@ export default function SignIn() {
         //@ts-ignore
         password: password,
         callback: (message) => {
+          console.log("tried login, got", message, "token is", token);
+          setLoading(false);
           if (message === "success") {
             return;
           }
@@ -85,6 +93,11 @@ export default function SignIn() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
+      {loading && (
+        <View>
+          <ActivityIndicator color={"black"} size={20} />
+        </View>
+      )}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={{

@@ -24,3 +24,10 @@ export const genres = [
 ] as const;
 
 export const bookImageRatio = 1.5;
+
+export const bookSortBy = [
+  "Newest",
+  "Oldest",
+  "Most Popular",
+  "Least Popular",
+] as const;

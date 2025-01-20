@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -15,14 +15,15 @@ import CreateAccount from "./routes/CreateAccount/CreateAccount";
 import RecommendedBook from "./routes/RecommendedBook/RecommendedBook";
 import SignIn from "./routes/SignIn/SignIn";
 
+import { RootState } from "../state/reduxStore";
+
 const Stack = createNativeStackNavigator();
 
 function RootNavigator() {
   const dispatch = useDispatch();
-  const isGuest = useSelector((state) => state.auth.isGuest);
-  const token = useSelector((state) => state.auth.token);
+  const isGuest = useSelector((state: RootState) => state.user.isGuest);
+  const token = useSelector((state: RootState) => state.user.token);
 
-  console.log(isGuest, token);
   return (
     <>
       <Stack.Navigator

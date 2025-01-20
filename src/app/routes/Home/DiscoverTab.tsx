@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import { genres } from "@/constants/books";
-import { tGenres, book } from "@/constants/types";
+import { bookSortBy, genres } from "@/constants/books";
+import { tGenres, book, tBookSortBy } from "@/constants/types";
 import {
   View,
   Text,
@@ -32,19 +32,11 @@ import { Dropdown } from "react-native-element-dropdown";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import BookModal from "@/components/BookModal";
 import { SecondsToTime } from "@/helpers/SecondsToTime";
-import Chip from "@/components/Chip";
-
+import BookCard from "@/components/BookCard";
 const Filter = () => {
   const { width, height } = useWindowDimensions();
-  const sortByValues = [
-    "Newest",
-    "Oldest",
-    "Most Popular",
-    "Least Popular",
-  ] as const;
 
-  const [value, setValue] =
-    useState<(typeof sortByValues)[number]>("Most Popular");
+  const [value, setValue] = useState<tBookSortBy>("Most Popular");
 
   const styles = StyleSheet.create({});
   return (
@@ -80,7 +72,7 @@ const Filter = () => {
           itemTextStyle={{ fontFamily: font("Jost", "Regular") }}
           containerStyle={{ borderRadius: 10 }}
           itemContainerStyle={{ paddingVertical: 0 }}
-          data={sortByValues.map((item) => {
+          data={bookSortBy.map((item) => {
             return { label: item, value: item };
           })}
           maxHeight={300}
@@ -115,109 +107,6 @@ export default function DiscoverTab({}: {}) {
     width: 85 * (width / 100),
     height: 10 * (height / 100),
     marginHorizontal: "auto",
-  };
-
-  const renderBook = (item: book, index: number) => {
-    const bookLength = SecondsToTime(item.length);
-
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          console.log("Hello");
-
-          setModalVisible(true);
-          setSelectedBook(item);
-        }}
-        key={index}
-        style={{
-          width: 85 * (width / 100),
-          height: 11 * (height / 100),
-          backgroundColor: VERYLIGHTGREY,
-          marginHorizontal: "auto",
-          marginBottom: 2 * (height / 100),
-          borderRadius: 2 * (width / 100),
-
-          paddingHorizontal: 4 * (width / 100),
-          paddingVertical: 1 * (height / 100),
-        }}
-      >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-            height: "50%",
-          }}
-        >
-          <View style={{ width: "100%", height: "100%" }}>
-            <ScrollView horizontal>
-              <TouchableWithoutFeedback>
-                <View style={{}}>
-                  <Text
-                    style={{
-                      color: BABYBLUE,
-                      fontFamily: font("Jost", "Regular"),
-                      fontSize: 2.75 * (height / 100),
-                    }}
-                  >
-                    {item.name}
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
-            </ScrollView>
-          </View>
-        </View>
-        <View
-          style={{
-            height: "50%",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              width: 55 * (width / 100),
-              height: "100%",
-            }}
-          >
-            <ScrollView horizontal>
-              <TouchableWithoutFeedback>
-                <View style={{ display: "flex", flexDirection: "row" }}>
-                  {item.tags.map((tag, index) => (
-                    <Chip
-                      content={tag}
-                      key={index}
-                      textStyle={{}}
-                      style={{
-                        marginLeft: 2 * (width / 100),
-                        paddingVertical: 0.3 * (height / 100),
-                      }}
-                    />
-                  ))}
-                </View>
-              </TouchableWithoutFeedback>
-            </ScrollView>
-          </View>
-          <Text
-            style={{
-              fontFamily: font("Jost", "Regular"),
-              fontSize: 2.2 * (height / 100),
-            }}
-          >
-            {" "}
-            {("0" + bookLength.hours).slice(-2)}:
-            {("0" + bookLength.minutes).slice(-2)}:
-            {("0" + bookLength.seconds).slice(-2)}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
   };
 
   return (
@@ -265,7 +154,16 @@ export default function DiscoverTab({}: {}) {
         </View>
         <View>
           {booksInSelectedGenre !== null &&
-            booksInSelectedGenre.map(renderBook)}
+            booksInSelectedGenre.map((item, index) => (
+              <BookCard
+                key={index}
+                book={item}
+                onPress={() => {
+                  setSelectedBook(item);
+                  setModalVisible(true);
+                }}
+              />
+            ))}
         </View>
       </View>
       <BookModal

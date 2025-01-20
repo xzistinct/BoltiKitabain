@@ -23,7 +23,7 @@ import * as SplashScreen from "expo-splash-screen";
 
 import store from "./state/reduxStore";
 import { Provider, useDispatch } from "react-redux";
-import { initAuth } from "./state/redux-slices/authSlice";
+import { initializeUser } from "./state/redux-slices/userSlice";
 
 import * as NavigationBar from "expo-navigation-bar";
 
@@ -57,10 +57,10 @@ const StateContainer = () => {
     OpenSans_400Regular,
     OpenSans_500Medium,
   });
-  const [authInitialized, setAuthInitialized] = useState(false);
+  const [authInitialized, setAuthInitialized] = useState(true);
 
   dispatch(
-    initAuth(() => {
+    initializeUser(() => {
       setAuthInitialized(true);
     })
   );

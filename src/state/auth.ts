@@ -2,14 +2,21 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { loginAttemptMessage, tUserInformation } from "@/constants/types";
 
-export const login = (username: string, password: string) => {
+export const login = async (username: string, password: string) => {
   const response: {
     success: boolean;
     token: null | string;
     message: loginAttemptMessage;
   } = { success: false, token: null, message: "success" };
 
-  console.log(username);
+  console.log(
+    "Attempting to login with username:",
+    username,
+    " password:",
+    password
+  );
+
+  await new Promise((r) => setTimeout(r, 2000));
 
   if (username === "3090606808" && password === "admin123") {
     response.success = true;

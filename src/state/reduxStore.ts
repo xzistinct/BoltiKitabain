@@ -1,16 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import authReducer from "./redux-slices/authSlice";
+import userReducer from "./redux-slices/userSlice";
 
-export default configureStore({
+const store = configureStore({
   reducer: {
-    auth: authReducer,
+    user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         // Ignore these action types
-        ignoredActions: ["auth/initAuth", "auth/login"],
+        ignoredActions: ["user/initializeUser", "user/login"],
         // Ignore these field paths in all actions
         ignoredActionPaths: ["meta.arg", "payload.timestamp"],
         // Ignore these paths in the state
@@ -18,3 +18,7 @@ export default configureStore({
       },
     }),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+
+export default store;
