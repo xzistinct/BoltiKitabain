@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 
-import { login as authLogin } from "../auth";
+import { login as authLogin, createUserAccount } from "../../helpers/auth";
 
 import {
   dispatchLoginAttempMessage,
@@ -116,17 +116,26 @@ export const userSlice = createSlice({
       }
     ) => {
       if (!initialized) {
-        throw new Error("authSlice not initialized");
+        action.payload.callback(false);
       }
 
       if (state.isGuest || state.token) {
-        throw new Error("Already authenticated");
+        action.payload.callback(false);
       }
 
-      if (true) {
-        state.userInfo = action.payload.userInfo;
-        action.payload.callback(true);
-      }
+      createUserAccount(action.payload.userInfo).then(
+        (createAccountAttempt) => {
+          console.log(
+            "Attepted to create account (redux)",
+            createAccountAttempt
+          );
+          if (createAccountAttempt.success) {
+            action.payload.callback(true);
+          } else {
+            action.payload.callback(false);
+          }
+        }
+      );
     },
     continueAsGuest: (
       state,
@@ -153,6 +162,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const { logout, login, initializeUser } = userSlice.actions;
+export const { logout, login, initializeUser, continueAsGuest, createAccount } =
+  userSlice.actions;
 
 export default userSlice.reducer;

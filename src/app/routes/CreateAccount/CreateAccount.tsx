@@ -23,8 +23,13 @@ import {
 } from "@/constants/styles";
 import DualText from "@/components/DualText";
 import NumberPad from "@/components/NumberPad";
+import { tUserInformation } from "@/constants/types";
 
-export default function CreateAccount() {
+export default function CreateAccount({ route }: any) {
+  let userInformation = route.params.userInformation as tUserInformation;
+  if (!userInformation) {
+    throw new Error("User information not passed to CreateAccount");
+  }
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
 
@@ -69,8 +74,16 @@ export default function CreateAccount() {
     if (err) {
       return;
     }
+    const updatedUserInformation = {
+      ...userInformation,
+      username: phoneNumber.join(""),
+      password: password || undefined,
+    };
+
     //@ts-ignore
-    navigation.navigate("InterestedGenres");
+    navigation.navigate("CreatingAccount", {
+      userInformation: updatedUserInformation,
+    });
   };
 
   return (

@@ -16,8 +16,20 @@ import RecommendedBook from "./routes/RecommendedBook/RecommendedBook";
 import SignIn from "./routes/SignIn/SignIn";
 
 import { RootState } from "../state/reduxStore";
+import CreatingAccount from "./routes/CreatingAccount/CreatingAccount";
 
-const Stack = createNativeStackNavigator();
+type RootStackParamList = {
+  Home: undefined;
+  Welcome: undefined;
+  SignIn: undefined;
+  BasicInfo: { userType: "Guest" | "Authorized" };
+  CreateAccount: undefined;
+  InterestedGenres: undefined;
+  RecommendedBook: undefined;
+  CreatingAccount: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   const dispatch = useDispatch();
@@ -36,18 +48,21 @@ function RootNavigator() {
         initialRouteName={isGuest || token ? "Home" : "Welcome"}
       >
         {isGuest || token ? (
-          <Stack.Screen name="Home" component={Home} />
+          <>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen
+              name="InterestedGenres"
+              component={InterestedGenres}
+            />
+            <Stack.Screen name="RecommendedBook" component={RecommendedBook} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Welcome" component={Welcome} />
             <Stack.Screen name="SignIn" component={SignIn} />
             <Stack.Screen name="BasicInfo" component={BasicInfo} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
-            <Stack.Screen
-              name="InterestedGenres"
-              component={InterestedGenres}
-            />
-            <Stack.Screen name="RecommendedBook" component={RecommendedBook} />
+            <Stack.Screen name="CreatingAccount" component={CreatingAccount} />
           </>
         )}
       </Stack.Navigator>

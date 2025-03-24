@@ -16,7 +16,11 @@ import {
 
 import { BABYBLUE, GREY, HOTPINK, LIGHTGREY } from "@/constants/colors";
 
-import { StaticScreenProps, useNavigation } from "@react-navigation/native";
+import {
+  StaticScreenProps,
+  useNavigation,
+  RouteProp,
+} from "@react-navigation/native";
 
 import isValidDate from "@/helpers/ValidDate";
 
@@ -28,14 +32,15 @@ import {
   SCREENHEADER,
 } from "@/constants/styles";
 import DualText from "@/components/DualText";
+import { tUserInformation } from "@/constants/types";
+import { useDispatch } from "react-redux";
 
-export default function BasicInfo({
-  route,
-}: StaticScreenProps<{ userType: "Guest" | "Authorized" }>) {
+export default function BasicInfo({ route }: any) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  const userType = route.params.userType;
+  const userType = route.params.userType as "Guest" | "Authorized";
 
   if (!userType) {
     throw new Error("Error occured, please try again later");
@@ -95,11 +100,18 @@ export default function BasicInfo({
     if (err) {
       return;
     }
-
-    navigation.navigate(
+    console.log("userType", userType);
+    if (userType === "Authorized") {
       //@ts-ignore
-      userType === "Guest" ? "InterestedGenres" : "CreateAccount"
-    );
+      navigation.navigate("CreateAccount", {
+        userInformation: {
+          dob: { day: dobDay, month: dobYear, year: dobYear },
+          gender: gender,
+          name: fullName,
+        },
+      } as { userInformation: tUserInformation });
+    } else {
+    }
   };
 
   const dobDayInput = useRef(null);
@@ -109,12 +121,12 @@ export default function BasicInfo({
   const dobInputStyle: StyleProp<TextStyle> = {
     borderBottomColor: "black",
     borderBottomWidth: 1,
-    width: 10 * (width / 100),
+    paddingHorizontal: 15,
     minWidth: 37.5,
     height: 4.5 * (height / 100),
     paddingVertical: 0,
     fontSize: 20,
-    paddingHorizontal: 5,
+
     fontFamily: "Roboto",
     color: "black",
     textAlign: "center",
@@ -338,11 +350,7 @@ export default function BasicInfo({
                 maxLength={4}
                 placeholder={"yyyy"}
                 placeholderTextColor={"black"}
-                style={{
-                  ...dobInputStyle,
-                  width: 14 * (width / 100),
-                  minWidth: 60,
-                }}
+                style={dobInputStyle}
                 value={dobYear?.toString()}
                 onKeyPress={({ nativeEvent: { key: keyValue } }) => {
                   if (keyValue === "Backspace" && dobYear === null) {

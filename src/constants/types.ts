@@ -1,5 +1,11 @@
 import { bookSortBy, genres } from "./books";
 
+export type tDate = {
+  day: number;
+  month: number;
+  year: number;
+};
+
 export type loginAttemptMessage =
   | "success"
   | "Invalid credentials"
@@ -7,10 +13,15 @@ export type loginAttemptMessage =
 
 export type tUserInformation = {
   name: string | null;
-  dob: string | null;
+  dob: tDate | null;
   gender: boolean | null;
-  currentlyReadingList: Array<string>;
-  readingList: Array<string>;
+  username: string | null;
+  password?: string;
+};
+
+export type tUserPrefs = {
+  currentlyReadingList: Array<string> | null;
+  readingList: Array<string> | null;
   interestedGenres: Array<tGenres>;
 };
 
