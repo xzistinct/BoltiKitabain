@@ -53,7 +53,7 @@ export default function BookCard({
       >
         <View style={{ width: "100%", height: "100%" }}>
           <ScrollView horizontal>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={onPress}>
               <View style={{}}>
                 <Text
                   style={{

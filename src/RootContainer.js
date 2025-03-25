@@ -59,11 +59,15 @@ const StateContainer = () => {
   });
   const [authInitialized, setAuthInitialized] = useState(true);
 
-  dispatch(
-    initializeUser(() => {
-      setAuthInitialized(true);
-    })
-  );
+  // Disabled for now
+
+  useEffect(() => {
+    dispatch(
+      initializeUser(() => {
+        setAuthInitialized(true);
+      })
+    );
+  }, []);
 
   useEffect(() => {
     if ((fontsLoaded || fontsErr) && authInitialized) {

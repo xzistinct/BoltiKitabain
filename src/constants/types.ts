@@ -18,12 +18,7 @@ export type tUserInformation = {
   name: string | null;
   dob: tDate | null;
   gender: boolean | null;
-};
-
-export type tUserPrefs = {
-  currentlyReadingList: Array<string> | null;
-  readingList: Array<string> | null;
-  interestedGenres: Array<tGenres>;
+  language: "English" | "Urdu";
 };
 
 export type tGenres = (typeof genres)[number];
@@ -39,6 +34,8 @@ export type book = {
   id: string;
   url: string;
   tags: string[];
+  chapters?: Array<{ name: string; length: number }>;
+  dateAdded?: tDate;
 };
 
 export type tBookSortBy = (typeof bookSortBy)[number];
