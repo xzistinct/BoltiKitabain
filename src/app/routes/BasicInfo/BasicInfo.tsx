@@ -33,12 +33,13 @@ import {
 } from "@/constants/styles";
 import DualText from "@/components/DualText";
 import { tUserInformation } from "@/constants/types";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/state/reduxStore";
+
+import { continueAsGuest } from "@/state/redux-slices/userSlice";
 
 export default function BasicInfo({ route }: any) {
   const { width, height } = useWindowDimensions();
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const userType = route.params.userType as "Guest" | "Authorized";
 
@@ -111,6 +112,16 @@ export default function BasicInfo({ route }: any) {
         },
       } as { userInformation: tUserInformation });
     } else {
+      dispatch(
+        continueAsGuest({
+          userInfo: {
+            dob: { day: dobDay, month: dobMonth, year: dobYear },
+            name: fullName,
+            gender: gender === "Male",
+          },
+          callback: (success: boolean) => {},
+        })
+      );
     }
   };
 

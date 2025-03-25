@@ -22,6 +22,7 @@ import { book } from "@/constants/types";
 import Modal from "react-native-modal";
 import Chip from "./Chip";
 import Stars from "./Stars";
+import { useNavigation } from "@react-navigation/native";
 
 export default function BookModal({
   book,
@@ -33,6 +34,13 @@ export default function BookModal({
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { width, height } = useWindowDimensions();
+  const navigation = useNavigation();
+
+  const startReading = () => {
+    setModalVisible(false);
+    //@ts-ignore
+    navigation.navigate("Player", { bookId: book.id });
+  };
 
   const actionButtonStyle: StyleProp<ViewStyle> = {
     backgroundColor: BABYBLUE,
@@ -188,7 +196,10 @@ export default function BookModal({
                 justifyContent: "space-around",
               }}
             >
-              <TouchableOpacity style={actionButtonStyle}>
+              <TouchableOpacity
+                style={actionButtonStyle}
+                onPress={startReading}
+              >
                 <Text style={actionButtonTextStyle}>Start reading</Text>
               </TouchableOpacity>
               <TouchableOpacity style={actionButtonStyle}>

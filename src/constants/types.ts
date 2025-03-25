@@ -1,22 +1,23 @@
 import { bookSortBy, genres } from "./books";
+import { errors } from "./errors";
 
 export type tDate = {
-  day: number;
-  month: number;
-  year: number;
+  day: number | null;
+  month: number | null;
+  year: number | null;
 };
 
-export type loginAttemptMessage =
-  | "success"
-  | "Invalid credentials"
-  | "unknown error";
+export type tUser = {
+  username: string | null;
+  password?: string;
+  token: string | null;
+  type: "guest" | "user";
+};
 
 export type tUserInformation = {
   name: string | null;
   dob: tDate | null;
   gender: boolean | null;
-  username: string | null;
-  password?: string;
 };
 
 export type tUserPrefs = {
@@ -27,10 +28,6 @@ export type tUserPrefs = {
 
 export type tGenres = (typeof genres)[number];
 
-export type dispatchLoginAttempMessage =
-  | loginAttemptMessage
-  | "failed to store credentials";
-
 export type book = {
   name: string;
   image: string;
@@ -40,7 +37,14 @@ export type book = {
   length: number;
   description: string;
   id: string;
+  url: string;
   tags: string[];
 };
 
 export type tBookSortBy = (typeof bookSortBy)[number];
+
+export type tError = (typeof errors)[keyof typeof errors];
+export type tResponse = {
+  success: boolean;
+  error?: tError;
+};

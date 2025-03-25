@@ -9,20 +9,20 @@ import { BarIndicator as ActivityIndicator } from "react-native-indicators";
 
 import font from "@/constants/fonts";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/state/reduxStore";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
 import { createAccount, login } from "@/state/redux-slices/userSlice";
-import { dispatchLoginAttempMessage } from "@/constants/types";
+import { tResponse, tUser, tUserInformation } from "@/constants/types";
 
 export default function CreatingAccount({ route }: any) {
   const { width, height } = useWindowDimensions();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigation = useNavigation();
 
-  const { userInformation } = route.params;
+  const user = route.params.user as tUser & tUserInformation;
 
-  console.log(userInformation);
+  console.log(user);
 
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "success"
@@ -31,16 +31,19 @@ export default function CreatingAccount({ route }: any) {
   useEffect(() => {
     (async () => {
       console.log("hello");
+      if (!user.username || !user.password) {
+        return;
+      }
       dispatch(
         createAccount({
-          userInfo: userInformation,
+          user: user,
           callback: (success: boolean) => {
             dispatch(
               login({
-                username: userInformation.username,
-                password: userInformation.password,
-                callback: (message: dispatchLoginAttempMessage) => {
-                  if (message === "success") {
+                username: user.username || "",
+                password: user.password || "",
+                callback: (message: tResponse) => {
+                  if (message.success) {
                     setScreenState("success");
                   }
                 },

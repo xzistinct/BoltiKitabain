@@ -17,6 +17,7 @@ import SignIn from "./routes/SignIn/SignIn";
 
 import { RootState } from "../state/reduxStore";
 import CreatingAccount from "./routes/CreatingAccount/CreatingAccount";
+import Player from "./routes/Player/Player";
 
 type RootStackParamList = {
   Home: undefined;
@@ -27,6 +28,7 @@ type RootStackParamList = {
   InterestedGenres: undefined;
   RecommendedBook: undefined;
   CreatingAccount: undefined;
+  Player: { bookId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -55,6 +57,7 @@ function RootNavigator() {
               component={InterestedGenres}
             />
             <Stack.Screen name="RecommendedBook" component={RecommendedBook} />
+            <Stack.Screen name="Player" component={Player} />
           </>
         ) : (
           <>

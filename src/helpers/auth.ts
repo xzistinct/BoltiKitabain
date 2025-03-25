@@ -1,10 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import {
-  loginAttemptMessage,
-  tUserInformation,
-  tUserPrefs,
-} from "@/constants/types";
+import { tError, tUser, tUserInformation, tUserPrefs } from "@/constants/types";
+import { errors } from "@/constants/errors";
 
 let testAuth: { username: string; password: string }[] = [
   { username: "3090606808", password: "admin123" },
@@ -20,8 +17,8 @@ export const login = async (username: string, password: string) => {
   const response: {
     success: boolean;
     token: null | string;
-    message: loginAttemptMessage;
-  } = { success: false, token: null, message: "success" };
+    error?: tError;
+  } = { success: false, token: null };
 
   console.log(
     "Attempting to login with username:",
@@ -37,7 +34,7 @@ export const login = async (username: string, password: string) => {
     response.token = "token";
     return response;
   }
-  response.message = "Invalid credentials";
+  response.error = errors["Invalid credentials"];
   response.success = false;
   return response;
 };
@@ -52,7 +49,6 @@ export const getUserInformation = async (
     currentlyReadingList: [],
     readingList: [],
     interestedGenres: [],
-    username: "",
   };
 
   //fetch locally stored data
@@ -65,14 +61,14 @@ export const getUserInformation = async (
 };
 
 export const createUserAccount = async (
-  userInformation: tUserInformation
+  user: tUser & tUserInformation
 ): Promise<{ success: boolean; message?: string }> => {
-  if (!userInformation.username || !userInformation.password) {
+  if (!user.username || !user.password) {
     return { success: false, message: "Invalid credentials" };
   }
   testAuth.push({
-    username: userInformation.username,
-    password: userInformation.password,
+    username: user.username,
+    password: user.password,
   });
   return { success: true };
 };

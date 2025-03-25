@@ -8,6 +8,7 @@ export function getBooksInGenre(genre: tGenres, num: number): Array<book> {
       name: `Harry Potter and the Sorcerer's Stone`,
       image: "none",
       author: "Ali Muhammad",
+      url: "none",
       length: 100,
       genre: genre,
       rating: 4.5,
@@ -32,3 +33,19 @@ export function getBooks(
   },
   callback: (book: book, err: boolean) => void
 ): void {}
+
+export async function getBookById(id: string): Promise<book> {
+  return {
+    name: `Harry Potter and the Sorcerer's Stone`,
+    image: "none",
+    url: "none",
+    author: "Ali Muhammad",
+    length: 100,
+    genre: "None",
+    rating: 4.5,
+    description:
+      "An 11-year-old orphan living with his unwelcoming aunt, uncle, and cousin, who learns of his own fame as a wizard known to have survived his parents' murder at the hands of the dark wizard Lord Voldemort as an infant when he is accepted to Hogwarts School of Witchcraft and Wizardry.",
+    id: "100",
+    tags: ["feel good", "funny", "aliens", "magic"],
+  };
+}

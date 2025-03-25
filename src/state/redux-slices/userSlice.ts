@@ -2,11 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { login as authLogin, createUserAccount } from "../../helpers/auth";
-import {
-  dispatchLoginAttempMessage,
-  loginAttemptMessage,
-  tUserInformation,
-} from "@/constants/types";
+import { tResponse, tUser, tUserInformation } from "@/constants/types";
+import { errors } from "@/constants/errors";
 
 // Define the initial state using that type
 const initialState: {
@@ -14,15 +11,11 @@ const initialState: {
   username: null | string;
   token: null | string;
   userInfo: tUserInformation | null;
-  loading: boolean;
-  error: string | null;
 } = {
   isGuest: false,
   username: null,
   token: null,
   userInfo: null,
-  loading: false,
-  error: null,
 };
 
 // Create async thunks with consistent naming (without "Thunk" suffix)
@@ -50,7 +43,7 @@ export const initializeUser = createAsyncThunk(
 
       if (!attempt.success) {
         callback(false, false);
-        return rejectWithValue(attempt.message);
+        return rejectWithValue(attempt.error);
       }
 
       callback(false, true);
@@ -72,22 +65,25 @@ export const login = createAsyncThunk(
     }: {
       username: string;
       password: string;
-      callback: (message: dispatchLoginAttempMessage) => void;
+      callback: (message: tResponse) => void;
     },
     { getState, rejectWithValue }
   ) => {
     try {
       const state = getState() as { user: typeof initialState };
       if (state.user.isGuest || state.user.token) {
-        callback("ALREADY_AUTHENTICATED");
-        return rejectWithValue("Already authenticated");
+        callback({ success: false, error: errors["Already authenticated"] });
+        return rejectWithValue(5);
       }
 
       const attempt = await authLogin(username, password);
-      callback(attempt.message);
+      callback({ success: attempt.success, error: attempt.error });
 
-      if (!attempt.success || !attempt.token) {
-        return rejectWithValue(attempt.message);
+      if (!attempt.success || !attempt.token || attempt.error) {
+        return rejectWithValue({
+          success: attempt.success,
+          error: attempt.error,
+        });
       }
 
       // Save credentials for auto-login
@@ -96,8 +92,14 @@ export const login = createAsyncThunk(
 
       return { username, token: attempt.token };
     } catch (error) {
-      callback("UNKNOWN_ERROR");
-      return rejectWithValue("Login failed");
+      callback({
+        success: false,
+        error: errors["Login failed unknown reason"],
+      });
+      return rejectWithValue({
+        success: false,
+        error: errors["Login failed unknown reason"],
+      });
     }
   }
 );
@@ -106,10 +108,10 @@ export const createAccount = createAsyncThunk(
   "user/createAccount",
   async (
     {
-      userInfo,
+      user,
       callback,
     }: {
-      userInfo: tUserInformation;
+      user: tUser & tUserInformation;
       callback: (success: boolean) => void;
     },
     { getState, rejectWithValue }
@@ -122,7 +124,7 @@ export const createAccount = createAsyncThunk(
         return rejectWithValue("Already authenticated");
       }
 
-      const createAccountAttempt = await createUserAccount(userInfo);
+      const createAccountAttempt = await createUserAccount(user);
       console.log("Attempted to create account (redux)", createAccountAttempt);
 
       callback(createAccountAttempt.success);
@@ -156,15 +158,21 @@ export const continueAsGuest = createAsyncThunk(
 
       if (state.user.isGuest || state.user.token) {
         callback(false);
-        return rejectWithValue("Already authenticated");
+        return rejectWithValue({
+          success: false,
+          error: errors["Already authenticated"],
+        });
       }
 
       await AsyncStorage.setItem("IsGuest", "true");
       callback(true);
-      return { userInfo };
+      return { success: true, userInfo };
     } catch (error) {
       callback(false);
-      return rejectWithValue("Failed to continue as guest");
+      return rejectWithValue({
+        success: false,
+        error: errors["Unknown error"],
+      });
     }
   }
 );
@@ -185,12 +193,7 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Handle initialize user
-    builder.addCase(initializeUser.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
     builder.addCase(initializeUser.fulfilled, (state, action) => {
-      state.loading = false;
       if ("isGuest" in action.payload) {
         state.isGuest = true;
       } else if ("username" in action.payload) {
@@ -198,53 +201,24 @@ export const userSlice = createSlice({
         state.token = action.payload.token;
       }
     });
-    builder.addCase(initializeUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+    builder.addCase(initializeUser.rejected, (state, action) => {});
 
     // Handle login
-    builder.addCase(login.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
+
     builder.addCase(login.fulfilled, (state, action) => {
-      state.loading = false;
       state.username = action.payload.username;
       state.token = action.payload.token;
     });
-    builder.addCase(login.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+    builder.addCase(login.rejected, (state, action) => {});
 
-    // Handle create account
-    builder.addCase(createAccount.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(createAccount.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(createAccount.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+    builder.addCase(createAccount.fulfilled, (state) => {});
+    builder.addCase(createAccount.rejected, (state, action) => {});
 
-    // Handle continue as guest
-    builder.addCase(continueAsGuest.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
     builder.addCase(continueAsGuest.fulfilled, (state, action) => {
-      state.loading = false;
       state.isGuest = true;
       state.userInfo = action.payload.userInfo;
     });
-    builder.addCase(continueAsGuest.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+    builder.addCase(continueAsGuest.rejected, (state, action) => {});
   },
 });
 
