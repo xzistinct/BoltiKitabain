@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SecureStore from "expo-secure-store";
 
 import {
   tError,
@@ -18,18 +19,11 @@ export const login = async (
   token: null | string;
   error?: tError;
 }> => {
-  const response: {
+  const loginResponse: {
     success: boolean;
     token: null | string;
     error?: tError;
   } = { success: false, token: null };
-
-  console.log(
-    "Attempting to login with username:",
-    username,
-    " password:",
-    password
-  );
 
   try {
     const response = await fetch(endpoints.login, {
@@ -43,9 +37,19 @@ export const login = async (
       }),
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
-    console.log("Data received from server:", data);
+    if (text === "Password incorrect") {
+      loginResponse.error = errors["Invalid credentials"];
+      loginResponse.success = false;
+      return loginResponse;
+    }
+    if (text === "This email is not registered") {
+      loginResponse.error = errors["Email not registered"];
+      loginResponse.success = false;
+      return loginResponse;
+    }
+    const data = await JSON.parse(text);
 
     if (data.token) {
       const name =
@@ -62,21 +66,29 @@ export const login = async (
       };
     }
   } catch (e) {
-    console.error("Error while logging in:");
+    console.error("Error while logging in:", e);
+    return { token: null, success: false, error: errors["Unknown error"] };
   }
 
-  response.error = errors["Invalid credentials"];
-  response.success = false;
-  return response;
+  loginResponse.error = errors["Invalid credentials"];
+  loginResponse.success = false;
+  return loginResponse;
 };
 
 export const createUserAccount = async (
   user: tUser,
   userInformation: tUserInformation
 ): Promise<tResponse> => {
-  if (!user.username || !user.password) {
-    return { success: false, error: errors["Invalid credentials"] };
+  if (!user.username || !user.password || !userInformation.name) {
+    return { success: false, error: errors["Insufficient information"] };
   }
+
+  console.log(
+    "Creating account with user:",
+    user,
+    "and user information:",
+    userInformation
+  );
 
   try {
     const response = await fetch(endpoints.register, {
@@ -107,6 +119,41 @@ export const createUserAccount = async (
   } catch (e) {
     console.error("Error while creating account:", e);
     return { success: false, error: errors["Unknown error"] };
+  }
+};
+
+export const getCredentialsFromStorage = async (): Promise<
+  { username: string; password: string } | tError
+> => {
+  let username: string | null;
+  let password: string | null;
+
+  try {
+    username = (await SecureStore.getItem("username")) || null;
+    password = (await SecureStore.getItem("password")) || null;
+  } catch (e) {
+    console.error("Error while getting credentials from storage:", e);
+    return errors["Unknown error"];
+  }
+
+  if (!username || !password) {
+    return errors["Failed to get credentials from storage"];
+  }
+
+  return { username, password };
+};
+
+export const setCredentialsInStorage = async (
+  username: string,
+  password: string
+): Promise<tResponse> => {
+  try {
+    await SecureStore.setItem("username", username);
+    await SecureStore.setItem("password", password);
+    return { success: true };
+  } catch (e) {
+    console.error("Error while storing credentials:", e);
+    return { success: false, error: errors["Failed to store credentials"] };
   }
 };
 

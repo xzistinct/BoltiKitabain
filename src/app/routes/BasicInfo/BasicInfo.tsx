@@ -40,6 +40,7 @@ import { continueAsGuest } from "@/state/redux-slices/userSlice";
 export default function BasicInfo({ route }: any) {
   const { width, height } = useWindowDimensions();
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
 
   const userType = route.params.userType as "Guest" | "Authorized";
 
@@ -117,7 +118,7 @@ export default function BasicInfo({ route }: any) {
           userInfo: {
             dob: { day: dobDay, month: dobMonth, year: dobYear },
             name: fullName,
-            gender: gender === "Male",
+            gender: gender,
           },
           callback: (success: boolean) => {},
         })

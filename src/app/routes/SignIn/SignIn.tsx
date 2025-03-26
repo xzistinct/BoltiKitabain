@@ -19,8 +19,8 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
+import { BarIndicator } from "react-native-indicators";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
 // import { useDispatch, useSelector } from "react-redux";
@@ -30,6 +30,7 @@ import { login } from "@/state/redux-slices/userSlice";
 import NumberPad from "@/components/NumberPad";
 import DualText from "@/components/DualText";
 import { SCREENTOPMARGIN } from "../Welcome/Welcome";
+import { errors, getErrorFromCode } from "@/constants/errors";
 
 export default function SignIn() {
   const { width, height } = useWindowDimensions();
@@ -56,6 +57,7 @@ export default function SignIn() {
     setLoginErr(null);
     setLoading(true);
     let err = false;
+    // This has been commented out because the server does not have the below validation
     // if (email === null || email.length < 4) {
     //   changeEmailHeaderDual("Please fill out email");
     //   err = true;
@@ -78,10 +80,11 @@ export default function SignIn() {
         callback: (message) => {
           console.log("tried login, got", message, "token is", token);
           setLoading(false);
-          if (message.success || !message.error) {
+          if (message.success || message.error === undefined) {
             return;
           }
-          setLoginErr(JSON.stringify(message.error));
+
+          setLoginErr(getErrorFromCode(message.error) + ` (${message.error})`);
         },
       })
     );
@@ -105,8 +108,20 @@ export default function SignIn() {
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       {loading && (
-        <View>
-          <ActivityIndicator color={"black"} size={20} />
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <BarIndicator color={BABYBLUE} size={50} />
         </View>
       )}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -175,7 +190,7 @@ export default function SignIn() {
                     textAlign: "center",
                     fontSize: 15,
                     color: "red",
-                    fontFamily: font("Jost", "Medium"),
+                    fontFamily: font("Jost", "Regular"),
                   }}
                 >
                   {loginErr}

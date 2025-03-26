@@ -18,7 +18,7 @@ export type tUserInformation = {
   name?: string;
   dob?: tDate;
   gender?: "Male" | "Female" | null;
-  language: "English" | "Urdu";
+  language?: "English" | "Urdu";
 };
 
 export type tUserPrefs = {

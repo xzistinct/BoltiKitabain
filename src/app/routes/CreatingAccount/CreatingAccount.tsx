@@ -20,7 +20,8 @@ export default function CreatingAccount({ route }: any) {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
 
-  const user = route.params.user as tUser & tUserInformation;
+  const user = route.params.user as tUser;
+  const userInformation = route.params.userInformation as tUserInformation;
 
   console.log(user);
 
@@ -30,14 +31,14 @@ export default function CreatingAccount({ route }: any) {
 
   useEffect(() => {
     (async () => {
-      console.log("hello");
       if (!user.username || !user.password) {
         return;
       }
       dispatch(
         createAccount({
           user: user,
-          callback: (success: boolean) => {
+          userInformation: userInformation,
+          callback: (success: tResponse) => {
             dispatch(
               login({
                 username: user.username || "",

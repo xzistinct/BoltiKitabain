@@ -4,9 +4,11 @@ import * as SecureStore from "expo-secure-store";
 import {
   login as authLogin,
   createUserAccount,
+  getCredentialsFromStorage,
   getUserInformation,
+  setCredentialsInStorage,
 } from "../../helpers/auth";
-import { tResponse, tUser, tUserInformation } from "@/constants/types";
+import { tError, tResponse, tUser, tUserInformation } from "@/constants/types";
 import { errors } from "@/constants/errors";
 
 // Define the initial state using that type
@@ -35,8 +37,13 @@ export const initializeUser = createAsyncThunk(
         return { isGuest: true };
       }
 
-      const username = await SecureStore.getItem("username");
-      const password = await SecureStore.getItem("password");
+      const credentials = await getCredentialsFromStorage();
+
+      if (typeof credentials !== "object") {
+        return rejectWithValue(credentials);
+      }
+
+      const { username, password } = credentials;
 
       if (!username || !password) {
         callback(false, false);
@@ -90,10 +97,6 @@ export const login = createAsyncThunk(
         });
       }
 
-      // Save credentials for auto-login
-      await SecureStore.setItemAsync("username", username);
-      await SecureStore.setItemAsync("password", password);
-
       return {
         username,
         token: attempt.token,
@@ -122,16 +125,24 @@ export const createAccount = createAsyncThunk(
     }: {
       user: tUser;
       userInformation: tUserInformation;
-      callback: (success: boolean) => void;
+      callback: (result: tResponse) => void;
     },
-    { getState, rejectWithValue }
+    {
+      getState,
+      rejectWithValue,
+    }: { rejectWithValue: (error: tError) => void; getState: any }
   ) => {
     try {
       const state = getState() as { user: typeof initialState };
 
       if (!state.user || state.user.isGuest || state.user.token) {
-        callback(false);
-        return rejectWithValue("Already authenticated");
+        callback({ success: false, error: errors["Already authenticated"] });
+        return rejectWithValue(errors["Already authenticated"]);
+      }
+
+      if (!user.username || !user.password || !userInformation.name) {
+        callback({ success: false, error: errors["Insufficient information"] });
+        return rejectWithValue(errors["Insufficient information"]);
       }
 
       const createAccountAttempt = await createUserAccount(
@@ -140,16 +151,24 @@ export const createAccount = createAsyncThunk(
       );
       console.log("Attempted to create account (redux)", createAccountAttempt);
 
-      callback(createAccountAttempt.success);
-
       if (!createAccountAttempt.success) {
-        return rejectWithValue("Account creation failed");
+        callback({ success: false, error: createAccountAttempt.error });
+        return rejectWithValue(errors["Unknown error"]);
       }
 
-      return { success: true };
+      const credentials = await setCredentialsInStorage(
+        user.username,
+        user.password
+      );
+      if (!credentials.success) {
+        callback({ success: false, error: credentials.error });
+        return rejectWithValue(credentials.error || errors["Unknown error"]);
+      }
+
+      return;
     } catch (error) {
-      callback(false);
-      return rejectWithValue("Account creation failed");
+      callback({ success: false, error: errors["Unknown error"] });
+      return rejectWithValue(errors["Unknown error"]);
     }
   }
 );
