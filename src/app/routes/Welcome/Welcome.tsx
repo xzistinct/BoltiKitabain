@@ -7,9 +7,16 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
-import { BABYBLUE, MAGENTA, GREY, LIGHTGREY } from "@/constants/colors";
+import {
+  BABYBLUE,
+  MAGENTA,
+  GREY,
+  LIGHTGREY,
+  DARKERGREY,
+} from "@/constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import font from "@/constants/fonts";
+import { useState } from "react";
 
 export const SCREENTOPMARGIN = () => {
   const { height } = useWindowDimensions();
@@ -22,6 +29,8 @@ function Welcome() {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
 
+  const [language, setLanguage] = useState<"English" | "Urdu">("English");
+
   return (
     <View
       style={{
@@ -31,6 +40,29 @@ function Welcome() {
         position: "relative",
       }}
     >
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          top: height * 0.075,
+          right: width * 0.1,
+        }}
+        onPress={() =>
+          language === "English" ? setLanguage("Urdu") : setLanguage("English")
+        }
+      >
+        <Text
+          style={{
+            fontFamily: font("OpenSans", "Regular"),
+            color: DARKERGREY,
+            fontSize: 18,
+            textDecorationLine: "underline",
+          }}
+        >
+          {language === "English"
+            ? "اردو میں ایپ استعمال کریں"
+            : "Use app in English"}
+        </Text>
+      </TouchableOpacity>
       <SCREENTOPMARGIN />
       <Image
         source={require("@/assets/images/book.png")}
@@ -76,6 +108,7 @@ function Welcome() {
             borderRadius: 3 * (width / 100),
           }}
           onPress={() =>
+            //@ts-ignore
             navigation.navigate("BasicInfo", { userType: "Guest" })
           }
         >
@@ -100,6 +133,7 @@ function Welcome() {
             borderRadius: 3 * (width / 100),
           }}
           onPress={() =>
+            //@ts-ignore
             navigation.navigate("BasicInfo", { userType: "Authorized" })
           }
         >
@@ -115,7 +149,12 @@ function Welcome() {
             Create an account
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+        <TouchableOpacity
+          onPress={() =>
+            //@ts-ignore
+            navigation.navigate("SignIn")
+          }
+        >
           <Text
             style={{
               marginTop: 1.75 * (height / 100),

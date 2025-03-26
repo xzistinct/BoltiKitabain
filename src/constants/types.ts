@@ -15,10 +15,17 @@ export type tUser = {
 };
 
 export type tUserInformation = {
-  name: string | null;
-  dob: tDate | null;
-  gender: boolean | null;
+  name?: string;
+  dob?: tDate;
+  gender?: "Male" | "Female" | null;
   language: "English" | "Urdu";
+};
+
+export type tUserPrefs = {
+  currentlyReadingList: string[];
+  readingList: string[];
+  interestedGenres: string[];
+  bookProgress: { [key: string]: number };
 };
 
 export type tGenres = (typeof genres)[number];

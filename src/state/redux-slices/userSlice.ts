@@ -1,7 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-import { login as authLogin, createUserAccount } from "../../helpers/auth";
+import {
+  login as authLogin,
+  createUserAccount,
+  getUserInformation,
+} from "../../helpers/auth";
 import { tResponse, tUser, tUserInformation } from "@/constants/types";
 import { errors } from "@/constants/errors";
 
@@ -15,7 +19,7 @@ const initialState: {
   isGuest: false,
   username: null,
   token: null,
-  userInfo: null,
+  userInfo: { gender: "Male", language: "English" },
 };
 
 // Create async thunks with consistent naming (without "Thunk" suffix)
@@ -41,7 +45,7 @@ export const initializeUser = createAsyncThunk(
 
       const attempt = await authLogin(username, password);
 
-      if (!attempt.success) {
+      if (!attempt.success || !attempt.error) {
         callback(false, false);
         return rejectWithValue(attempt.error);
       }
@@ -90,7 +94,11 @@ export const login = createAsyncThunk(
       await SecureStore.setItemAsync("username", username);
       await SecureStore.setItemAsync("password", password);
 
-      return { username, token: attempt.token };
+      return {
+        username,
+        token: attempt.token,
+        userInfo: await getUserInformation(),
+      };
     } catch (error) {
       callback({
         success: false,
@@ -109,9 +117,11 @@ export const createAccount = createAsyncThunk(
   async (
     {
       user,
+      userInformation,
       callback,
     }: {
-      user: tUser & tUserInformation;
+      user: tUser;
+      userInformation: tUserInformation;
       callback: (success: boolean) => void;
     },
     { getState, rejectWithValue }
@@ -124,7 +134,10 @@ export const createAccount = createAsyncThunk(
         return rejectWithValue("Already authenticated");
       }
 
-      const createAccountAttempt = await createUserAccount(user);
+      const createAccountAttempt = await createUserAccount(
+        user,
+        userInformation
+      );
       console.log("Attempted to create account (redux)", createAccountAttempt);
 
       callback(createAccountAttempt.success);
@@ -190,6 +203,9 @@ export const userSlice = createSlice({
       SecureStore.deleteItemAsync("username");
       SecureStore.deleteItemAsync("password");
     },
+    setLanguage: (state, action: { payload: "English" | "Urdu" }) => {
+      state.userInfo!.language = action.payload;
+    },
   },
   extraReducers: (builder) => {
     // Handle initialize user
@@ -208,6 +224,10 @@ export const userSlice = createSlice({
     builder.addCase(login.fulfilled, (state, action) => {
       state.username = action.payload.username;
       state.token = action.payload.token;
+
+      if (typeof action.payload.userInfo === "object") {
+        state.userInfo = action.payload.userInfo;
+      }
     });
     builder.addCase(login.rejected, (state, action) => {});
 
@@ -216,7 +236,10 @@ export const userSlice = createSlice({
 
     builder.addCase(continueAsGuest.fulfilled, (state, action) => {
       state.isGuest = true;
-      state.userInfo = action.payload.userInfo;
+      state.userInfo = {
+        ...action.payload.userInfo,
+        language: state.userInfo?.language || action.payload.userInfo.language,
+      };
     });
     builder.addCase(continueAsGuest.rejected, (state, action) => {});
   },

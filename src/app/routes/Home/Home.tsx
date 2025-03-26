@@ -30,6 +30,8 @@ import HomeTab from "./HomeTab";
 import DiscoverTab from "./DiscoverTab";
 import { getBooksInGenre } from "@/helpers/GetBooks";
 import BookModal from "@/components/BookModal";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
+import { logout } from "@/state/redux-slices/userSlice";
 
 const tabs = ["Home", "Discover"] as const;
 
@@ -43,6 +45,10 @@ const NAVBAR = ({
   setCurrentTab: React.Dispatch<React.SetStateAction<tTabs>>;
 }) => {
   const { width, height } = useWindowDimensions();
+  const dispatch = useAppDispatch();
+  const gender = useAppSelector((state) => state.user.userInfo?.gender);
+
+  console.log("Gender", gender);
   const NAVBARTEXTSTYLE: StyleProp<TextStyle> = {
     fontSize: 3 * (height / 100),
     fontFamily: font("Jost", "Regular"),
@@ -56,29 +62,50 @@ const NAVBAR = ({
       style={{
         display: "flex",
         flexDirection: "row",
-
-        width: 65 * (width / 100),
-
-        marginHorizontal: "auto",
       }}
     >
-      {tabs.map((item, index) => (
-        <TouchableOpacity onPress={() => setCurrentTab(item)} key={index}>
-          <Text
-            style={
-              currentTab === item
-                ? {
-                    ...NAVBARTEXTSTYLE,
-                    backgroundColor: LIGHTERGREY,
-                    fontFamily: font("Jost", "Medium"),
-                  }
-                : NAVBARTEXTSTYLE
-            }
-          >
-            {item}
-          </Text>
-        </TouchableOpacity>
-      ))}
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          marginHorizontal: "auto",
+        }}
+      >
+        {tabs.map((item, index) => (
+          <TouchableOpacity onPress={() => setCurrentTab(item)} key={index}>
+            <Text
+              style={
+                currentTab === item
+                  ? {
+                      ...NAVBARTEXTSTYLE,
+                      backgroundColor: LIGHTERGREY,
+                      fontFamily: font("Jost", "Medium"),
+                    }
+                  : NAVBARTEXTSTYLE
+              }
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <TouchableOpacity
+        style={{ marginLeft: "auto", marginRight: 10 * (width / 100) }}
+        onPress={() => {
+          dispatch(logout());
+        }}
+      >
+        <Image
+          source={require("@/assets/images/profileicon.png")}
+          style={{
+            width: width * 0.1,
+            height: width * 0.1,
+            borderRadius: 1000,
+            borderWidth: 1,
+            borderColor: DARKGREY,
+          }}
+        />
+      </TouchableOpacity>
     </View>
   );
 };

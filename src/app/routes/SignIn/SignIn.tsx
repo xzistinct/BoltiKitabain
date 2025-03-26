@@ -23,7 +23,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
-import { useDispatch, useSelector } from "react-redux";
+// import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 
 import { login } from "@/state/redux-slices/userSlice";
 import NumberPad from "@/components/NumberPad";
@@ -33,40 +34,37 @@ import { SCREENTOPMARGIN } from "../Welcome/Welcome";
 export default function SignIn() {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [loginErr, setLoginErr] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [phoneNumberHeaderDual, changePhoneNumberHeaderDual] = useState<
-    string | null
-  >(null);
+  const [emailHeaderDual, changeEmailHeaderDual] = useState<string | null>(
+    null
+  );
 
   const [passwordHeaderDual, changePasswordHeaderDual] = useState<
     string | null
   >(null);
 
-  const [phoneNumber, setPhoneNumber] = useState<Array<number | null>>(
-    Array(10).fill(null)
-  );
+  const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
 
-  //@ts-ignore
-  const token = useSelector((state) => state.user.token);
+  const token = useAppSelector((state) => state.user.token);
 
   const handleNext = () => {
     setLoginErr(null);
     setLoading(true);
     let err = false;
-    if (phoneNumber.includes(null)) {
-      changePhoneNumberHeaderDual("Please fill out phone number");
-      err = true;
-    }
+    // if (email === null || email.length < 4) {
+    //   changeEmailHeaderDual("Please fill out email");
+    //   err = true;
+    // }
 
-    if (password === null || password.length < 8) {
-      changePasswordHeaderDual("Password is at least 8 characters");
-      err = true;
-    }
+    // if (password === null || password.length < 8) {
+    //   changePasswordHeaderDual("Password is at least 8 characters");
+    //   err = true;
+    // }
 
     if (err) {
       return;
@@ -74,21 +72,34 @@ export default function SignIn() {
 
     dispatch(
       login({
-        username: phoneNumber.join(""),
+        username: email || "",
         //@ts-ignore
         password: password,
         callback: (message) => {
           console.log("tried login, got", message, "token is", token);
           setLoading(false);
-          if (message === "success") {
+          if (message.success || !message.error) {
             return;
           }
-          setLoginErr(message);
+          setLoginErr(JSON.stringify(message.error));
         },
       })
     );
 
     return;
+  };
+
+  const TextInputStyle = {
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    width: 70 * (width / 100),
+    height: 4.5 * (height / 100),
+    paddingVertical: 0,
+
+    fontSize: 20,
+    paddingHorizontal: 15,
+    fontFamily: "Roboto",
+    color: "black",
   };
 
   return (
@@ -173,8 +184,8 @@ export default function SignIn() {
             </View>
             <View style={{ width: width }}>
               <DualText
-                originalContent="Phone Number"
-                dualContent={phoneNumberHeaderDual}
+                originalContent="Email"
+                dualContent={emailHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
               />
@@ -188,59 +199,32 @@ export default function SignIn() {
                   width: width,
                 }}
               >
-                <Text
-                  style={{
-                    fontFamily: font("Jost", "Regular"),
-                    fontSize: 20,
-                    color: "black",
-                    marginRight: 81 * (width / 100),
-
-                    marginLeft: "auto",
-                    paddingBottom: 0,
-                  }}
-                >
-                  + 92
-                </Text>
-                <View
-                  style={{
-                    position: "absolute",
-                    left: 22 * (width / 100),
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <NumberPad
-                    numbers={phoneNumber}
-                    setNumbers={setPhoneNumber}
-                    onChangeNumber={() => {
-                      changePhoneNumberHeaderDual(null);
+                <View style={{ marginHorizontal: "auto" }}>
+                  <TextInput
+                    style={TextInputStyle}
+                    onChangeText={(value) => {
+                      changeEmailHeaderDual(null);
+                      if (value) {
+                        setEmail(value);
+                      }
                     }}
+                    placeholder="example@pitb.com"
+                    placeholderTextColor={"gray"}
                   />
                 </View>
               </View>
             </View>
 
-            <View style={{ marginTop: 6 * (height / 100), width: width }}>
+            <View style={{ marginTop: 4 * (height / 100), width: width }}>
               <DualText
                 originalContent="Password"
                 dualContent={passwordHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
               />
-              <View style={{ marginLeft: 22 * (width / 100) }}>
+              <View style={{ marginHorizontal: "auto" }}>
                 <TextInput
-                  style={{
-                    borderBottomColor: "black",
-                    borderBottomWidth: 1,
-                    width: 57 * (width / 100),
-                    height: 4.5 * (height / 100),
-                    paddingVertical: 0,
-
-                    fontSize: 20,
-                    paddingHorizontal: 15,
-                    fontFamily: "Roboto",
-                    color: "black",
-                  }}
+                  style={TextInputStyle}
                   secureTextEntry={true}
                   onChangeText={(value) => {
                     changePasswordHeaderDual(null);
