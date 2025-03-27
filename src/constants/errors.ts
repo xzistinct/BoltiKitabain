@@ -13,6 +13,7 @@ export const errors = {
   "Unknown error": 100,
   "Unknown internal error": 200,
   "Redux state did not initialize": 201,
+  "Failed to get books": 202,
 } as const;
 
 export const getErrorFromCode = (code: number) => {

@@ -25,6 +25,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { SecondsToTime } from "@/helpers/SecondsToTime";
 import { useNavigation } from "@react-navigation/native";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
@@ -140,12 +141,12 @@ export default function Player({ route }: any) {
 
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "loaded"
-  >("loaded");
+  >("loading");
 
   useEffect(() => {
     (async () => {
       setBook(await getBookById(bookId));
-      setScreenState("loaded");
+      setScreenState("loading");
     })();
   });
   return (
@@ -153,15 +154,7 @@ export default function Player({ route }: any) {
       {screenState === "loaded" && book !== null && (
         <LoadedPlayer book={book} />
       )}
-      {screenState === "loading" && (
-        <>
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <BarIndicator count={5} />
-          </View>
-        </>
-      )}
+      {screenState === "loading" && <LoadingOverlay />}
     </View>
   );
 }

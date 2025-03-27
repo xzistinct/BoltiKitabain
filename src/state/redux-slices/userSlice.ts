@@ -20,11 +20,13 @@ const initialState: {
   username: null | string;
   token: null | string;
   userInfo: tUserInformation | null;
+  initialized: boolean;
 } = {
   isGuest: false,
   username: null,
   token: null,
   userInfo: { gender: "Male", language: "English" },
+  initialized: false,
 };
 
 // Create async thunks with consistent naming (without "Thunk" suffix)

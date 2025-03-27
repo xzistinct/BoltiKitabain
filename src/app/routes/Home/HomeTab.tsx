@@ -4,12 +4,20 @@ import {
   StyleProp,
   TextStyle,
   useWindowDimensions,
+  ScrollView,
 } from "react-native";
 
 import font from "@/constants/fonts";
 
 import Shelf from "./Shelf";
 import { book } from "@/constants/types";
+import { useEffect, useState } from "react";
+import LoadingOverlay from "@/components/LoadingOverlay";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
+import {
+  fetchCurrentlyReading,
+  fetchPopularBooks,
+} from "@/state/redux-slices/bookSlice";
 
 type tBookShelf = {
   books: book[] | null;
@@ -20,6 +28,31 @@ type tBookShelf = {
 
 export default function HomeTab() {
   const { width, height } = useWindowDimensions();
+  const dispatch = useAppDispatch();
+  const popularBooks = useAppSelector(
+    (state) => state.books.fetchedPopularBooks
+  );
+
+  const [screenState, setScreenState] = useState<
+    "loading" | "loaded" | "error"
+  >("loading");
+
+  useEffect(() => {
+    (async () => {
+      // Fetch data
+      dispatch(
+        fetchPopularBooks({
+          callback: (books) => {
+            if (books instanceof Array) {
+              setScreenState("loaded");
+            } else {
+              setScreenState("error");
+            }
+          },
+        })
+      );
+    })();
+  }, []);
 
   const renderBookShelf = (item: tBookShelf[0], index: number) => {
     const ShelfHeaderStyle: StyleProp<TextStyle> = {
@@ -53,9 +86,20 @@ export default function HomeTab() {
       behaviour: "Open",
       emptyMessage: "Add to your reading list to fill this shelf",
     },
+    {
+      books: popularBooks,
+      title: "Popular",
+      behaviour: "Modal",
+      emptyMessage: "No popular books found",
+    },
   ];
 
   return (
-    <View>{bookShelf.map((item, index) => renderBookShelf(item, index))}</View>
+    <>
+      <ScrollView>
+        {bookShelf.map((item, index) => renderBookShelf(item, index))}
+      </ScrollView>
+      {screenState === "loading" && <LoadingOverlay />}
+    </>
   );
 }

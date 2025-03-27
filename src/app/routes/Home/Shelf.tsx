@@ -1,5 +1,10 @@
+import BookImage from "@/components/BookImage";
+import BookModal from "@/components/BookModal";
 import { GREY, LIGHTBROWN } from "@/constants/colors";
 import { book } from "@/constants/types";
+import { endpoints } from "@/helpers/endpoints";
+import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -42,6 +47,10 @@ export default function Shelf({
   emptyMessage: string;
 }) {
   const { width, height } = useWindowDimensions();
+  const navigation = useNavigation();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<book | null>(null);
 
   return (
     <View
@@ -67,17 +76,21 @@ export default function Shelf({
             renderItem={(item) => (
               <TouchableOpacity
                 style={{
-                  width: 30 * (width / 100),
-                  height: 20 * (height / 100),
                   backgroundColor: GREY,
                   marginRight: 5 * (width / 100),
                 }}
                 onPress={() => {
                   if (behaviour === "Open") {
-                    // Open the book
+                    //@ts-ignore
+                    navigation.navigate("Player", { bookId: item.item.id });
+                  } else if (behaviour === "Modal") {
+                    setSelectedBook(item.item);
+                    setModalVisible(true);
                   }
                 }}
-              ></TouchableOpacity>
+              >
+                <BookImage id={item.item.image} height={0.2 * height} />
+              </TouchableOpacity>
             )}
           />
         ) : (
@@ -111,6 +124,13 @@ export default function Shelf({
         <SHELFBOTTOM />
         <SHELFBOTTOM />
       </View>
+      {modalVisible && selectedBook && (
+        <BookModal
+          book={selectedBook}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        />
+      )}
     </View>
   );
 }

@@ -32,6 +32,7 @@ export type tGenres = (typeof genres)[number];
 
 export type book = {
   name: string;
+  name_urdu?: string;
   image: string;
   author: string;
   genre: string;
@@ -43,6 +44,7 @@ export type book = {
   tags: string[];
   chapters?: Array<{ name: string; length: number }>;
   dateAdded?: tDate;
+  narrator?: string;
 };
 
 export type tBookSortBy = (typeof bookSortBy)[number];
