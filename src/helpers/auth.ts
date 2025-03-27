@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SecureStore from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 
 import {
   tError,
@@ -18,6 +18,7 @@ export const login = async (
   success: boolean;
   token: null | string;
   error?: tError;
+  userInformation?: tUserInformation;
 }> => {
   const loginResponse: {
     success: boolean;
@@ -56,13 +57,11 @@ export const login = async (
         JSON.parse(atob(data.token.split(".")[1]))["first_name"] +
         " " +
         JSON.parse(atob(data.token.split(".")[1]))["last_name"];
-      await AsyncStorage.setItem("auth_token", data.token);
-      console.log("user name is", name);
-      //@ts-ignore
-      await storeUserInformation({ name: name, gender: "Male" });
+
       return {
         success: true,
         token: data.token,
+        userInformation: { name },
       };
     }
   } catch (e) {
@@ -70,7 +69,7 @@ export const login = async (
     return { token: null, success: false, error: errors["Unknown error"] };
   }
 
-  loginResponse.error = errors["Invalid credentials"];
+  loginResponse.error = errors["Unknown error"];
   loginResponse.success = false;
   return loginResponse;
 };
@@ -82,13 +81,6 @@ export const createUserAccount = async (
   if (!user.username || !user.password || !userInformation.name) {
     return { success: false, error: errors["Insufficient information"] };
   }
-
-  console.log(
-    "Creating account with user:",
-    user,
-    "and user information:",
-    userInformation
-  );
 
   try {
     const response = await fetch(endpoints.register, {
@@ -104,39 +96,45 @@ export const createUserAccount = async (
       }),
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
-    if (response.status === 400 && data.includes("already exist")) {
+    if (response.status === 400 && text.includes("already exist")) {
       return { success: false, error: errors["Email already registered"] };
     } else if (!response.ok) {
-      console.log("Error while creating account:", data);
       return { success: false, error: errors["Unknown error"] };
     }
 
-    console.log("Data received from server:", data);
+    const data = await JSON.parse(text);
 
-    return storeUserInformation(userInformation);
+    if (data.email) {
+      return { success: true };
+    }
   } catch (e) {
-    console.error("Error while creating account:", e);
     return { success: false, error: errors["Unknown error"] };
   }
+  return { success: false, error: errors["Unknown error"] };
 };
 
 export const getCredentialsFromStorage = async (): Promise<
-  { username: string; password: string } | tError
+  { username: string; password: string } | tError | "IsGuest"
 > => {
+  if ((await AsyncStorage.getItem("IsGuest")) === "true") {
+    return "IsGuest";
+  }
+
   let username: string | null;
   let password: string | null;
 
   try {
-    username = (await SecureStore.getItem("username")) || null;
-    password = (await SecureStore.getItem("password")) || null;
+    username = await SecureStore.getItemAsync("username");
+    password = await SecureStore.getItemAsync("password");
   } catch (e) {
     console.error("Error while getting credentials from storage:", e);
     return errors["Unknown error"];
   }
 
   if (!username || !password) {
+    console.log("Got username:", username, "Got password:", password);
     return errors["Failed to get credentials from storage"];
   }
 
@@ -147,9 +145,10 @@ export const setCredentialsInStorage = async (
   username: string,
   password: string
 ): Promise<tResponse> => {
+  console.log("Setting credentials:", username, password);
   try {
-    await SecureStore.setItem("username", username);
-    await SecureStore.setItem("password", password);
+    await SecureStore.setItemAsync("username", username);
+    await SecureStore.setItemAsync("password", password);
     return { success: true };
   } catch (e) {
     console.error("Error while storing credentials:", e);
@@ -157,7 +156,7 @@ export const setCredentialsInStorage = async (
   }
 };
 
-export const getUserInformation = async (): Promise<
+export const getUserInformationFromStorage = async (): Promise<
   tUserInformation | tError
 > => {
   let userInformation: tUserInformation | null;
@@ -178,10 +177,10 @@ export const getUserInformation = async (): Promise<
   return userInformation;
 };
 
-const storeUserInformation = async (
+export const setUserInformationInStorage = async (
   userInformation: tUserInformation
 ): Promise<tResponse> => {
-  const stored = await getUserInformation();
+  const stored = await getUserInformationFromStorage();
   try {
     await AsyncStorage.setItem(
       "userInformation",
@@ -194,6 +193,19 @@ const storeUserInformation = async (
     return { success: true };
   } catch (e) {
     console.error("Error while storing user information:", e);
+    return { success: false, error: errors["Unknown error"] };
+  }
+};
+
+export const clearUserFromStorage = async (): Promise<tResponse> => {
+  try {
+    await AsyncStorage.removeItem("userInformation");
+    await AsyncStorage.removeItem("IsGuest");
+    await SecureStore.deleteItemAsync("username");
+    await SecureStore.deleteItemAsync("password");
+    return { success: true };
+  } catch (e) {
+    console.error("Error while clearing user from storage:", e);
     return { success: false, error: errors["Unknown error"] };
   }
 };

@@ -32,7 +32,7 @@ import {
   SCREENHEADER,
 } from "@/constants/styles";
 import DualText from "@/components/DualText";
-import { tUserInformation } from "@/constants/types";
+import { tResponse, tUserInformation } from "@/constants/types";
 import { useAppDispatch } from "@/state/reduxStore";
 
 import { continueAsGuest } from "@/state/redux-slices/userSlice";
@@ -75,7 +75,7 @@ export default function BasicInfo({ route }: any) {
       err = true;
     } else if (
       fullName.split(" ").length < 2 ||
-      !fullName.split(" ").every((str) => str.length >= 3)
+      !fullName.split(" ").every((str: string) => str.length >= 3)
     ) {
       changeFullNameHeaderDual("Please enter your full name");
       err = true;
@@ -120,7 +120,7 @@ export default function BasicInfo({ route }: any) {
             name: fullName,
             gender: gender,
           },
-          callback: (success: boolean) => {},
+          callback: (success: tResponse) => {},
         })
       );
     }
