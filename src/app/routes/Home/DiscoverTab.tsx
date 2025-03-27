@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { bookSortBy, genres } from "@/constants/books";
-import { tGenres, book, tBookSortBy } from "@/constants/types";
+import { tGenres, book } from "@/constants/types";
 import {
   View,
   Text,
@@ -18,25 +17,17 @@ import {
 import font from "@/constants/fonts";
 
 import Carousel from "react-native-reanimated-carousel";
-import { useSharedValue } from "react-native-reanimated";
-import { getBooksInGenre } from "@/helpers/GetBooks";
-import {
-  BABYBLUE,
-  DARKERGREY,
-  LIGHTERGREY,
-  VERYLIGHTGREY,
-} from "@/constants/colors";
-
-import { Dropdown } from "react-native-element-dropdown";
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import BookModal from "@/components/BookModal";
-import { SecondsToTime } from "@/helpers/SecondsToTime";
+
 import BookCard from "@/components/BookCard";
+import { useAppSelector } from "@/state/reduxStore";
+
+const genres = ["Fiction", "Non-Fiction", "Science", "History", "Biography"];
+
 const Filter = () => {
   const { width, height } = useWindowDimensions();
-
-  const [value, setValue] = useState<tBookSortBy>("Most Popular");
 
   const styles = StyleSheet.create({});
   return (
@@ -60,30 +51,6 @@ const Filter = () => {
         >
           Sort by{" "}
         </Text>
-        <Dropdown
-          style={{
-            margin: 16,
-            height: 4 * (height / 100),
-            width: 35 * (width / 100),
-            borderBottomColor: "gray",
-            borderBottomWidth: 0.5,
-          }}
-          selectedTextStyle={{ fontFamily: font("Jost", "Regular") }}
-          itemTextStyle={{ fontFamily: font("Jost", "Regular") }}
-          containerStyle={{ borderRadius: 10 }}
-          itemContainerStyle={{ paddingVertical: 0 }}
-          data={bookSortBy.map((item) => {
-            return { label: item, value: item };
-          })}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Select item"
-          value={value}
-          onChange={(item) => {
-            setValue(item.value);
-          }}
-        />
       </View>
       <View>
         <FontAwesome name="filter" size={3 * (height / 100)} color="black" />
@@ -94,11 +61,14 @@ const Filter = () => {
 
 export default function DiscoverTab({}: {}) {
   const { width, height } = useWindowDimensions();
-  const [currentGenre, setCurrentGenre] = useState<tGenres>(genres[0]);
+  const [currentGenre, setCurrentGenre] = useState<string>("Fiction");
+  const popularBooks = useAppSelector(
+    (state) => state.books.fetchedPopularBooks
+  );
 
   const [booksInSelectedGenre, setBooksInSelectedGenre] = useState<
     book[] | null
-  >(getBooksInGenre(currentGenre, 10));
+  >(popularBooks);
 
   const [selectedBook, setSelectedBook] = useState<book | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -118,7 +88,7 @@ export default function DiscoverTab({}: {}) {
             windowSize={1}
             onSnapToItem={(index) => {
               setCurrentGenre(genres[index]);
-              setBooksInSelectedGenre(getBooksInGenre(genres[index], 15));
+              setBooksInSelectedGenre(popularBooks);
             }}
             //@ts-ignore
             height={CarouselStyle.height}

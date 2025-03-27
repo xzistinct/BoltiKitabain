@@ -24,14 +24,10 @@ import * as SplashScreen from "expo-splash-screen";
 import store from "./state/reduxStore";
 import { Provider, useDispatch } from "react-redux";
 import { initializeUser } from "./state/redux-slices/userSlice";
-
-import * as NavigationBar from "expo-navigation-bar";
-
-import { StatusBar, Text } from "react-native";
+import { initializeBookState } from "./state/redux-slices/bookSlice";
 
 import RootNavigator from "./app/RootNavigator";
 
-import font from "./constants/fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -57,7 +53,8 @@ const StateContainer = () => {
     OpenSans_400Regular,
     OpenSans_500Medium,
   });
-  const [authInitialized, setAuthInitialized] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const [bookStateInitialized, setBookStateInitialized] = useState(false);
 
   // Disabled for now
 
@@ -67,13 +64,18 @@ const StateContainer = () => {
         setAuthInitialized(true);
       })
     );
+    dispatch(
+      initializeBookState(() => {
+        setBookStateInitialized(true);
+      })
+    );
   }, []);
 
   useEffect(() => {
-    if ((fontsLoaded || fontsErr) && authInitialized) {
+    if ((fontsLoaded || fontsErr) && authInitialized && bookStateInitialized) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontsErr, authInitialized]);
+  }, [fontsLoaded, fontsErr, authInitialized, bookStateInitialized]);
 
   if ((!fontsLoaded && !fontsErr) || !authInitialized) {
     return null;

@@ -10,7 +10,7 @@ import Home from "./routes/Home/Home";
 
 import { Text } from "react-native";
 import BasicInfo from "./routes/BasicInfo/BasicInfo";
-import InterestedGenres from "./routes/InterestedGenres/InterestedGenres";
+// import InterestedGenres from "./routes/InterestedGenres/InterestedGenres";
 import CreateAccount from "./routes/CreateAccount/CreateAccount";
 import RecommendedBook from "./routes/RecommendedBook/RecommendedBook";
 import SignIn from "./routes/SignIn/SignIn";
@@ -52,10 +52,10 @@ function RootNavigator() {
         {isGuest || token ? (
           <>
             <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen
+            {/* <Stack.Screen
               name="InterestedGenres"
               component={InterestedGenres}
-            />
+            /> */}
             <Stack.Screen name="RecommendedBook" component={RecommendedBook} />
             <Stack.Screen name="Player" component={Player} />
           </>

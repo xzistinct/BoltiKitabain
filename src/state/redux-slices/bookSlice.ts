@@ -1,80 +1,69 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { book, tError, tResponse } from "@/constants/types";
+import {
+  book,
+  Bookmark,
+  Bookmarks,
+  BookProgress,
+  BookProgresses,
+  tError,
+  tResponse,
+} from "@/constants/types";
 import { endpoints } from "@/helpers/endpoints";
 import { errors, getErrorFromCode } from "@/constants/errors";
+import { getPopularBooks } from "@/helpers/books";
+
+import { RootState } from "../reduxStore";
 
 // Define types
-interface BookProgress {
-  bookId: string;
-  currentPage: number;
-  totalPages: number;
-  lastReadAt: string;
-}
-
-interface Bookmark {
-  id: string;
-  bookId: string;
-  page: number;
-  note?: string;
-  createdAt: string;
-}
 
 interface BookState {
   currentlyReading: string[]; // Array of book IDs
-  bookProgress: Record<string, BookProgress>; // Map of bookId to progress
-  bookmarks: Bookmark[];
+  bookProgress: BookProgresses; // Map of bookId to progress
+  bookmarks: Bookmarks;
   fetchedPopularBooks: book[];
-  fetchedByGenre: { genre: string; books: book[] };
+  fetchedByGenre: Record<string, book[]>;
+  readingList: string[];
+  initialized: boolean;
 }
 
 // Initial state
 const initialState: BookState = {
+  readingList: [],
   currentlyReading: [],
   bookProgress: {},
-  bookmarks: [],
+  bookmarks: {},
   fetchedPopularBooks: [],
-  fetchedByGenre: { genre: "", books: [] },
+  fetchedByGenre: {},
+  initialized: false,
 };
 
 // Async thunks
-export const fetchCurrentlyReading = createAsyncThunk(
-  "book/fetchCurrentlyReading",
-  async (_, { rejectWithValue }) => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("currentlyReading");
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  }
-);
 
-export const fetchBookProgress = createAsyncThunk(
-  "book/fetchBookProgress",
-  async (_, { rejectWithValue }) => {
+export const initializeBookState = createAsyncThunk(
+  "book/initializeBookState",
+  async (
+    _,
+    { rejectWithValue }: { rejectWithValue: (err: tError) => void }
+  ): Promise<void | {
+    currentlyReading: string[];
+    bookProgress: BookProgresses;
+    bookmarks: Bookmarks;
+    readingList: string[];
+  }> => {
     try {
-      const jsonValue = await AsyncStorage.getItem("bookProgress");
-      return jsonValue != null ? JSON.parse(jsonValue) : {};
+      const currentlyReading = await AsyncStorage.getItem("currentlyReading");
+      const bookProgress = await AsyncStorage.getItem("bookProgress");
+      const bookmarks = await AsyncStorage.getItem("bookmarks");
+      const readingList = await AsyncStorage.getItem("readingList");
+      return {
+        currentlyReading: currentlyReading ? JSON.parse(currentlyReading) : [],
+        bookProgress: bookProgress ? JSON.parse(bookProgress) : {},
+        bookmarks: bookmarks ? JSON.parse(bookmarks) : {},
+        readingList: readingList ? JSON.parse(readingList) : {},
+      };
     } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  }
-);
-
-export const fetchReadingList = createAsyncThunk(
-  "book/fetchReadingList",
-  async (_, { rejectWithValue }) => {}
-);
-
-export const fetchBookmarks = createAsyncThunk(
-  "book/fetchBookmarks",
-  async (_, { rejectWithValue }) => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("bookmarks");
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
+      return rejectWithValue(errors["Failed to initialize book state"]);
     }
   }
 );
@@ -83,30 +72,35 @@ export const fetchPopularBooks = createAsyncThunk(
   "book/fetchPopularBooks",
   async (
     { callback }: { callback: (books: tResponse) => void },
-    { rejectWithValue }: { rejectWithValue: (err: tError) => void }
+    {
+      getState,
+      rejectWithValue,
+    }: {
+      getState: () => any;
+      rejectWithValue: (err: tError) => void;
+    }
   ): Promise<void | book[]> => {
-    try {
-      const response = await fetch(endpoints.books);
-      if (!response.ok) {
-        return rejectWithValue(errors["Failed to get books"]);
-      }
-
-      const data = await response.json();
-      if (!Array.isArray(data)) {
-        return rejectWithValue(errors["Failed to get books"]);
-      }
-      let books: book[] = data.map((book: any) => {
-        return {
-          name: book["title"],
-          name_urdu: book["titleUrdu"],
-          image: book["image"],
-          description: book["description"],
-          id: book["_id"],
-          author: book["author"],
-          genre: book["genre"],
-          narrator: book["narrator"],
-        } as book;
+    // Get current state and check if popular books already exist
+    const state = getState().books as BookState;
+    if (!state.initialized) {
+      return rejectWithValue(errors["Redux state not initialized"]);
+    }
+    if (state.fetchedPopularBooks.length > 0) {
+      callback({
+        success: false,
+        error: errors["Data already exists"] || errors["Unknown error"],
       });
+      return rejectWithValue(
+        errors["Data already exists"] || errors["Unknown error"]
+      );
+    }
+    try {
+      callback({ success: true });
+      const books = await getPopularBooks();
+      if (typeof books === "number") {
+        callback({ success: false, error: books });
+        return rejectWithValue(books);
+      }
       callback({ success: true });
       return books;
     } catch (error) {
@@ -123,7 +117,11 @@ const bookSlice = createSlice({
   initialState,
   reducers: {
     // Additional reducers for updating state can be added here
+
     addToCurrentlyReading: (state, action: PayloadAction<string>) => {
+      if (!state.initialized) {
+        return;
+      }
       if (!state.currentlyReading.includes(action.payload)) {
         state.currentlyReading.push(action.payload);
         // Save to AsyncStorage
@@ -135,7 +133,24 @@ const bookSlice = createSlice({
         );
       }
     },
+    addToReadingList: (state, action: PayloadAction<string>) => {
+      if (!state.initialized) {
+        return;
+      }
+      if (!Array.from(state.readingList).includes(action.payload)) {
+        state.readingList = [...Array.from(state.readingList), action.payload];
+        console.log("Reading list:", state.readingList);
+        // Save to AsyncStorage
+        AsyncStorage.setItem(
+          "readingList",
+          JSON.stringify(state.readingList)
+        ).catch((error) => console.error("Error saving reading list:", error));
+      }
+    },
     updateBookProgress: (state, action: PayloadAction<BookProgress>) => {
+      if (!state.initialized) {
+        return;
+      }
       state.bookProgress[action.payload.bookId] = action.payload;
       // Save to AsyncStorage
       AsyncStorage.setItem(
@@ -144,16 +159,22 @@ const bookSlice = createSlice({
       ).catch((error) => console.error("Error saving book progress:", error));
     },
     addBookmark: (state, action: PayloadAction<Bookmark>) => {
-      state.bookmarks.push(action.payload);
+      if (!state.initialized) {
+        return;
+      }
+      state.bookmarks[action.payload.bookId].push(action.payload);
       // Save to AsyncStorage
       AsyncStorage.setItem("bookmarks", JSON.stringify(state.bookmarks)).catch(
         (error) => console.error("Error saving bookmarks:", error)
       );
     },
-    removeBookmark: (state, action: PayloadAction<string>) => {
-      state.bookmarks = state.bookmarks.filter(
-        (bookmark) => bookmark.id !== action.payload
-      );
+    removeBookmark: (state, action: PayloadAction<Bookmark>) => {
+      if (!state.initialized) {
+        return;
+      }
+      state.bookmarks[action.payload.bookId] = state.bookmarks[
+        action.payload.bookId
+      ].filter((bookmark) => bookmark.timeStamp === action.payload.timeStamp);
       // Save to AsyncStorage
       AsyncStorage.setItem("bookmarks", JSON.stringify(state.bookmarks)).catch(
         (error) => console.error("Error saving bookmarks:", error)
@@ -161,23 +182,20 @@ const bookSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Handle currently reading list fetch
+    // Initialize book state
     builder
-      .addCase(fetchCurrentlyReading.pending, (state) => {})
-      .addCase(fetchCurrentlyReading.fulfilled, (state, action) => {})
-      .addCase(fetchCurrentlyReading.rejected, (state, action) => {});
+      .addCase(initializeBookState.pending, () => {})
+      .addCase(initializeBookState.fulfilled, (state, action) => {
+        if (!action.payload) {
+          return;
+        }
+        state.readingList = action.payload.readingList;
+        state.currentlyReading = action.payload.currentlyReading;
+        state.bookProgress = action.payload.bookProgress;
+        state.bookmarks = action.payload.bookmarks;
+        state.initialized = true;
+      });
 
-    // Handle book progress fetch
-    builder
-      .addCase(fetchBookProgress.pending, (state) => {})
-      .addCase(fetchBookProgress.fulfilled, (state, action) => {})
-      .addCase(fetchBookProgress.rejected, (state, action) => {});
-
-    // Handle bookmarks fetch
-    builder
-      .addCase(fetchBookmarks.pending, (state) => {})
-      .addCase(fetchBookmarks.fulfilled, (state, action) => {})
-      .addCase(fetchBookmarks.rejected, (state, action) => {});
     // Handle popular books fetch
     builder
       .addCase(fetchPopularBooks.pending, (state) => {})
@@ -197,6 +215,7 @@ const bookSlice = createSlice({
 // Export actions and reducer
 export const {
   addToCurrentlyReading,
+  addToReadingList,
   updateBookProgress,
   addBookmark,
   removeBookmark,

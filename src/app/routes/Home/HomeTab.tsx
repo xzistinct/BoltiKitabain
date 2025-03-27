@@ -14,10 +14,9 @@ import { book } from "@/constants/types";
 import { useEffect, useState } from "react";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
-import {
-  fetchCurrentlyReading,
-  fetchPopularBooks,
-} from "@/state/redux-slices/bookSlice";
+import { fetchPopularBooks } from "@/state/redux-slices/bookSlice";
+import { getBookById } from "@/helpers/books";
+import { useSelector } from "react-redux";
 
 type tBookShelf = {
   books: book[] | null;
@@ -32,6 +31,11 @@ export default function HomeTab() {
   const popularBooks = useAppSelector(
     (state) => state.books.fetchedPopularBooks
   );
+  const readingList = useAppSelector((state) => state.books.readingList);
+  const currentlyReading = useAppSelector(
+    (state) => state.books.currentlyReading
+  );
+  const jwt = useAppSelector((state) => state.user.token);
 
   const [screenState, setScreenState] = useState<
     "loading" | "loaded" | "error"
@@ -43,7 +47,7 @@ export default function HomeTab() {
       dispatch(
         fetchPopularBooks({
           callback: (books) => {
-            if (books instanceof Array) {
+            if (books.success) {
               setScreenState("loaded");
             } else {
               setScreenState("error");
@@ -54,11 +58,35 @@ export default function HomeTab() {
     })();
   }, []);
 
+  const [readingListBooks, setReadingListBooks] = useState<book[] | null>(null);
+  const [currentlyReadingBooks, setCurrentlyReadingBooks] = useState<
+    book[] | null
+  >(null);
+
+  useEffect(() => {
+    (async () => {
+      console.log("Reading list books", readingList);
+      let books: book[] = [];
+      for (let book of readingList) {
+        let bookData = await getBookById(book, jwt || "");
+
+        console.log("Book data", bookData);
+        if (typeof bookData === "object") {
+          books.push(bookData);
+        }
+      }
+      setReadingListBooks(books);
+    })();
+  }, [readingList]);
+
+  useEffect(() => {}, [currentlyReading]);
+
   const renderBookShelf = (item: tBookShelf[0], index: number) => {
     const ShelfHeaderStyle: StyleProp<TextStyle> = {
       color: "black",
       fontSize: 3.2 * (height / 100),
       marginLeft: 4 * (width / 100),
+      marginBottom: 1.5 * (height / 100),
       fontFamily: font("Jost", "Regular"),
     };
     return (
@@ -75,13 +103,13 @@ export default function HomeTab() {
 
   const bookShelf: tBookShelf = [
     {
-      books: null,
+      books: currentlyReadingBooks,
       title: "Currently reading",
       behaviour: "Open",
       emptyMessage: "Start reading to fill this shelf",
     },
     {
-      books: null,
+      books: readingListBooks,
       title: "In your reading list",
       behaviour: "Open",
       emptyMessage: "Add to your reading list to fill this shelf",
@@ -96,7 +124,10 @@ export default function HomeTab() {
 
   return (
     <>
-      <ScrollView>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
         {bookShelf.map((item, index) => renderBookShelf(item, index))}
       </ScrollView>
       {screenState === "loading" && <LoadingOverlay />}

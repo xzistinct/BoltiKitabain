@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { BarIndicator } from "react-native-indicators";
 
 import { book } from "@/constants/types";
-import { getBookById } from "@/helpers/GetBooks";
+import { getBookById } from "@/helpers/books";
 import font from "@/constants/fonts";
 import {
   BABYBLUE,
@@ -99,10 +99,10 @@ function LoadedPlayer({ book }: { book: book }) {
         >
           <Text style={{ color: DARKERGREY, fontSize: 13 }}>0:00</Text>
           <Text style={{ color: DARKERGREY, fontSize: 13 }}>
-            {SecondsToTime(book.length).hours > 0 &&
-              SecondsToTime(book.length).hours + ":"}
-            {SecondsToTime(book.length).minutes}:
-            {SecondsToTime(book.length).seconds}
+            {SecondsToTime(book.length || 0).hours > 0 &&
+              SecondsToTime(book.length || 0).hours + ":"}
+            {SecondsToTime(book.length || 0).minutes}:
+            {SecondsToTime(book.length || 0).seconds}
           </Text>
         </View>
         <View
@@ -145,8 +145,11 @@ export default function Player({ route }: any) {
 
   useEffect(() => {
     (async () => {
-      setBook(await getBookById(bookId));
-      setScreenState("loading");
+      let book = await getBookById(bookId);
+      if (typeof book === "object") {
+        setBook(book);
+      }
+      setScreenState("loaded");
     })();
   });
   return (

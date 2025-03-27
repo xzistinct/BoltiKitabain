@@ -23,8 +23,6 @@ export default function CreatingAccount({ route }: any) {
   const user = route.params.user as tUser;
   const userInformation = route.params.userInformation as tUserInformation;
 
-  console.log(user);
-
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "success"
   >("loading");

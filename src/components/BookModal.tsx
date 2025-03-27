@@ -1,7 +1,5 @@
-import { bookImageRatio } from "@/constants/books";
 import { BABYBLUE, GREY } from "@/constants/colors";
 import font from "@/constants/fonts";
-import { getBooksInGenre } from "@/helpers/GetBooks";
 import { SecondsToTime } from "@/helpers/SecondsToTime";
 import React, { act, useEffect, useState } from "react";
 import {
@@ -24,6 +22,8 @@ import Chip from "./Chip";
 import Stars from "./Stars";
 import { useNavigation } from "@react-navigation/native";
 import BookImage from "./BookImage";
+import { useAppDispatch } from "@/state/reduxStore";
+import { addToReadingList } from "@/state/redux-slices/bookSlice";
 
 export default function BookModal({
   book,
@@ -36,6 +36,7 @@ export default function BookModal({
 }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
   const startReading = () => {
     setModalVisible(false);
@@ -64,7 +65,7 @@ export default function BookModal({
 
   if (!book || !modalVisible) return null;
 
-  const showTopBar = book.length && (book.tags || book.genre) && book.rating;
+  const showTopBar = book.length || book.tags || book.genre || book.rating;
 
   const bookLength = book.length
     ? SecondsToTime(book.length)
@@ -102,7 +103,7 @@ export default function BookModal({
               backgroundColor: "white",
               width: width,
               height: showTopBar
-                ? 57.5 * (height / 100)
+                ? 55.5 * (height / 100)
                 : 47.5 * (height / 100),
               maxHeight: 60 * (height / 100),
               borderTopLeftRadius: 40,
@@ -131,7 +132,7 @@ export default function BookModal({
                   marginHorizontal: "auto",
                 }}
               >
-                {book.length && (
+                {book.length ? (
                   <Text
                     style={{
                       fontSize: 4.5 * (width / 100),
@@ -142,20 +143,33 @@ export default function BookModal({
                     {("0" + bookLength.minutes).slice(-2)}:
                     {("0" + bookLength.seconds).slice(-2)}
                   </Text>
+                ) : (
+                  <Text
+                    style={{
+                      width: 0.5 * width,
+                      fontSize: 4 * (width / 100),
+
+                      fontFamily: font("OpenSans", "Regular"),
+                    }}
+                  >
+                    {book.name}
+                  </Text>
                 )}
                 <View style={{ width: 40 * (width / 100) }}>
                   <ScrollView horizontal style={{}}>
                     <TouchableHighlight>
                       <View style={{ display: "flex", flexDirection: "row" }}>
                         {(book.tags || book.genre) &&
-                          book.tags.map((tag, index) => (
-                            <Chip
-                              content={tag}
-                              key={index}
-                              textStyle={{}}
-                              style={{ marginLeft: 2 * (width / 100) }}
-                            />
-                          ))}
+                          [book.tags || [], book.genre]
+                            .flat()
+                            .map((tag, index) => (
+                              <Chip
+                                content={tag}
+                                key={index}
+                                textStyle={{}}
+                                style={{ marginLeft: 2 * (width / 100) }}
+                              />
+                            ))}
                       </View>
                     </TouchableHighlight>
                   </ScrollView>
@@ -210,10 +224,15 @@ export default function BookModal({
                 style={actionButtonStyle}
                 onPress={startReading}
               >
-                <Text style={actionButtonTextStyle}>Start reading</Text>
+                <Text style={actionButtonTextStyle}>Start listening</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={actionButtonStyle}>
-                <Text style={actionButtonTextStyle}>Add to reading list</Text>
+              <TouchableOpacity
+                style={actionButtonStyle}
+                onPress={() => {
+                  dispatch(addToReadingList(book.id));
+                }}
+              >
+                <Text style={actionButtonTextStyle}>Add to list</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -28,7 +28,7 @@ import Shelf from "./Shelf";
 import { useState } from "react";
 import HomeTab from "./HomeTab";
 import DiscoverTab from "./DiscoverTab";
-import { getBooksInGenre } from "@/helpers/GetBooks";
+
 import BookModal from "@/components/BookModal";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import { logout } from "@/state/redux-slices/userSlice";
@@ -48,7 +48,6 @@ const NAVBAR = ({
   const dispatch = useAppDispatch();
   const gender = useAppSelector((state) => state.user.userInfo?.gender);
 
-  console.log("Gender", gender);
   const NAVBARTEXTSTYLE: StyleProp<TextStyle> = {
     fontSize: 3 * (height / 100),
     fontFamily: font("Jost", "Regular"),

@@ -78,7 +78,6 @@ export default function SignIn() {
         //@ts-ignore
         password: password,
         callback: (message) => {
-          console.log("tried login, got", message, "token is", token);
           setLoading(false);
           if (message.success || message.error === undefined) {
             return;

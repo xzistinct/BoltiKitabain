@@ -61,7 +61,7 @@ export const login = async (
       return {
         success: true,
         token: data.token,
-        userInformation: { name },
+        userInformation: { name, gender: "Male" },
       };
     }
   } catch (e) {

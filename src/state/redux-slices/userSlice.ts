@@ -41,7 +41,6 @@ export const initializeUser = createAsyncThunk(
     token?: string;
     userInfo: tUserInformation;
   }> => {
-    console.log("Initializing user");
     try {
       const userInfo = await getUserInformationFromStorage();
       if (!userInfo) {
@@ -54,20 +53,16 @@ export const initializeUser = createAsyncThunk(
       const credentials = await getCredentialsFromStorage();
 
       if (credentials === "IsGuest") {
-        console.log("User is guest");
         callback(true, false);
         return { isGuest: true, userInfo };
       }
 
       if (typeof credentials !== "object") {
-        console.log("Failed to get credentials from storage", credentials);
         callback(false, false);
         return rejectWithValue(credentials);
       }
 
       const { username, password } = credentials;
-
-      console.log("Got credentials", username, password);
 
       if (!username || !password) {
         callback(false, false);
@@ -75,8 +70,6 @@ export const initializeUser = createAsyncThunk(
           errors["Failed to get credentials from storage"]
         );
       }
-
-      console.log("Got user information", userInfo);
 
       const attempt = await authLogin(username, password);
 
@@ -95,7 +88,7 @@ export const initializeUser = createAsyncThunk(
       return {
         username,
         token: attempt.token || undefined,
-        userInfo,
+        userInfo: { ...userInfo, ...attempt.userInformation },
         isGuest: false,
       };
     } catch (error) {
@@ -146,9 +139,6 @@ export const login = createAsyncThunk(
       await setCredentialsInStorage(username, password);
       await setUserInformationInStorage(attempt.userInformation);
 
-      console.log(await getUserInformationFromStorage());
-      console.log(await getCredentialsFromStorage());
-
       return {
         token: attempt.token,
         userInfo: attempt.userInformation,
@@ -197,7 +187,6 @@ export const createAccount = createAsyncThunk(
         user,
         userInformation
       );
-      console.log("Attempted to create account (redux)", createAccountAttempt);
 
       if (!createAccountAttempt.success) {
         callback({ success: false, error: createAccountAttempt.error });
@@ -275,11 +264,9 @@ export const userSlice = createSlice({
       if (!action.payload) {
         return;
       }
-      console.log("initialized user, got", action.payload);
       if (action.payload.isGuest === true && action.payload.userInfo) {
         state.isGuest = true;
         state.userInfo = action.payload.userInfo;
-        console.log("Initialized guest", state);
       } else if (
         action.payload.username &&
         action.payload.token &&
@@ -288,16 +275,9 @@ export const userSlice = createSlice({
         state.username = action.payload.username || null;
         state.token = action.payload.token || null;
         state.userInfo = action.payload.userInfo || null;
-
-        console.log("Initialized user", state);
       }
     });
-    builder.addCase(initializeUser.rejected, (state, action) => {
-      console.log(
-        "Failed to initialize user",
-        getErrorFromCode(action.payload as tError)
-      );
-    });
+    builder.addCase(initializeUser.rejected, (state, action) => {});
 
     // Handle login
 
@@ -307,7 +287,7 @@ export const userSlice = createSlice({
       }
       state.token = action.payload.token;
 
-      if (typeof action.payload.userInfo === "object") {
+      if (action.payload.userInfo) {
         state.userInfo = action.payload.userInfo;
       }
     });

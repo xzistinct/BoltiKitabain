@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { endpoints } from "@/helpers/endpoints";
 import { GREY } from "@/constants/colors";
+import { getImageURL } from "@/helpers/books";
 
 export default function BookImage({
   id,
@@ -46,7 +47,7 @@ export default function BookImage({
     >
       <Image
         source={{
-          uri: endpoints.image + "/" + id,
+          uri: getImageURL(id),
         }}
         style={{
           width: width,

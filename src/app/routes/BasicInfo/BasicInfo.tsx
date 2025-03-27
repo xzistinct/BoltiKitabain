@@ -102,7 +102,7 @@ export default function BasicInfo({ route }: any) {
     if (err) {
       return;
     }
-    console.log("userType", userType);
+
     if (userType === "Authorized") {
       //@ts-ignore
       navigation.navigate("CreateAccount", {
