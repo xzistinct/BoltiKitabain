@@ -15,7 +15,7 @@ export default function BookImage({
   height,
   containerStyle,
 }: {
-  id: string;
+  id?: string;
   width?: number;
   height?: number;
   containerStyle?: StyleProp<ViewStyle>;
@@ -45,15 +45,17 @@ export default function BookImage({
         ...containerStyle,
       }}
     >
-      <Image
-        source={{
-          uri: getImageURL(id),
-        }}
-        style={{
-          width: width,
-          height: height,
-        }}
-      />
+      {id && (
+        <Image
+          source={{
+            uri: getImageURL(id),
+          }}
+          style={{
+            width: width,
+            height: height,
+          }}
+        />
+      )}
     </View>
   );
 }

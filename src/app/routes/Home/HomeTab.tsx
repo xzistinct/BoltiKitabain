@@ -69,6 +69,7 @@ export default function HomeTab() {
   >(null);
 
   useEffect(() => {
+    setReadingListBooks(Array<book>(readingList.length).fill({}));
     (async () => {
       console.log("Reading list books", readingList);
       let books: book[] = [];
@@ -79,6 +80,9 @@ export default function HomeTab() {
         if (typeof bookData === "object") {
           books.push(bookData);
         }
+      }
+      if (books.length === 0) {
+        return;
       }
       setReadingListBooks(books);
     })();
@@ -123,7 +127,7 @@ export default function HomeTab() {
       behaviour: "Open",
       emptyMessage: "Add to your reading list to fill this shelf",
       onLongPress: (book) => {
-        dispatch(removeFromReadingList(book.id));
+        dispatch(removeFromReadingList(book.id || ""));
       },
     },
     {

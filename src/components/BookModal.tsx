@@ -164,7 +164,7 @@ export default function BookModal({
                             .flat()
                             .map((tag, index) => (
                               <Chip
-                                content={tag}
+                                content={tag || ""}
                                 key={index}
                                 textStyle={{}}
                                 style={{ marginLeft: 2 * (width / 100) }}
@@ -229,7 +229,7 @@ export default function BookModal({
               <TouchableOpacity
                 style={actionButtonStyle}
                 onPress={() => {
-                  dispatch(addToReadingList(book.id));
+                  dispatch(addToReadingList(book.id || ""));
                 }}
               >
                 <Text style={actionButtonTextStyle}>Add to list</Text>

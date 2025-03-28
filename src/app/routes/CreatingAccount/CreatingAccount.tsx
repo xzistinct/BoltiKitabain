@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
 import { createAccount, login } from "@/state/redux-slices/userSlice";
 import { tResponse, tUser, tUserInformation } from "@/constants/types";
+import { getErrorFromCode } from "@/constants/errors";
 
 export default function CreatingAccount({ route }: any) {
   const { width, height } = useWindowDimensions();
@@ -26,6 +27,7 @@ export default function CreatingAccount({ route }: any) {
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "success"
   >("loading");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -37,13 +39,24 @@ export default function CreatingAccount({ route }: any) {
           user: user,
           userInformation: userInformation,
           callback: (success: tResponse) => {
+            console.log("create account success", success);
+            if (!success.success && success.error) {
+              setScreenState("error");
+              setError(getErrorFromCode(success.error));
+              return;
+            }
             dispatch(
               login({
                 username: user.username || "",
                 password: user.password || "",
                 callback: (message: tResponse) => {
+                  console.log("login in create account message", message);
                   if (message.success) {
                     setScreenState("success");
+                  }
+                  if (message.error) {
+                    setScreenState("error");
+                    setError(getErrorFromCode(message.error));
                   }
                 },
               })
@@ -89,7 +102,7 @@ export default function CreatingAccount({ route }: any) {
               marginTop: height * 0.005,
             }}
           >
-            Error Number 0: No internet connection
+            {error}
           </Text>
           <View style={{ marginTop: height * 0.05, alignItems: "center" }}>
             <TouchableOpacity

@@ -30,15 +30,15 @@ export type tUserPrefs = {
 export type tGenres = string;
 
 export type book = {
-  name: string;
+  name?: string;
   name_urdu?: string;
-  image: string;
-  author: string;
-  genre: string[];
+  image?: string;
+  author?: string;
+  genre?: string[];
   rating?: number;
   length?: number;
-  description: string;
-  id: string;
+  description?: string;
+  id?: string;
   tags?: string[];
   chapters?: Array<{ name: string; length: number }>;
   dateAdded?: tDate;

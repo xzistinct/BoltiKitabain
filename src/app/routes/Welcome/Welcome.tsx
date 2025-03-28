@@ -104,31 +104,6 @@ function Welcome() {
           style={{
             width: "100%",
             height: 8 * (height / 100),
-            backgroundColor: GREY,
-            borderRadius: 3 * (width / 100),
-          }}
-          onPress={() =>
-            //@ts-ignore
-            navigation.navigate("BasicInfo", { userType: "Guest" })
-          }
-        >
-          <Text
-            style={{
-              color: "white",
-              fontSize: 5 * (width / 100),
-              fontFamily: font("Jost", "Medium"),
-              textAlign: "center",
-              marginVertical: "auto",
-            }}
-          >
-            Continue as guest
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            marginTop: 2 * (height / 100),
-            width: "100%",
-            height: 8 * (height / 100),
             backgroundColor: BABYBLUE,
             borderRadius: 3 * (width / 100),
           }}
@@ -150,6 +125,13 @@ function Welcome() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          style={{
+            width: "100%",
+            marginTop: 2 * (height / 100),
+            height: 8 * (height / 100),
+            backgroundColor: BABYBLUE,
+            borderRadius: 3 * (width / 100),
+          }}
           onPress={() =>
             //@ts-ignore
             navigation.navigate("SignIn")
@@ -157,15 +139,14 @@ function Welcome() {
         >
           <Text
             style={{
-              marginTop: 1.75 * (height / 100),
-              fontSize: 15,
-              width: 47.5 * (width / 100),
-              marginHorizontal: "auto",
+              color: "white",
+              fontSize: 5 * (width / 100),
+              fontFamily: font("Jost", "Medium"),
               textAlign: "center",
-              textDecorationLine: "underline",
+              marginVertical: "auto",
             }}
           >
-            Already have an account? Sign in
+            Sign In
           </Text>
         </TouchableOpacity>
       </View>

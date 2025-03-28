@@ -95,7 +95,7 @@ export default function Shelf({
                   if (onLongPress) onLongPress(item.item);
                 }}
               >
-                <BookImage id={item.item.image} height={0.2 * height} />
+                <BookImage id={item.item?.image} height={0.2 * height} />
               </TouchableOpacity>
             )}
           />

@@ -26,10 +26,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { SecondsToTime } from "@/helpers/SecondsToTime";
 import { useNavigation } from "@react-navigation/native";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { useAppSelector } from "@/state/reduxStore";
 
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
+
+  const jwt = useAppSelector((state) => state.user.token);
 
   const [sliderValue, setSliderValue] = useState<number>(0);
   return (
@@ -136,6 +139,7 @@ function LoadedPlayer({ book }: { book: book }) {
 export default function Player({ route }: any) {
   const bookId = route.params.bookId;
   const { width, height } = useWindowDimensions();
+  const jwt = useAppSelector((state) => state.user.token);
 
   let [book, setBook] = useState<book | null>(null);
 
@@ -145,7 +149,7 @@ export default function Player({ route }: any) {
 
   useEffect(() => {
     (async () => {
-      let book = await getBookById(bookId);
+      let book = await getBookById(bookId, jwt || "");
       if (typeof book === "object") {
         setBook(book);
       }
