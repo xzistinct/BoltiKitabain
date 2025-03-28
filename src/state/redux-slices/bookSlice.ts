@@ -9,7 +9,7 @@ import {
   tError,
   tResponse,
 } from "@/constants/types";
-import { endpoints } from "@/helpers/endpoints";
+import { endpoints } from "@/constants/endpoints";
 import { errors, getErrorFromCode } from "@/constants/errors";
 import { getPopularBooks } from "@/helpers/books";
 
@@ -145,7 +145,7 @@ const bookSlice = createSlice({
       }
       if (!Array.from(state.readingList).includes(action.payload)) {
         state.readingList = [...Array.from(state.readingList), action.payload];
-        console.log("Reading list:", state.readingList);
+
         // Save to AsyncStorage
         AsyncStorage.setItem(
           "readingList",

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import store from "../state/reduxStore";
+import store, { useAppSelector } from "../state/reduxStore";
 import { useSelector, useDispatch } from "react-redux";
 
 import Welcome from "./routes/Welcome/Welcome";
@@ -35,8 +35,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   const dispatch = useDispatch();
-  const isGuest = useSelector((state: RootState) => state.user.isGuest);
-  const token = useSelector((state: RootState) => state.user.token);
+  const isGuest = useAppSelector((state) => state.user.isGuest);
+  const token = useAppSelector((state) => state.user.token);
 
   return (
     <>

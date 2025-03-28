@@ -5,7 +5,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { endpoints } from "@/helpers/endpoints";
+import { endpoints } from "@/constants/endpoints";
 import { GREY } from "@/constants/colors";
 import { getImageURL } from "@/helpers/books";
 

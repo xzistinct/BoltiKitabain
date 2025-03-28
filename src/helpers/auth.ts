@@ -9,7 +9,7 @@ import {
   tUserPrefs,
 } from "@/constants/types";
 import { errors } from "@/constants/errors";
-import { endpoints } from "./endpoints";
+import { endpoints } from "../constants/endpoints";
 
 export const login = async (
   username: string,
@@ -145,7 +145,6 @@ export const setCredentialsInStorage = async (
   username: string,
   password: string
 ): Promise<tResponse> => {
-  console.log("Setting credentials:", username, password);
   try {
     await SecureStore.setItemAsync("username", username);
     await SecureStore.setItemAsync("password", password);

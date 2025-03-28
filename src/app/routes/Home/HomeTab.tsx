@@ -71,12 +71,10 @@ export default function HomeTab() {
   useEffect(() => {
     setReadingListBooks(Array<book>(readingList.length).fill({}));
     (async () => {
-      console.log("Reading list books", readingList);
       let books: book[] = [];
       for (let book of readingList) {
         let bookData = await getBookById(book, jwt || "");
 
-        console.log("Book data", bookData);
         if (typeof bookData === "object") {
           books.push(bookData);
         }

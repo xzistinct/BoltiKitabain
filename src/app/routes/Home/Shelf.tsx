@@ -2,7 +2,7 @@ import BookImage from "@/components/BookImage";
 import BookModal from "@/components/BookModal";
 import { GREY, LIGHTBROWN } from "@/constants/colors";
 import { book } from "@/constants/types";
-import { endpoints } from "@/helpers/endpoints";
+import { endpoints } from "@/constants/endpoints";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import {

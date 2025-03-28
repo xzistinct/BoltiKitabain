@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { tGenres, book } from "@/constants/types";
 import {
@@ -23,7 +23,9 @@ import BookModal from "@/components/BookModal";
 
 import BookCard from "@/components/BookCard";
 import { useAppSelector } from "@/state/reduxStore";
-import { getBookCategories } from "@/helpers/books";
+import { getBookCategories, getBooksByCategory } from "@/helpers/books";
+import { BarIndicator } from "react-native-indicators";
+import { BABYBLUE } from "@/constants/colors";
 
 const Filter = () => {
   const { width, height } = useWindowDimensions();
@@ -61,7 +63,12 @@ const Filter = () => {
 export default function DiscoverTab({}: {}) {
   const { width, height } = useWindowDimensions();
   const [categories, setCategories] = useState<string[]>([]);
-  const [currentGenre, setCurrentGenre] = useState<string>("");
+  const [currentCategory, setCurrentCategory] = useState<string>("");
+  const [booksInCurrentCategory, setBooksInCurrentCategory] = useState<
+    book[] | null
+  >([]);
+  const jwt = useAppSelector((state) => state.user.token);
+  const booksByCategoryRef = useRef<Record<string, book[]>>({});
 
   useEffect(() => {
     (async () => {
@@ -70,8 +77,25 @@ export default function DiscoverTab({}: {}) {
         return;
       }
       setCategories(categoriesGotten);
+      setCurrentCategory(categoriesGotten[0]);
     })();
   }, []);
+
+  useEffect(() => {
+    console.log("Current category: ", currentCategory);
+    (async () => {
+      if (!booksByCategoryRef.current[currentCategory]) {
+        console.log("Fetching books for category: ", currentCategory);
+
+        const books = await getBooksByCategory(currentCategory, jwt || "");
+        if (typeof books === "number") {
+          return;
+        }
+        booksByCategoryRef.current[currentCategory] = books;
+      }
+      setBooksInCurrentCategory(booksByCategoryRef.current[currentCategory]);
+    })();
+  }, [currentCategory]);
 
   const [selectedBook, setSelectedBook] = useState<book | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -88,10 +112,11 @@ export default function DiscoverTab({}: {}) {
         <View style={{ height: CarouselStyle.height }}>
           <Carousel
             data={categories}
-            windowSize={1}
-            // onSnapToItem={(index) => {
-            //   setCurrentGenre(categories[index]);
-            // }}
+            windowSize={3}
+            onSnapToItem={(index) => {
+              console.log("Snapped");
+              setCurrentCategory(categories[index]);
+            }}
             //@ts-ignore
             height={CarouselStyle.height}
             loop={true}
@@ -106,13 +131,30 @@ export default function DiscoverTab({}: {}) {
               parallaxAdjacentItemScale: 0.5,
             }}
             renderItem={({ item, index }) => (
-              <View style={{ display: "flex", alignItems: "center" }}>
+              <View
+                style={{
+                  display: "flex",
+                  height: CarouselStyle.height,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "white",
+                  borderRadius: 10,
+                  alignSelf: "center",
+                  paddingHorizontal: 4,
+                  paddingVertical: 10,
+                  width: "auto",
+                  flexGrow: 0,
+                  flexShrink: 1,
+                }}
+              >
                 <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
                   style={{
-                    fontSize: 7 * (height / 100),
+                    fontSize: 5 * (height / 100),
                     fontFamily: font("Jost", "Regular"),
-
-                    backgroundColor: "white",
+                    textAlign: "center",
+                    maxWidth: "90%",
                   }}
                 >
                   {item}
@@ -121,22 +163,33 @@ export default function DiscoverTab({}: {}) {
             )}
           />
         </View>
-        <View>
-          <Filter />
-        </View>
-        <View>
-          {/* {booksInSelectedGenre !== null &&
-            booksInSelectedGenre.map((item, index) => (
-              <BookCard
-                key={index}
-                book={item}
-                onPress={() => {
-                  setSelectedBook(item);
-                  setModalVisible(true);
-                }}
-              />
-            ))} */}
-        </View>
+        {booksInCurrentCategory && booksInCurrentCategory.length > 0 ? (
+          <FlatList
+            data={booksInCurrentCategory}
+            removeClippedSubviews={true}
+            renderItem={(item) => {
+              return (
+                <BookCard
+                  book={item.item}
+                  onPress={() => {
+                    setSelectedBook(item.item);
+                    setModalVisible(true);
+                  }}
+                />
+              );
+            }}
+          />
+        ) : (
+          <View
+            style={{
+              height: height - (CarouselStyle.height as number) - 100,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <BarIndicator color={BABYBLUE} />
+          </View>
+        )}
       </View>
       <BookModal
         book={selectedBook}

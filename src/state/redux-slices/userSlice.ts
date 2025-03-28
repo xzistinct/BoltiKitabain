@@ -14,14 +14,16 @@ import { tError, tResponse, tUser, tUserInformation } from "@/constants/types";
 import { errors, getErrorFromCode } from "@/constants/errors";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-// Define the initial state using that type
-const initialState: {
+interface UserState {
   isGuest: boolean;
   username: null | string;
   token: null | string;
   userInfo: tUserInformation | null;
   initialized: boolean;
-} = {
+}
+
+// Define the initial state using that type
+const initialState: UserState = {
   isGuest: false,
   username: null,
   token: null,

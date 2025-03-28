@@ -1,5 +1,5 @@
 import { book, tError, tGenres } from "@/constants/types";
-import { endpoints } from "./endpoints";
+import { endpoints } from "../constants/endpoints";
 import { errors } from "@/constants/errors";
 
 export function getImageURL(id: string): string {
@@ -40,17 +40,15 @@ export async function getPopularBooks(): Promise<book[] | tError> {
     if (!Array.isArray(data)) {
       return errors["Failed to get appropriate response from server"];
     }
-    let books: book[] = data.filter((book: any) => {
-      const json = parseBookJSON(book);
-      if (typeof json !== "object") {
-        return false; // Skip elements where json is an error
-      }
-      return json;
-    });
+    const books: book[] = data
+      .map((bookData: any) => parseBookJSON(bookData))
+      .filter((result) => typeof result === "object");
 
     if (books.length === 0) {
       return errors["Failed to get appropriate response from server"];
     }
+
+    console.log("Books:", books);
 
     return books;
   } catch (error) {
@@ -109,5 +107,37 @@ export async function getBookCategories(): Promise<string[] | tError> {
   } catch (error) {
     console.error("Error parsing JSON:", error);
     return errors["Failed to parse server response"];
+  }
+}
+
+export async function getBooksByCategory(
+  category: string,
+  jwt: string
+): Promise<book[] | tError> {
+  try {
+    const response = await fetch(endpoints.filteredBooks, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": jwt,
+      },
+      body: JSON.stringify({ parentVal: category, genreVal: "", subVal: "" }),
+    });
+    if (!response.ok) {
+      return errors["Failed to get appropriate response from server"];
+    }
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      return errors["Failed to get appropriate response from server"];
+    }
+    let books: book[] = data
+      .map((bookData: any) => parseBookJSON(bookData))
+      .filter((result) => typeof result === "object");
+
+    return books;
+  } catch (error) {
+    console.error("Error fetching books by category:", error);
+    return errors["Failed to get appropriate response from server"];
   }
 }

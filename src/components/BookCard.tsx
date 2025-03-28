@@ -24,7 +24,7 @@ export default function BookCard({
   onPress: () => void;
 }) {
   const { width, height } = useWindowDimensions();
-  const bookLength = SecondsToTime(book.length);
+  const bookLength = SecondsToTime(book.length || 0);
 
   return (
     <TouchableOpacity
@@ -89,17 +89,19 @@ export default function BookCard({
           <ScrollView horizontal>
             <TouchableWithoutFeedback>
               <View style={{ display: "flex", flexDirection: "row" }}>
-                {book.tags.map((tag, index) => (
-                  <Chip
-                    content={tag}
-                    key={index}
-                    textStyle={{}}
-                    style={{
-                      marginLeft: 2 * (width / 100),
-                      paddingVertical: 0.3 * (height / 100),
-                    }}
-                  />
-                ))}
+                {book.tags &&
+                  book.tags.length > 0 &&
+                  book.tags.map((tag, index) => (
+                    <Chip
+                      content={tag}
+                      key={index}
+                      textStyle={{}}
+                      style={{
+                        marginLeft: 2 * (width / 100),
+                        paddingVertical: 0.3 * (height / 100),
+                      }}
+                    />
+                  ))}
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
