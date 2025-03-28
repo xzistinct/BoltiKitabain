@@ -5,6 +5,7 @@ import {
   TextStyle,
   useWindowDimensions,
   ScrollView,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import font from "@/constants/fonts";
@@ -136,10 +137,16 @@ export default function HomeTab() {
   return (
     <>
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        nestedScrollEnabled={true}
+        contentContainerStyle={{
+          paddingBottom: 20 * (height / 100), // Add sufficient bottom padding
+        }}
       >
-        {bookShelf.map((item, index) => renderBookShelf(item, index))}
+        <TouchableWithoutFeedback>
+          <View>
+            {bookShelf.map((item, index) => renderBookShelf(item, index))}
+          </View>
+        </TouchableWithoutFeedback>
       </ScrollView>
       {screenState === "loading" && <LoadingOverlay />}
     </>
