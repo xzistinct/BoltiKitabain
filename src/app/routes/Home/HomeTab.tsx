@@ -142,6 +142,7 @@ export default function HomeTab() {
     <>
       <ScrollView
         nestedScrollEnabled={true}
+        removeClippedSubviews={true}
         contentContainerStyle={{
           paddingBottom: 20 * (height / 100), // Add sufficient bottom padding
         }}

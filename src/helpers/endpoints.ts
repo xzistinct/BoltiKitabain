@@ -3,4 +3,5 @@ export const endpoints: Record<string, string> = {
   register: "https://boltikitabain.pk:8443/api/users/register",
   books: "https://boltikitabain.pk:8443/api/books",
   image: "https://boltikitabain.pk:8443/images",
+  categories: "https://boltikitabain.pk:8443/api/categories",
 };

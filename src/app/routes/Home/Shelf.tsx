@@ -73,6 +73,9 @@ export default function Shelf({
         {books !== null && books.length > 0 ? (
           <FlatList
             horizontal
+            initialNumToRender={5}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={3}
             data={books}
             style={{ width: "100%" }}
             nestedScrollEnabled

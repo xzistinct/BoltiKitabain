@@ -131,9 +131,7 @@ export const login = createAsyncThunk(
         attempt.error ||
         !attempt.userInformation
       ) {
-        return rejectWithValue(
-          attempt.error || errors["Login failed unknown reason"]
-        );
+        return rejectWithValue(attempt.error || errors["Invalid credentials"]);
       }
 
       await setCredentialsInStorage(username, password);
@@ -146,9 +144,9 @@ export const login = createAsyncThunk(
     } catch (error) {
       callback({
         success: false,
-        error: errors["Login failed unknown reason"],
+        error: errors["Unknown error"],
       });
-      return rejectWithValue(errors["Login failed unknown reason"]);
+      return rejectWithValue(errors["Unknown error"]);
     }
   }
 );

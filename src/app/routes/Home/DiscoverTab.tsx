@@ -23,8 +23,7 @@ import BookModal from "@/components/BookModal";
 
 import BookCard from "@/components/BookCard";
 import { useAppSelector } from "@/state/reduxStore";
-
-const genres = ["Fiction", "Non-Fiction", "Science", "History", "Biography"];
+import { getBookCategories } from "@/helpers/books";
 
 const Filter = () => {
   const { width, height } = useWindowDimensions();
@@ -61,14 +60,18 @@ const Filter = () => {
 
 export default function DiscoverTab({}: {}) {
   const { width, height } = useWindowDimensions();
-  const [currentGenre, setCurrentGenre] = useState<string>("Fiction");
-  const popularBooks = useAppSelector(
-    (state) => state.books.fetchedPopularBooks
-  );
+  const [categories, setCategories] = useState<string[]>([]);
+  const [currentGenre, setCurrentGenre] = useState<string>("");
 
-  const [booksInSelectedGenre, setBooksInSelectedGenre] = useState<
-    book[] | null
-  >(popularBooks);
+  useEffect(() => {
+    (async () => {
+      const categoriesGotten = await getBookCategories();
+      if (typeof categoriesGotten === "number") {
+        return;
+      }
+      setCategories(categoriesGotten);
+    })();
+  }, []);
 
   const [selectedBook, setSelectedBook] = useState<book | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -84,12 +87,11 @@ export default function DiscoverTab({}: {}) {
       <View style={{ width: width }}>
         <View style={{ height: CarouselStyle.height }}>
           <Carousel
-            data={Array.from(genres)}
+            data={categories}
             windowSize={1}
-            onSnapToItem={(index) => {
-              setCurrentGenre(genres[index]);
-              setBooksInSelectedGenre(popularBooks);
-            }}
+            // onSnapToItem={(index) => {
+            //   setCurrentGenre(categories[index]);
+            // }}
             //@ts-ignore
             height={CarouselStyle.height}
             loop={true}
@@ -123,7 +125,7 @@ export default function DiscoverTab({}: {}) {
           <Filter />
         </View>
         <View>
-          {booksInSelectedGenre !== null &&
+          {/* {booksInSelectedGenre !== null &&
             booksInSelectedGenre.map((item, index) => (
               <BookCard
                 key={index}
@@ -133,7 +135,7 @@ export default function DiscoverTab({}: {}) {
                   setModalVisible(true);
                 }}
               />
-            ))}
+            ))} */}
         </View>
       </View>
       <BookModal
