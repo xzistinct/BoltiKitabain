@@ -48,6 +48,8 @@ const NAVBAR = ({
   const dispatch = useAppDispatch();
   const gender = useAppSelector((state) => state.user.userInfo?.gender);
 
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
   const NAVBARTEXTSTYLE: StyleProp<TextStyle> = {
     fontSize: 3 * (height / 100),
     fontFamily: font("Jost", "Regular"),
@@ -90,23 +92,71 @@ const NAVBAR = ({
           </TouchableOpacity>
         ))}
       </View>
-      <TouchableOpacity
-        style={{ marginLeft: "auto", marginRight: 10 * (width / 100) }}
-        onPress={() => {
-          dispatch(logout());
+      <View
+        style={{
+          marginLeft: "auto",
+          marginRight: 15 * (width / 100),
         }}
       >
-        <Image
-          source={require("@/assets/images/profileicon.png")}
-          style={{
-            width: width * 0.1,
-            height: width * 0.1,
-            borderRadius: 1000,
-            borderWidth: 1,
-            borderColor: DARKGREY,
+        <TouchableOpacity
+          onPress={() => {
+            setIsDropdownVisible(!isDropdownVisible);
           }}
-        />
-      </TouchableOpacity>
+        >
+          <Image
+            source={require("@/assets/images/profileicon.png")}
+            style={{
+              width: width * 0.1,
+              height: width * 0.1,
+              borderRadius: 1000,
+              borderWidth: 1,
+              borderColor: DARKGREY,
+            }}
+          />
+        </TouchableOpacity>
+        {isDropdownVisible && (
+          <View
+            style={{
+              position: "absolute",
+              top: width * 0.11,
+              width: 25 * (width / 100),
+              left: -6.25 * (width / 100),
+              backgroundColor: "white",
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: LIGHTGREY,
+              padding: 10,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              elevation: 3,
+              zIndex: 1000,
+            }}
+          >
+            <TouchableOpacity
+              style={{ paddingVertical: 8 }}
+              onPress={() => {
+                setIsDropdownVisible(false);
+              }}
+            >
+              <Text style={{ fontFamily: font("Jost", "Regular") }}>
+                Profile
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ paddingVertical: 8 }}
+              onPress={() => {
+                dispatch(logout());
+                setIsDropdownVisible(false);
+              }}
+            >
+              <Text style={{ fontFamily: font("Jost", "Regular") }}>
+                Logout
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
   );
 };

@@ -4,4 +4,4 @@
 4. Audio playback through https://rntp.dev/docs/basics/getting-started/
 5. Specific book parser for server -> client
 6. Helper to get books from genre, based on id, etc.
-7. Get genres, categories, etc from server
+7. Fix delay in DiscoverTab carousel changes with activity loader

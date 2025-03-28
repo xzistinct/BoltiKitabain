@@ -22,7 +22,7 @@ import Chip from "./Chip";
 import Stars from "./Stars";
 import { useNavigation } from "@react-navigation/native";
 import BookImage from "./BookImage";
-import { useAppDispatch } from "@/state/reduxStore";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import { addToReadingList } from "@/state/redux-slices/bookSlice";
 
 export default function BookModal({
@@ -37,6 +37,15 @@ export default function BookModal({
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const readingList = useAppSelector((state) => state.books.readingList);
+  const [addedToReadingList, setAddedToReadingList] = useState(
+    readingList.some((item) => item === book?.id)
+  );
+
+  useEffect(() => {
+    const isBookInReadingList = readingList.some((item) => item === book?.id);
+    setAddedToReadingList(isBookInReadingList);
+  }, [readingList]);
 
   const startReading = () => {
     setModalVisible(false);
@@ -64,6 +73,8 @@ export default function BookModal({
   };
 
   if (!book || !modalVisible) return null;
+
+  console.log("addedToReadingList", addedToReadingList);
 
   const showTopBar = book.length || book.tags || book.genre || book.rating;
 
@@ -226,14 +237,25 @@ export default function BookModal({
               >
                 <Text style={actionButtonTextStyle}>Start listening</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={actionButtonStyle}
-                onPress={() => {
-                  dispatch(addToReadingList(book.id || ""));
-                }}
-              >
-                <Text style={actionButtonTextStyle}>Add to list</Text>
-              </TouchableOpacity>
+              {!addedToReadingList ? (
+                <TouchableOpacity
+                  style={actionButtonStyle}
+                  onPress={() => {
+                    dispatch(addToReadingList(book.id || ""));
+                  }}
+                >
+                  <Text style={actionButtonTextStyle}>Add to list</Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{
+                    ...actionButtonStyle,
+                    backgroundColor: GREY,
+                  }}
+                >
+                  <Text style={actionButtonTextStyle}>Added to list</Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
