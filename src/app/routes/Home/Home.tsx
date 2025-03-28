@@ -62,13 +62,14 @@ const NAVBAR = ({
         display: "flex",
         flexDirection: "row",
         marginBottom: 2.5 * (height / 100),
+        width: width,
       }}
     >
       <View
         style={{
           display: "flex",
           flexDirection: "row",
-          marginHorizontal: "auto",
+          marginLeft: width * 0.1,
         }}
       >
         {tabs.map((item, index) => (
