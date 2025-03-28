@@ -46,8 +46,8 @@ export default function BookModal({
 
   const actionButtonStyle: StyleProp<ViewStyle> = {
     backgroundColor: BABYBLUE,
-    width: 45 * (width / 100),
-    height: 8.5 * (height / 100),
+    width: 40 * (width / 100),
+    height: 7.5 * (height / 100),
     paddingHorizontal: 3 * (width / 100),
     display: "flex",
     justifyContent: "center",

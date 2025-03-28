@@ -43,7 +43,7 @@ const initialState: BookState = {
 export const initializeBookState = createAsyncThunk(
   "book/initializeBookState",
   async (
-    _,
+    callback: (response: tResponse) => void,
     { rejectWithValue }: { rejectWithValue: (err: tError) => void }
   ): Promise<void | {
     currentlyReading: string[];
@@ -56,6 +56,7 @@ export const initializeBookState = createAsyncThunk(
       const bookProgress = await AsyncStorage.getItem("bookProgress");
       const bookmarks = await AsyncStorage.getItem("bookmarks");
       const readingList = await AsyncStorage.getItem("readingList");
+      callback({ success: true });
       return {
         currentlyReading: currentlyReading ? JSON.parse(currentlyReading) : [],
         bookProgress: bookProgress ? JSON.parse(bookProgress) : {},
@@ -63,6 +64,11 @@ export const initializeBookState = createAsyncThunk(
         readingList: readingList ? JSON.parse(readingList) : {},
       };
     } catch (error) {
+      console.error("Error initializing book state:", error);
+      callback({
+        success: false,
+        error: errors["Failed to initialize book state"],
+      });
       return rejectWithValue(errors["Failed to initialize book state"]);
     }
   }
@@ -147,6 +153,15 @@ const bookSlice = createSlice({
         ).catch((error) => console.error("Error saving reading list:", error));
       }
     },
+    removeFromReadingList: (state, action: PayloadAction<string>) => {
+      if (!state.initialized) {
+        return;
+      }
+      state.readingList = Array.from(state.readingList).filter(
+        (bookId) => bookId !== action.payload
+      );
+      AsyncStorage.setItem("readingList", JSON.stringify(state.readingList));
+    },
     updateBookProgress: (state, action: PayloadAction<BookProgress>) => {
       if (!state.initialized) {
         return;
@@ -215,6 +230,7 @@ const bookSlice = createSlice({
 // Export actions and reducer
 export const {
   addToCurrentlyReading,
+  removeFromReadingList,
   addToReadingList,
   updateBookProgress,
   addBookmark,

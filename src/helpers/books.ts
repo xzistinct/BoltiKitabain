@@ -56,7 +56,6 @@ export async function getBookById(
     body: null,
     method: "GET",
   });
-  console.log("Response", response);
   if (!response.ok) {
     return errors["Failed to get books"];
   }
