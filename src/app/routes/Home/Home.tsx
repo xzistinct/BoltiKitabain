@@ -61,6 +61,7 @@ const NAVBAR = ({
       style={{
         display: "flex",
         flexDirection: "row",
+        marginBottom: 2.5 * (height / 100),
       }}
     >
       <View
@@ -165,14 +166,8 @@ function Home() {
             />
           </View>
 
-          <ScrollView
-            scrollEnabled={true}
-            style={{ flex: 1, width: width }}
-            removeClippedSubviews={true}
-          >
-            <NAVBAR currentTab={currentTab} setCurrentTab={setCurrentTab} />
-            <View>{currentTab === "Home" ? <HomeTab /> : <DiscoverTab />}</View>
-          </ScrollView>
+          <NAVBAR currentTab={currentTab} setCurrentTab={setCurrentTab} />
+          <View>{currentTab === "Home" ? <HomeTab /> : <DiscoverTab />}</View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </View>

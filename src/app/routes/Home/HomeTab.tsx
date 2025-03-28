@@ -14,7 +14,10 @@ import { book } from "@/constants/types";
 import { useEffect, useState } from "react";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
-import { fetchPopularBooks } from "@/state/redux-slices/bookSlice";
+import {
+  fetchPopularBooks,
+  removeFromReadingList,
+} from "@/state/redux-slices/bookSlice";
 import { getBookById } from "@/helpers/books";
 import { useSelector } from "react-redux";
 
@@ -23,6 +26,7 @@ type tBookShelf = {
   title: string;
   behaviour: "Open" | "Modal";
   emptyMessage: string;
+  onLongPress?: (book: book) => void;
 }[];
 
 export default function HomeTab() {
@@ -90,12 +94,16 @@ export default function HomeTab() {
       fontFamily: font("Jost", "Regular"),
     };
     return (
-      <View key={index} style={{ marginTop: 5 * (height / 100) }}>
+      <View
+        key={index}
+        style={{ marginTop: index === 0 ? 0 : 5 * (height / 100) }}
+      >
         <Text style={ShelfHeaderStyle}>{item.title}</Text>
         <Shelf
           books={item.books}
           emptyMessage={item.emptyMessage}
           behaviour={item.behaviour}
+          onLongPress={item.onLongPress}
         />
       </View>
     );
@@ -113,6 +121,9 @@ export default function HomeTab() {
       title: "In your reading list",
       behaviour: "Open",
       emptyMessage: "Add to your reading list to fill this shelf",
+      onLongPress: (book) => {
+        dispatch(removeFromReadingList(book.id));
+      },
     },
     {
       books: popularBooks,

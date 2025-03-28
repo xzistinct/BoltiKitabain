@@ -41,10 +41,12 @@ export default function Shelf({
   books,
   behaviour,
   emptyMessage,
+  onLongPress,
 }: {
   books: book[] | null;
   behaviour: "Open" | "Modal";
   emptyMessage: string;
+  onLongPress?: (book: book) => void;
 }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
@@ -88,6 +90,9 @@ export default function Shelf({
                     setSelectedBook(item.item);
                     setModalVisible(true);
                   }
+                }}
+                onLongPress={() => {
+                  if (onLongPress) onLongPress(item.item);
                 }}
               >
                 <BookImage id={item.item.image} height={0.2 * height} />
