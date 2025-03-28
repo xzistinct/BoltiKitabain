@@ -40,7 +40,8 @@ export default function BookImage({
       style={{
         width: width,
         height: height,
-        backgroundColor: GREY,
+        justifyContent: "center",
+        alignItems: "center",
         //@ts-ignore
         ...containerStyle,
       }}
@@ -53,6 +54,9 @@ export default function BookImage({
           style={{
             width: width,
             height: height,
+            borderRadius: 3 * (swidth / 100),
+            overflow: "hidden",
+            borderWidth: 2,
           }}
         />
       )}

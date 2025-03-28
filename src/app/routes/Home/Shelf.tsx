@@ -82,7 +82,6 @@ export default function Shelf({
             renderItem={(item) => (
               <TouchableOpacity
                 style={{
-                  backgroundColor: GREY,
                   marginRight: 5 * (width / 100),
                 }}
                 onPress={() => {
