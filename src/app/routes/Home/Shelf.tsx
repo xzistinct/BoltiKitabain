@@ -68,11 +68,12 @@ export default function Shelf({
           height: 20 * (height / 100),
         }}
       >
-        {books !== null && books.length > 1 ? (
+        {books !== null && books.length > 0 ? (
           <FlatList
             horizontal
             data={books}
             style={{ width: "100%" }}
+            nestedScrollEnabled
             renderItem={(item) => (
               <TouchableOpacity
                 style={{
