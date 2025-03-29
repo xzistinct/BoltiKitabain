@@ -13,8 +13,6 @@ import { endpoints } from "@/constants/endpoints";
 import { errors, getErrorFromCode } from "@/constants/errors";
 import { getPopularBooks } from "@/helpers/books";
 
-import { RootState } from "../reduxStore";
-
 // Define types
 
 interface BookState {

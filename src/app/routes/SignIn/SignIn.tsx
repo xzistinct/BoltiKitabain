@@ -218,10 +218,11 @@ export default function SignIn() {
                 <View style={{ marginHorizontal: "auto" }}>
                   <TextInput
                     style={TextInputStyle}
+                    autoCapitalize="none"
                     onChangeText={(value) => {
                       changeEmailHeaderDual(null);
                       if (value) {
-                        setEmail(value);
+                        setEmail(value.toLowerCase());
                       }
                     }}
                     placeholder="example@pitb.com"

@@ -214,12 +214,15 @@ const NAVBAR = ({
           <Text
             style={{
               marginTop: 2 * (height / 100),
-              fontFamily: font("OpenSans", "SemiBold"),
+              fontFamily: font("OpenSans", "Medium"),
               fontSize: 2 * (height / 100),
               textAlign: "center",
             }}
           >
-            Are you sure? This will erase your preferences and saved data.
+            Are you sure?{" "}
+            <Text style={{ fontFamily: font("OpenSans", "SemiBold") }}>
+              This will erase your preferences and saved data.
+            </Text>
           </Text>
           <View
             style={{
