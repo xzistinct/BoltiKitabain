@@ -1,3 +1,5 @@
+import { searchBooks } from "@/helpers/books";
+
 export const endpoints = {
   login: "https://boltikitabain.pk:8443/api/users/login",
   register: "https://boltikitabain.pk:8443/api/users/register",
@@ -5,4 +7,5 @@ export const endpoints = {
   image: "https://boltikitabain.pk:8443/images",
   categories: "https://boltikitabain.pk:8443/api/categories",
   filteredBooks: "https://boltikitabain.pk:8443/api/books/filtered",
+  searchBooks: "https://boltikitabain.pk:8443/api/books/search",
 } as const;

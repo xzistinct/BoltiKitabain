@@ -8,16 +8,21 @@ import { useSelector, useDispatch } from "react-redux";
 import Welcome from "./routes/Welcome/Welcome";
 import Home from "./routes/Home/Home";
 
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import BasicInfo from "./routes/BasicInfo/BasicInfo";
 // import InterestedGenres from "./routes/InterestedGenres/InterestedGenres";
 import CreateAccount from "./routes/CreateAccount/CreateAccount";
 import RecommendedBook from "./routes/RecommendedBook/RecommendedBook";
 import SignIn from "./routes/SignIn/SignIn";
 
+import * as NavigationBar from "expo-navigation-bar";
+
 import { RootState } from "../state/reduxStore";
+import { StatusBar, AppState, AppStateStatus } from "react-native";
+
 import CreatingAccount from "./routes/CreatingAccount/CreatingAccount";
 import Player from "./routes/Player/Player";
+import Search from "./routes/Search/Search";
 
 type RootStackParamList = {
   Home: undefined;
@@ -29,6 +34,7 @@ type RootStackParamList = {
   RecommendedBook: undefined;
   CreatingAccount: undefined;
   Player: { bookId: string };
+  Search: { searchQuery: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -37,6 +43,33 @@ function RootNavigator() {
   const dispatch = useDispatch();
   const isGuest = useAppSelector((state) => state.user.isGuest);
   const token = useAppSelector((state) => state.user.token);
+  // Configure both status bar and navigation bar
+  const configureAppBars = () => {
+    // Status bar (top)
+    StatusBar.setBackgroundColor("white");
+    StatusBar.setBarStyle("dark-content");
+
+    // Navigation bar (bottom) - Android only
+    if (Platform.OS === "android") {
+      NavigationBar.setBackgroundColorAsync("white");
+    }
+  };
+
+  useEffect(() => {
+    // Set initial configuration
+    configureAppBars();
+
+    // Listen for app state changes
+    const subscription = AppState.addEventListener(
+      "change",
+      (nextAppState: AppStateStatus) => {
+        if (nextAppState === "active") {
+          // Re-apply configuration when app becomes active
+          configureAppBars();
+        }
+      }
+    );
+  }, []);
 
   return (
     <>
@@ -56,8 +89,9 @@ function RootNavigator() {
               name="InterestedGenres"
               component={InterestedGenres}
             /> */}
-            <Stack.Screen name="RecommendedBook" component={RecommendedBook} />
+            {/* <Stack.Screen name="RecommendedBook" component={RecommendedBook} /> */}
             <Stack.Screen name="Player" component={Player} />
+            <Stack.Screen name="Search" component={Search} />
           </>
         ) : (
           <>

@@ -17,6 +17,8 @@ import {
   Image,
 } from "react-native";
 
+const tsBrown = "#A0522D";
+
 const SHELFBOTTOM = () => {
   const { width, height } = useWindowDimensions();
   return (
@@ -25,7 +27,7 @@ const SHELFBOTTOM = () => {
         width: 5 * (width / 100),
         height: 0,
         borderTopWidth: 10,
-        borderTopColor: LIGHTBROWN,
+        borderTopColor: tsBrown,
 
         borderLeftWidth: 1 * (width / 100),
         borderLeftColor: "transparent",
@@ -117,7 +119,7 @@ export default function Shelf({
         style={{
           width: "100%",
           height: 2 * (height / 100),
-          backgroundColor: LIGHTBROWN,
+          backgroundColor: tsBrown,
           borderRadius: 5,
           marginHorizontal: "auto",
         }}
@@ -132,7 +134,7 @@ export default function Shelf({
         <SHELFBOTTOM />
         <SHELFBOTTOM />
       </View>
-      {modalVisible && selectedBook && (
+      {selectedBook && (
         <BookModal
           book={selectedBook}
           modalVisible={modalVisible}

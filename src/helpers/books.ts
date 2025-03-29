@@ -48,8 +48,6 @@ export async function getPopularBooks(): Promise<book[] | tError> {
       return errors["Failed to get appropriate response from server"];
     }
 
-    console.log("Books:", books);
-
     return books;
   } catch (error) {
     console.error("Error parsing JSON:", error);
@@ -138,6 +136,38 @@ export async function getBooksByCategory(
     return books;
   } catch (error) {
     console.error("Error fetching books by category:", error);
+    return errors["Failed to get appropriate response from server"];
+  }
+}
+
+export async function searchBooks(
+  query: string,
+  jwt: string
+): Promise<book[] | tError> {
+  try {
+    const response = await fetch(endpoints.searchBooks, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": jwt,
+      },
+      body: JSON.stringify({ searchVal: query }),
+    });
+    if (!response.ok) {
+      return errors["Failed to get appropriate response from server"];
+    }
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      return errors["Failed to get appropriate response from server"];
+    }
+    let books: book[] = data
+      .map((bookData: any) => parseBookJSON(bookData))
+      .filter((result) => typeof result === "object");
+
+    return books;
+  } catch (error) {
+    console.error("Error searching books:", error);
     return errors["Failed to get appropriate response from server"];
   }
 }

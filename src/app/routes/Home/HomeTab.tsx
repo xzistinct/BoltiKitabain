@@ -69,7 +69,6 @@ export default function HomeTab() {
   >(null);
 
   useEffect(() => {
-    setReadingListBooks(Array<book>(readingList.length).fill({}));
     (async () => {
       let books: book[] = [];
       for (let book of readingList) {
@@ -79,7 +78,7 @@ export default function HomeTab() {
           books.push(bookData);
         }
       }
-      if (books.length === 0) {
+      if (books.length === 0 && readingList.length > 0) {
         return;
       }
       setReadingListBooks(books);

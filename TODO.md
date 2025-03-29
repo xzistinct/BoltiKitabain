@@ -5,3 +5,5 @@
 5. Specific book parser for server -> client
 6. Helper to get books from genre, based on id, etc.
 7. Fix delay in DiscoverTab carousel changes with activity loader
+
+Toast notification on removing and adding to list

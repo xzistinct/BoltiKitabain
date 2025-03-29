@@ -20,7 +20,10 @@ import {
   TextInput,
   StyleProp,
   TextStyle,
+  StatusBar,
 } from "react-native";
+
+import Modal from "react-native-modal";
 
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -32,6 +35,10 @@ import DiscoverTab from "./DiscoverTab";
 import BookModal from "@/components/BookModal";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import { logout } from "@/state/redux-slices/userSlice";
+import { useNavigation } from "@react-navigation/native";
+
+import * as NavigationBar from "expo-navigation-bar";
+import { clearBookData } from "@/state/redux-slices/bookSlice";
 
 const tabs = ["Home", "Discover"] as const;
 
@@ -47,8 +54,10 @@ const NAVBAR = ({
   const { width, height } = useWindowDimensions();
   const dispatch = useAppDispatch();
   const gender = useAppSelector((state) => state.user.userInfo?.gender);
+  const navigation = useNavigation();
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const NAVBARTEXTSTYLE: StyleProp<TextStyle> = {
     fontSize: 3 * (height / 100),
@@ -133,7 +142,7 @@ const NAVBAR = ({
             <View
               style={{
                 position: "absolute",
-                top: width * 0.11,
+                top: 10,
                 width: 25 * (width / 100),
                 left: -6.25 * (width / 100),
                 backgroundColor: "white",
@@ -162,8 +171,7 @@ const NAVBAR = ({
               <TouchableOpacity
                 style={{ paddingVertical: 8 }}
                 onPress={() => {
-                  dispatch(logout());
-                  setIsDropdownVisible(false);
+                  setLogoutModalVisible(true);
                 }}
               >
                 <Text style={{ fontFamily: font("Jost", "Regular") }}>
@@ -174,6 +182,87 @@ const NAVBAR = ({
           </View>
         )}
       </View>
+      <Modal
+        isVisible={logoutModalVisible}
+        onBackdropPress={() => setLogoutModalVisible(false)}
+        style={{ justifyContent: "center", alignItems: "center", margin: 0 }}
+        backdropOpacity={0.1}
+        onModalHide={() => {
+          StatusBar.setBackgroundColor("white"); // Reset when closed
+          // Navigation bar (bottom) - Android only
+          if (Platform.OS === "android") {
+            NavigationBar.setBackgroundColorAsync("white");
+          }
+        }}
+        onModalShow={() => {
+          StatusBar.setBackgroundColor("rgba(255, 255, 255, 0.87)"); // Match backdrop opacity
+          // Navigation bar (bottom) - Android only
+          if (Platform.OS === "android") {
+            NavigationBar.setBackgroundColorAsync("rgba(255, 255, 255, 0.87)");
+          }
+        }}
+      >
+        <View
+          style={{
+            width: 75 * (width / 100),
+            height: 15 * (height / 100),
+            backgroundColor: "white",
+            borderRadius: 10,
+          }}
+        >
+          <Text
+            style={{
+              marginTop: 2 * (height / 100),
+              fontFamily: font("OpenSans", "Medium"),
+              fontSize: 2 * (height / 100),
+              textAlign: "center",
+            }}
+          >
+            Are you sure? This will erase your preferences and saved data.
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 2 * (height / 100),
+              marginHorizontal: "auto",
+              justifyContent: "space-around",
+              width: 60 * (width / 100),
+            }}
+          >
+            <TouchableOpacity>
+              <Text
+                style={{
+                  fontFamily: font("Jost", "Regular"),
+                  fontSize: 2.5 * (height / 100),
+                  color: DARKGREY,
+                }}
+                onPress={() => {
+                  setLogoutModalVisible(false);
+                }}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(logout());
+                dispatch(clearBookData());
+                setLogoutModalVisible(false);
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: font("Jost", "Regular"),
+                  fontSize: 2.5 * (height / 100),
+                  color: DARKGREY,
+                }}
+              >
+                Logout
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -182,6 +271,9 @@ function Home() {
   const { width, height } = useWindowDimensions();
 
   const [currentTab, setCurrentTab] = useState<tTabs>("Home");
+  const navigation = useNavigation();
+
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   return (
     <View
@@ -231,6 +323,12 @@ function Home() {
               }}
               placeholder="Search the catalogue"
               placeholderTextColor={GREY}
+              value={searchQuery}
+              onChangeText={(text) => setSearchQuery(text)}
+              onSubmitEditing={() => {
+                //@ts-ignore
+                navigation.navigate("Search", { searchQuery: searchQuery });
+              }}
             />
           </View>
 

@@ -202,6 +202,8 @@ export const createAccount = createAsyncThunk(
         return rejectWithValue(credentials.error || errors["Unknown error"]);
       }
 
+      callback({ success: true });
+
       return;
     } catch (error) {
       callback({ success: false, error: errors["Unknown error"] });
@@ -252,6 +254,8 @@ export const userSlice = createSlice({
       state.username = null;
       state.token = null;
       state.userInfo = null;
+      state.initialized = false;
+
       clearUserFromStorage();
     },
     setLanguage: (state, action: { payload: "English" | "Urdu" }) => {

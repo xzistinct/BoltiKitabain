@@ -198,10 +198,12 @@ export const setUserInformationInStorage = async (
 
 export const clearUserFromStorage = async (): Promise<tResponse> => {
   try {
+    console.log("Clearing user from storage");
     await AsyncStorage.removeItem("userInformation");
     await AsyncStorage.removeItem("IsGuest");
     await SecureStore.deleteItemAsync("username");
     await SecureStore.deleteItemAsync("password");
+
     return { success: true };
   } catch (e) {
     console.error("Error while clearing user from storage:", e);

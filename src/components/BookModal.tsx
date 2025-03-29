@@ -13,6 +13,8 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
+  StatusBar,
+  Platform,
 } from "react-native";
 
 import { book } from "@/constants/types";
@@ -24,6 +26,8 @@ import { useNavigation } from "@react-navigation/native";
 import BookImage from "./BookImage";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import { addToReadingList } from "@/state/redux-slices/bookSlice";
+
+import * as NavigationBar from "expo-navigation-bar";
 
 export default function BookModal({
   book,
@@ -38,14 +42,21 @@ export default function BookModal({
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const readingList = useAppSelector((state) => state.books.readingList);
-  const [addedToReadingList, setAddedToReadingList] = useState(
-    readingList.some((item) => item === book?.id)
-  );
+  const [addedToReadingList, setAddedToReadingList] = useState<boolean>(false);
+  const checkIfBookInReadingList = () => {
+    const isBookInReadingList = readingList.some((item) => {
+      if (item == book?.id) {
+        return true;
+      }
+      return false;
+    });
+    setAddedToReadingList(isBookInReadingList);
+  };
 
   useEffect(() => {
-    const isBookInReadingList = readingList.some((item) => item === book?.id);
-    setAddedToReadingList(isBookInReadingList);
-  }, [readingList]);
+    console.log("readingList", readingList);
+    checkIfBookInReadingList();
+  }, [readingList, book]);
 
   const startReading = () => {
     setModalVisible(false);
@@ -72,9 +83,7 @@ export default function BookModal({
     textAlign: "center",
   };
 
-  if (!book || !modalVisible) return null;
-
-  console.log("addedToReadingList", addedToReadingList);
+  if (!book) return null;
 
   const showTopBar = book.length || book.tags || book.genre || book.rating;
 
@@ -100,6 +109,15 @@ export default function BookModal({
         style={{
           justifyContent: "flex-end", // Aligns the modal at the bottom
           margin: 0, // Removes default margin around the modal
+        }}
+        onModalHide={() => {
+          console.log("Modal closed");
+          StatusBar.setBackgroundColor("white"); // Reset when closed
+          // Navigation bar (bottom) - Android only
+        }}
+        onModalShow={() => {
+          StatusBar.setBackgroundColor("rgba(255, 255, 255, 0.87)"); // Match backdrop opacity
+          // Navigation bar (bottom) - Android only
         }}
       >
         <View
@@ -242,6 +260,7 @@ export default function BookModal({
                   style={actionButtonStyle}
                   onPress={() => {
                     dispatch(addToReadingList(book.id || ""));
+                    setModalVisible(false);
                   }}
                 >
                   <Text style={actionButtonTextStyle}>Add to list</Text>

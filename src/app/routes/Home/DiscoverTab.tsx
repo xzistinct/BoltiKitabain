@@ -82,11 +82,8 @@ export default function DiscoverTab({}: {}) {
   }, []);
 
   useEffect(() => {
-    console.log("Current category: ", currentCategory);
     (async () => {
       if (!booksByCategoryRef.current[currentCategory]) {
-        console.log("Fetching books for category: ", currentCategory);
-
         const books = await getBooksByCategory(currentCategory, jwt || "");
         if (typeof books === "number") {
           return;

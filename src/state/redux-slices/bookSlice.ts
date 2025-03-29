@@ -61,7 +61,7 @@ export const initializeBookState = createAsyncThunk(
         currentlyReading: currentlyReading ? JSON.parse(currentlyReading) : [],
         bookProgress: bookProgress ? JSON.parse(bookProgress) : {},
         bookmarks: bookmarks ? JSON.parse(bookmarks) : {},
-        readingList: readingList ? JSON.parse(readingList) : {},
+        readingList: readingList ? JSON.parse(readingList) : [],
       };
     } catch (error) {
       console.error("Error initializing book state:", error);
@@ -89,19 +89,23 @@ export const fetchPopularBooks = createAsyncThunk(
     // Get current state and check if popular books already exist
     const state = getState().books as BookState;
     if (!state.initialized) {
+      callback({
+        success: false,
+        error: errors["Redux state not initialized"],
+      });
       return rejectWithValue(errors["Redux state not initialized"]);
     }
     if (state.fetchedPopularBooks.length > 0) {
+      console.log("Already fetched popular books");
       callback({
         success: false,
-        error: errors["Data already exists"] || errors["Unknown error"],
+        error: errors["Data already exists"],
       });
       return rejectWithValue(
         errors["Data already exists"] || errors["Unknown error"]
       );
     }
     try {
-      callback({ success: true });
       const books = await getPopularBooks();
       if (typeof books === "number") {
         callback({ success: false, error: books });
@@ -123,7 +127,21 @@ const bookSlice = createSlice({
   initialState,
   reducers: {
     // Additional reducers for updating state can be added here
+    clearBookData: (state) => {
+      state.bookProgress = {};
+      state.bookmarks = {};
+      state.currentlyReading = [];
+      state.readingList = [];
 
+      state.fetchedPopularBooks = [];
+
+      console.log(state.readingList);
+
+      AsyncStorage.removeItem("currentlyReading");
+      AsyncStorage.removeItem("bookProgress");
+      AsyncStorage.removeItem("bookmarks");
+      AsyncStorage.removeItem("readingList");
+    },
     addToCurrentlyReading: (state, action: PayloadAction<string>) => {
       if (!state.initialized) {
         return;
@@ -235,5 +253,6 @@ export const {
   updateBookProgress,
   addBookmark,
   removeBookmark,
+  clearBookData,
 } = bookSlice.actions;
 export default bookSlice.reducer;

@@ -131,7 +131,7 @@ export default function CreateAccount({ route }: any) {
             <View style={{ marginTop: 5 * (height / 100) }}>
               <View style={{ width: width }}>
                 <DualText
-                  originalContent="Phone Number"
+                  originalContent="Email"
                   dualContent={emailHeaderDual}
                   style={INPUTHEADER.textStyle(width, height)}
                   dualStyle={INPUTHEADER.dualTextStyle()}
