@@ -25,6 +25,8 @@ export const loadedFonts = [
   getFont("Roboto", "Bold"),
   getFont("OpenSans", "Regular"),
   getFont("OpenSans", "Medium"),
+  getFont("OpenSans", "SemiBold"),
+  getFont("OpenSans", "Bold"),
 ];
 
 export type tLoadedFonts = (typeof loadedFonts)[number];
@@ -53,7 +55,7 @@ export default function font(
   const selectedFont = getFont(fontType, fontWeight, italic);
 
   if (loadedFonts.indexOf(selectedFont) === -1) {
-    throw new Error(`Font ${selectedFont} not loaded`);
+    return getFont("Jost", "Regular");
   }
 
   return selectedFont;

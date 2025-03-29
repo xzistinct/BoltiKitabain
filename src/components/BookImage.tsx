@@ -54,7 +54,7 @@ export default function BookImage({
           style={{
             width: width,
             height: height,
-            borderRadius: 2 * (swidth / 100),
+            borderRadius: 1 * (swidth / 100),
             overflow: "hidden",
             borderWidth: 1,
           }}

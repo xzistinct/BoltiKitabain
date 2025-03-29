@@ -190,7 +190,7 @@ export default function BasicInfo({ route }: any) {
           >
             <DualText
               originalContent="Full Name"
-              dualContent={null}
+              dualContent={fullNameHeaderDual}
               style={INPUTHEADER.textStyle(width, height)}
               dualStyle={INPUTHEADER.dualTextStyle()}
             />

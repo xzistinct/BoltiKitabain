@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   KeyboardAvoidingView,
   TextInput,
+  TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -46,13 +47,13 @@ export default function Search({ route }: any) {
             alignItems: "center",
           }}
         >
-          <View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Entypo
               name="chevron-small-left"
               size={width * 0.15}
               color="black"
             />
-          </View>
+          </TouchableOpacity>
           <TextInput
             style={{
               borderBottomColor: DARKGREY,

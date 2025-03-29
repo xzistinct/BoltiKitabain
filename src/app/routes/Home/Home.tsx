@@ -5,6 +5,7 @@ import {
   LIGHTGREY,
   LIGHTERGREY,
   VERYLIGHTGREY,
+  RED,
 } from "@/constants/colors";
 import font from "@/constants/fonts";
 import {
@@ -213,7 +214,7 @@ const NAVBAR = ({
           <Text
             style={{
               marginTop: 2 * (height / 100),
-              fontFamily: font("OpenSans", "Medium"),
+              fontFamily: font("OpenSans", "SemiBold"),
               fontSize: 2 * (height / 100),
               textAlign: "center",
             }}
@@ -254,7 +255,7 @@ const NAVBAR = ({
                 style={{
                   fontFamily: font("Jost", "Regular"),
                   fontSize: 2.5 * (height / 100),
-                  color: DARKGREY,
+                  color: RED,
                 }}
               >
                 Logout

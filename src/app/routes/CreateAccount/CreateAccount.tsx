@@ -11,6 +11,8 @@ import {
   Platform,
 } from "react-native";
 
+import Entypo from "@expo/vector-icons/Entypo";
+
 import { BABYBLUE } from "@/constants/colors";
 import { useNavigation } from "@react-navigation/native";
 
@@ -47,6 +49,8 @@ export default function CreateAccount({ route }: any) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string | null>(null);
   const [retypePassword, setRetypePassword] = useState<string | null>(null);
+
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const handlePhoneNumberChange = () => {
     changeEmailHeaderDual(null);
@@ -149,10 +153,15 @@ export default function CreateAccount({ route }: any) {
                   <View style={{ marginHorizontal: "auto" }}>
                     <TextInput
                       style={TextInputStyle}
+                      autoCapitalize="none"
+                      autoCorrect={false}
                       onChangeText={(value) => {
                         changeEmailHeaderDual(null);
                         if (value) {
-                          setEmail(value);
+                          console.log(
+                            `Original: ${value}, Lowercase: ${value.toLowerCase()}`
+                          );
+                          setEmail(value.toLowerCase());
                         }
                       }}
                       placeholder="example@pitb.com"
@@ -169,10 +178,16 @@ export default function CreateAccount({ route }: any) {
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
               />
-              <View style={{ marginHorizontal: "auto" }}>
+              <View
+                style={{
+                  marginHorizontal: "auto",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
                 <TextInput
                   style={TextInputStyle}
-                  secureTextEntry={true}
+                  secureTextEntry={!passwordVisible}
                   onChangeText={(value) => {
                     changePasswordHeaderDual(null);
                     setPassword(value);
@@ -180,6 +195,16 @@ export default function CreateAccount({ route }: any) {
                   placeholder="8 characters or more"
                   placeholderTextColor={"gray"}
                 />
+                <TouchableOpacity
+                  style={{ position: "absolute", right: 0 }}
+                  onPress={() => setPasswordVisible(!passwordVisible)}
+                >
+                  <Entypo
+                    name={passwordVisible ? "eye-with-line" : "eye"}
+                    size={24}
+                    color="black"
+                  />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={{ marginTop: 3 * (height / 100), width: width }}>

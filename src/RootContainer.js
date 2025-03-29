@@ -17,6 +17,8 @@ import {
 import {
   OpenSans_400Regular,
   OpenSans_500Medium,
+  OpenSans_600SemiBold,
+  OpenSans_700Bold,
 } from "@expo-google-fonts/open-sans";
 
 import * as SplashScreen from "expo-splash-screen";
@@ -52,6 +54,8 @@ const StateContainer = () => {
     Roboto_700Bold,
     OpenSans_400Regular,
     OpenSans_500Medium,
+    OpenSans_600SemiBold,
+    OpenSans_700Bold,
   });
   const [authInitialized, setAuthInitialized] = useState(false);
   const [bookStateInitialized, setBookStateInitialized] = useState(false);

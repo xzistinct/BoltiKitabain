@@ -58,15 +58,17 @@ export default function SignIn() {
     setLoading(true);
     let err = false;
     // This has been commented out because the server does not have the below validation
-    // if (email === null || email.length < 4) {
-    //   changeEmailHeaderDual("Please fill out email");
-    //   err = true;
-    // }
+    if (email === null || email.length === 0) {
+      changeEmailHeaderDual("Please fill out email");
+      err = true;
+    }
 
-    // if (password === null || password.length < 8) {
-    //   changePasswordHeaderDual("Password is at least 8 characters");
-    //   err = true;
-    // }
+    if (password === null || password.length === 0) {
+      changePasswordHeaderDual("Password is at least 8 characters");
+      err = true;
+    }
+
+    setLoading(false);
 
     if (err) {
       return;

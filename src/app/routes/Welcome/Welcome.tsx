@@ -8,7 +8,7 @@ import {
 import { useSelector } from "react-redux";
 
 import {
-  BABYBLUE,
+  BABYBLUE as NAVYBLUE,
   MAGENTA,
   GREY,
   LIGHTGREY,
@@ -76,7 +76,7 @@ function Welcome() {
 
       <Text
         style={{
-          color: BABYBLUE,
+          color: NAVYBLUE,
           fontSize: 10 * (width / 100),
           fontFamily: "RobotoFlex",
           fontWeight: 600,
@@ -104,7 +104,7 @@ function Welcome() {
           style={{
             width: "100%",
             height: 8 * (height / 100),
-            backgroundColor: BABYBLUE,
+            backgroundColor: NAVYBLUE,
             borderRadius: 3 * (width / 100),
           }}
           onPress={() =>
@@ -129,7 +129,7 @@ function Welcome() {
             width: "100%",
             marginTop: 2 * (height / 100),
             height: 8 * (height / 100),
-            backgroundColor: BABYBLUE,
+            backgroundColor: NAVYBLUE,
             borderRadius: 3 * (width / 100),
           }}
           onPress={() =>
