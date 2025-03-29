@@ -23,6 +23,7 @@ import { StatusBar, AppState, AppStateStatus } from "react-native";
 import CreatingAccount from "./routes/CreatingAccount/CreatingAccount";
 import Player from "./routes/Player/Player";
 import Search from "./routes/Search/Search";
+import Contribute from "./routes/Contribute/Contribute";
 
 type RootStackParamList = {
   Home: undefined;
@@ -35,6 +36,7 @@ type RootStackParamList = {
   CreatingAccount: undefined;
   Player: { bookId: string };
   Search: { searchQuery: string };
+  Contribute: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -92,6 +94,7 @@ function RootNavigator() {
             {/* <Stack.Screen name="RecommendedBook" component={RecommendedBook} /> */}
             <Stack.Screen name="Player" component={Player} />
             <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name="Contribute" component={Contribute} />
           </>
         ) : (
           <>

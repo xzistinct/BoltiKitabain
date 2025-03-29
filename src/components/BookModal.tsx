@@ -189,6 +189,7 @@ export default function BookModal({
                     {book.name}
                   </Text>
                 )}
+
                 <View style={{ width: 40 * (width / 100) }}>
                   <ScrollView horizontal style={{}}>
                     <TouchableHighlight>
@@ -213,6 +214,43 @@ export default function BookModal({
                 )}
               </View>
             )}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-around",
+                paddingHorizontal: 10 * (width / 100),
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 3 * (width / 100),
+                  fontFamily: font("OpenSans", "Regular"),
+                }}
+              >
+                By: {book.author}
+              </Text>
+              {book.narrator && (
+                <Text
+                  style={{
+                    fontSize: 3 * (width / 100),
+                    fontFamily: font("OpenSans", "Regular"),
+                  }}
+                >
+                  Narrator: {book.narrator}
+                </Text>
+              )}
+              {book.contributor && (
+                <Text
+                  style={{
+                    fontSize: 3 * (width / 100),
+                    fontFamily: font("OpenSans", "Regular"),
+                  }}
+                >
+                  Contributor: {book.contributor}
+                </Text>
+              )}
+            </View>
             <View
               style={{
                 flexDirection: "row",

@@ -73,7 +73,7 @@ const NAVBAR = ({
       style={{
         display: "flex",
         flexDirection: "row",
-        marginBottom: 2.5 * (height / 100),
+
         width: width,
       }}
     >
@@ -163,10 +163,12 @@ const NAVBAR = ({
                 style={{ paddingVertical: 8 }}
                 onPress={() => {
                   setIsDropdownVisible(false);
+                  //@ts-ignore
+                  navigation.navigate("Contribute");
                 }}
               >
                 <Text style={{ fontFamily: font("Jost", "Regular") }}>
-                  Profile
+                  Contribute
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -302,7 +304,7 @@ function Home() {
           <View
             style={{
               display: "flex",
-              marginTop: 5 * (height / 100),
+              marginTop: 7.5 * (height / 100),
               flexDirection: "row",
               width: 90 * (width / 100),
               marginHorizontal: "auto",

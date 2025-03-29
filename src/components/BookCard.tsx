@@ -82,41 +82,16 @@ export default function BookCard({
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            width: 55 * (width / 100),
+            width: "90%",
             height: "100%",
           }}
         >
           <ScrollView horizontal>
             <TouchableWithoutFeedback>
-              <View style={{ display: "flex", flexDirection: "row" }}>
-                {book.tags &&
-                  book.tags.length > 0 &&
-                  book.tags.map((tag, index) => (
-                    <Chip
-                      content={tag}
-                      key={index}
-                      textStyle={{}}
-                      style={{
-                        marginLeft: 2 * (width / 100),
-                        paddingVertical: 0.3 * (height / 100),
-                      }}
-                    />
-                  ))}
-              </View>
+              <Text>{book.description}</Text>
             </TouchableWithoutFeedback>
           </ScrollView>
         </View>
-        <Text
-          style={{
-            fontFamily: font("Jost", "Regular"),
-            fontSize: 2.2 * (height / 100),
-          }}
-        >
-          {" "}
-          {("0" + bookLength.hours).slice(-2)}:
-          {("0" + bookLength.minutes).slice(-2)}:
-          {("0" + bookLength.seconds).slice(-2)}
-        </Text>
       </View>
     </TouchableOpacity>
   );

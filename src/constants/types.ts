@@ -38,6 +38,7 @@ export type book = {
   rating?: number;
   length?: number;
   description?: string;
+  contributor?: string;
   id?: string;
   tags?: string[];
   chapters?: Array<{ name: string; length: number }>;

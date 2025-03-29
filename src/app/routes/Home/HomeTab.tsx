@@ -170,7 +170,8 @@ export default function HomeTab() {
         nestedScrollEnabled={true}
         removeClippedSubviews={true}
         contentContainerStyle={{
-          paddingBottom: 20 * (height / 100), // Add sufficient bottom padding
+          paddingBottom: 30 * (height / 100), // Add sufficient bottom padding
+          marginTop: 2.5 * (height / 100),
         }}
       >
         <TouchableWithoutFeedback>

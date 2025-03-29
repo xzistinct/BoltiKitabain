@@ -21,6 +21,7 @@ export function parseBookJSON(bookJSON: any): book | tError {
         bookJSON["subCategory"],
       ].flat(),
       narrator: bookJSON["narrator"],
+      contributor: bookJSON["contributor"],
     };
     return response;
   } catch (error) {

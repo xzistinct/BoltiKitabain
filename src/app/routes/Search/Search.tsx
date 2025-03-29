@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { BarIndicator } from "react-native-indicators";
 
 export default function Search({ route }: any) {
   const { width, height } = useWindowDimensions();
@@ -39,7 +40,7 @@ export default function Search({ route }: any) {
         <View
           style={{
             display: "flex",
-            marginTop: 5 * (height / 100),
+            marginTop: 7.5 * (height / 100),
             flexDirection: "row",
             width: 90 * (width / 100),
             marginHorizontal: "auto",
@@ -70,6 +71,9 @@ export default function Search({ route }: any) {
             placeholder="Search the catalogue"
             placeholderTextColor={GREY}
           />
+        </View>
+        <View style={{ flex: 1, backgroundColor: "red" }}>
+          {screenState === "loading" && <BarIndicator />}
         </View>
       </KeyboardAvoidingView>
     </View>
