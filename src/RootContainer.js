@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from "react";
 
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 
+import { NotifierWrapper } from "react-native-notifier";
+
 import { useFonts } from "expo-font";
 import {
   Jost_400Regular,
@@ -30,7 +32,7 @@ import { initializeBookState } from "./state/redux-slices/bookSlice";
 
 import RootNavigator from "./app/RootNavigator";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import {
@@ -91,13 +93,15 @@ const StateContainer = () => {
 function RootContainer() {
   return (
     <GestureHandlerRootView>
-      <Provider store={store}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <NavigationContainer>
-            <StateContainer />
-          </NavigationContainer>
-        </SafeAreaView>
-      </Provider>
+      <SafeAreaProvider>
+        <Provider store={store}>
+          <NotifierWrapper>
+            <NavigationContainer>
+              <StateContainer />
+            </NavigationContainer>
+          </NotifierWrapper>
+        </Provider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

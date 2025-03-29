@@ -57,6 +57,7 @@ export default function BookImage({
             borderRadius: 1 * (swidth / 100),
             overflow: "hidden",
             borderWidth: 1,
+            borderColor: "transparent",
           }}
         />
       )}

@@ -6,6 +6,7 @@ import {
   useWindowDimensions,
   ScrollView,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from "react-native";
 
 import font from "@/constants/fonts";
@@ -16,11 +17,15 @@ import { useEffect, useState } from "react";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import {
+  addToReadingList,
   fetchPopularBooks,
   removeFromReadingList,
 } from "@/state/redux-slices/bookSlice";
 import { getBookById } from "@/helpers/books";
 import { useSelector } from "react-redux";
+import { Notifier, Easing } from "react-native-notifier";
+import { NAVYBLUE } from "@/constants/colors";
+import DefaultNotificationContainer from "@/components/DefaultNotificationContainer";
 
 type tBookShelf = {
   books: book[] | null;
@@ -125,6 +130,30 @@ export default function HomeTab() {
       emptyMessage: "Add to your reading list to fill this shelf",
       onLongPress: (book) => {
         dispatch(removeFromReadingList(book.id || ""));
+        // Configure notifier to show from bottom
+        Notifier.showNotification({
+          description:
+            "Item removed from reading list. Press notification to undo.",
+          duration: 3000,
+          enterFrom: "bottom",
+          onHidden: () => console.log("Hidden"),
+          onPress: () => console.log("Press"),
+          hideOnPress: false,
+
+          Component: () => (
+            <DefaultNotificationContainer>
+              <Text>Item removed from reading list.</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(addToReadingList(book.id || ""));
+                  Notifier.hideNotification();
+                }}
+              >
+                <Text style={{ color: NAVYBLUE }}>Undo</Text>
+              </TouchableOpacity>
+            </DefaultNotificationContainer>
+          ),
+        });
       },
     },
     {

@@ -1,4 +1,4 @@
-import { BABYBLUE, GREY } from "@/constants/colors";
+import { BABYBLUE, GREY, NAVYBLUE } from "@/constants/colors";
 import font from "@/constants/fonts";
 import { SecondsToTime } from "@/helpers/SecondsToTime";
 import React, { act, useEffect, useState } from "react";
@@ -25,9 +25,14 @@ import Stars from "./Stars";
 import { useNavigation } from "@react-navigation/native";
 import BookImage from "./BookImage";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
-import { addToReadingList } from "@/state/redux-slices/bookSlice";
+import {
+  addToReadingList,
+  removeFromReadingList,
+} from "@/state/redux-slices/bookSlice";
 
 import * as NavigationBar from "expo-navigation-bar";
+import DefaultNotificationContainer from "./DefaultNotificationContainer";
+import { Notifier } from "react-native-notifier";
 
 export default function BookModal({
   book,
@@ -261,6 +266,29 @@ export default function BookModal({
                   onPress={() => {
                     dispatch(addToReadingList(book.id || ""));
                     setModalVisible(false);
+                    Notifier.showNotification({
+                      description:
+                        "Item added to reading list. Press notification to undo.",
+                      duration: 3000,
+                      enterFrom: "bottom",
+                      onHidden: () => console.log("Hidden"),
+                      onPress: () => console.log("Press"),
+                      hideOnPress: false,
+
+                      Component: () => (
+                        <DefaultNotificationContainer>
+                          <Text>Item added to reading list.</Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              dispatch(removeFromReadingList(book.id || ""));
+                              Notifier.hideNotification();
+                            }}
+                          >
+                            <Text style={{ color: NAVYBLUE }}>Undo</Text>
+                          </TouchableOpacity>
+                        </DefaultNotificationContainer>
+                      ),
+                    });
                   }}
                 >
                   <Text style={actionButtonTextStyle}>Add to list</Text>
