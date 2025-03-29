@@ -28,11 +28,62 @@ import { useNavigation } from "@react-navigation/native";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppSelector } from "@/state/reduxStore";
 
+import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+  Capability,
+} from "react-native-track-player";
+
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
 
   const jwt = useAppSelector((state) => state.user.token);
+
+  useEffect(() => {
+    (async () => {
+      // Set up the player
+      await TrackPlayer.setupPlayer();
+
+      await TrackPlayer.updateOptions({
+        android: {
+          appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
+        },
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.Stop,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.SeekTo,
+        ],
+        compactCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.Stop,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.SeekTo,
+        ],
+        notificationCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+        ],
+      });
+
+      // Add a track to the queue
+      await TrackPlayer.add({
+        id: "trackId",
+        url: "https://boltikitabain.pk:8443/audios/1635697397819GK%20class%201%20chapter%201.mp3",
+        title: "Track Title",
+        artist: "Track Artist",
+      });
+
+      // Start playing it
+      await TrackPlayer.play();
+    })();
+  }, []);
 
   const [sliderValue, setSliderValue] = useState<number>(0);
   return (

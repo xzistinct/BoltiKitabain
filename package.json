@@ -49,6 +49,7 @@
     "react-native-screens": "~4.1.0",
     "react-native-slider": "^0.11.0",
     "react-native-svg": "15.8.0",
+    "react-native-track-player": "^4.1.1",
     "react-native-web": "~0.19.13",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1"
