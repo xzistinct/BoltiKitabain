@@ -57,7 +57,7 @@ function LoadedPlayer({ book }: { book: book }) {
 
   const [currentChapter, setCurrentChapter] = useState<number>(0);
 
-  const trackProgress = useProgress();
+  const trackProgress = useProgress(250);
   const playbackState = usePlaybackState();
 
   const sliderTouchableRef = useRef<View>(null);

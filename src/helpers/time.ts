@@ -11,7 +11,7 @@ export function SecondsToTime(seconds: number): {
 }
 
 export function PrettyPrintSeconds(seconds: number) {
-  seconds = Math.ceil(seconds);
+  seconds = Math.round(seconds);
   let time = SecondsToTime(seconds);
   return `${time.hours > 0 ? time.hours + ":" : ""}${
     time.minutes < 10 ? "0" : ""
