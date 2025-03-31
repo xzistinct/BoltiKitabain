@@ -72,14 +72,15 @@ function LoadedPlayer({ book }: { book: book }) {
     }, [])
   );
 
-  const loadCurrentChapterToTrack = () => {
-    if (!book.chapters || !book.chapters[currentChapter]) {
+  const loadChapterToTrack = (chapterNumber: number) => {
+    setCurrentChapter(chapterNumber);
+    if (!book.chapters || !book.chapters[chapterNumber]) {
       return;
     }
     TrackPlayer.load({
-      title: book.name + " - " + book.chapters[currentChapter].name,
+      title: book.name + " - " + book.chapters[chapterNumber].name,
       artist: book.author,
-      url: getAudioURL(book.chapters[currentChapter].audio_id),
+      url: getAudioURL(book.chapters[chapterNumber].audio_id),
       artwork: getImageURL(book.image || ""),
     });
   };
@@ -90,7 +91,7 @@ function LoadedPlayer({ book }: { book: book }) {
         console.error("No chapters found for this book.");
         return;
       }
-      loadCurrentChapterToTrack();
+      loadChapterToTrack(0);
       // Start playing it
       await TrackPlayer.play();
     })();
@@ -107,8 +108,7 @@ function LoadedPlayer({ book }: { book: book }) {
       if (!book.chapters) return;
       // Handle track ending - move to next chapter if available
       if (currentChapter < book.chapters.length - 1) {
-        setCurrentChapter(currentChapter + 1);
-        loadCurrentChapterToTrack();
+        loadChapterToTrack(currentChapter + 1);
       } else {
         // Reached the end of the book
         console.log("End of book reached");
@@ -212,8 +212,7 @@ function LoadedPlayer({ book }: { book: book }) {
                 renderItem={(item) => (
                   <TouchableOpacity
                     onPress={() => {
-                      setCurrentChapter(item.index);
-                      loadCurrentChapterToTrack();
+                      loadChapterToTrack(item.index);
                     }}
                   >
                     <Text
