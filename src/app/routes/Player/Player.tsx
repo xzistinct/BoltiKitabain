@@ -274,9 +274,9 @@ function LoadedPlayer({ book }: { book: book }) {
           <TouchableOpacity
             onPress={() => {
               if (playbackState.state === PlayState.Playing) {
-                TrackPlayer.play();
-              } else {
                 TrackPlayer.pause();
+              } else {
+                TrackPlayer.play();
               }
             }}
             style={{
