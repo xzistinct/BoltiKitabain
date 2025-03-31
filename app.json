@@ -33,7 +33,8 @@
       ],
       "react-native-edge-to-edge",
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ]
   }
 }

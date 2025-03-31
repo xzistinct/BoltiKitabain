@@ -12,7 +12,6 @@ import {
 import { endpoints } from "@/constants/endpoints";
 import { errors, getErrorFromCode } from "@/constants/errors";
 import { getPopularBooks } from "@/helpers/books";
-import { remove } from "react-native-track-player/lib/src/trackPlayer";
 
 // Define types
 

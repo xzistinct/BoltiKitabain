@@ -41,81 +41,107 @@ import BookImage, { imageRatio } from "@/components/BookImage";
 import Chip from "@/components/Chip";
 import { endpoints } from "@/constants/endpoints";
 
-import TrackPlayer, {
-  useProgress,
-  usePlaybackState,
-  State as PlayState,
-  useTrackPlayerEvents,
-  Event,
-} from "react-native-track-player";
-import { addToCurrentlyReading } from "@/state/redux-slices/bookSlice";
+import {
+  AudioPlayer,
+  useAudioPlayer,
+  setAudioModeAsync,
+  useAudioPlayerStatus,
+} from "expo-audio";
+
+import {
+  addToCurrentlyReading,
+  updateBookProgress,
+} from "@/state/redux-slices/bookSlice";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
 
-  const [currentChapter, setCurrentChapter] = useState<number>(0);
+  const bookProgress = useAppSelector(
+    (state) => state.books.bookProgress[book.id || ""]
+  );
 
-  const trackProgress = useProgress(250);
-  const playbackState = usePlaybackState();
+  let audioSource = {
+    uri: getAudioURL(book?.chapters[0].audio_id),
+  };
+
+  let AudioPlayer = useAudioPlayer(audioSource, 250);
+  const AudioPlayerStatus = useAudioPlayerStatus(AudioPlayer);
 
   const sliderTouchableRef = useRef<View>(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log("Screen is focused");
-
-      return () => {
-        TrackPlayer.stop();
-      };
-    }, [])
-  );
-
   const loadChapterToTrack = (chapterNumber: number) => {
-    setCurrentChapter(chapterNumber);
-    if (!book.chapters || !book.chapters[chapterNumber]) {
+    if (!book.chapters || !book.chapters[chapterNumber] || !AudioPlayer) {
       return;
     }
-    TrackPlayer.load({
-      title: book.name + " - " + book.chapters[chapterNumber].name,
-      artist: book.author,
-      url: getAudioURL(book.chapters[chapterNumber].audio_id),
-      artwork: getImageURL(book.image || ""),
-    });
+    try {
+      AudioPlayer.replace({
+        uri: getAudioURL(book.chapters[chapterNumber].audio_id),
+      });
+    } catch (e) {}
+    dispatch(
+      updateBookProgress({
+        bookId: book.id || "",
+        currentChapter: chapterNumber,
+        currentProgressSeconds: 0,
+      })
+    );
   };
 
   useEffect(() => {
+    setAudioModeAsync({
+      shouldPlayInBackground: true,
+    });
+    if (!bookProgress) {
+      dispatch(
+        updateBookProgress({
+          bookId: book.id || "",
+          currentChapter: 0,
+          currentProgressSeconds: 0,
+        })
+      );
+    }
+
     (async () => {
       if (!book.chapters) {
         console.error("No chapters found for this book.");
         return;
       }
-      loadChapterToTrack(0);
       // Start playing it
-      await TrackPlayer.play();
+      AudioPlayer.play();
+      if (bookProgress?.currentProgressSeconds) {
+        AudioPlayer.seekTo(bookProgress.currentProgressSeconds);
+      }
     })();
 
     setTimeout(() => {
       dispatch(addToCurrentlyReading(book.id || ""));
     }, 5000);
+    setInterval(() => {
+      if (AudioPlayer.currentTime && AudioPlayer.duration) {
+        dispatch(
+          updateBookProgress({
+            bookId: book.id || "",
+            currentChapter: bookProgress?.currentChapter || 0,
+            currentProgressSeconds: AudioPlayer.currentTime,
+          })
+        );
+      }
+    }, 5000);
+
+    return () => {
+      AudioPlayer.release();
+    };
   }, []);
 
-  // Inside your LoadedPlayer component
-  useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
-    if (event.type === Event.PlaybackQueueEnded) {
-      console.log("Track ended!");
-      if (!book.chapters) return;
-      // Handle track ending - move to next chapter if available
-      if (currentChapter < book.chapters.length - 1) {
-        loadChapterToTrack(currentChapter + 1);
-      } else {
-        // Reached the end of the book
-        console.log("End of book reached");
-        // You could display a message or reset to the beginning
-      }
+  useEffect(() => {
+    if (AudioPlayerStatus?.playbackState === "ended") {
+      console.log("ended");
+      loadChapterToTrack(bookProgress?.currentChapter + 1 || 0);
     }
-  });
+  }, [AudioPlayerStatus.playbackState]);
 
   return (
     <View style={{ paddingTop: height * 0.05 }}>
@@ -223,7 +249,7 @@ function LoadedPlayer({ book }: { book: book }) {
                         marginVertical: height * 0.0075,
                         color: NAVYBLUE,
                         backgroundColor:
-                          currentChapter === item.index
+                          bookProgress?.currentChapter === item.index
                             ? VERYLIGHTGREY
                             : "white",
                         marginHorizontal: width * 0.01,
@@ -264,9 +290,8 @@ function LoadedPlayer({ book }: { book: book }) {
               const { locationX } = event.nativeEvent;
               sliderTouchableRef.current?.measure(
                 (x, y, width, height, pageX, pageY) => {
-                  const position = (locationX / width) * trackProgress.duration;
-                  TrackPlayer.seekTo(position);
-                  trackProgress.position = position;
+                  const position = (locationX / width) * AudioPlayer.duration;
+                  AudioPlayer.seekTo(position);
                 }
               );
             }}
@@ -284,9 +309,12 @@ function LoadedPlayer({ book }: { book: book }) {
                   borderWidth: 1,
                 }}
                 thumbTintColor={LIGHTGREY}
-                value={trackProgress.position}
-                maximumValue={trackProgress.duration}
-                onValueChange={(value: number) => TrackPlayer.seekTo(value)}
+                value={AudioPlayerStatus.currentTime}
+                maximumValue={AudioPlayerStatus.duration}
+                onValueChange={(value: number) => {
+                  AudioPlayer.seekTo(value);
+                  console.log("changed");
+                }}
               />
             </View>
           </TouchableWithoutFeedback>
@@ -301,10 +329,10 @@ function LoadedPlayer({ book }: { book: book }) {
           }}
         >
           <Text style={{ color: DARKERGREY, fontSize: 13 }}>
-            {PrettyPrintSeconds(trackProgress.position)}
+            {PrettyPrintSeconds(AudioPlayerStatus.currentTime)}
           </Text>
           <Text style={{ color: DARKERGREY, fontSize: 13 }}>
-            {PrettyPrintSeconds(trackProgress.duration)}
+            {PrettyPrintSeconds(AudioPlayerStatus.duration)}
           </Text>
         </View>
         <View
@@ -320,10 +348,10 @@ function LoadedPlayer({ book }: { book: book }) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              if (playbackState.state === PlayState.Playing) {
-                TrackPlayer.pause();
+              if (AudioPlayer.playing) {
+                AudioPlayer.pause();
               } else {
-                TrackPlayer.play();
+                AudioPlayer.play();
               }
             }}
             style={{
@@ -334,7 +362,7 @@ function LoadedPlayer({ book }: { book: book }) {
               marginHorizontal: 0.05 * width,
             }}
           >
-            {playbackState.state === PlayState.Playing ? (
+            {AudioPlayer.playing ? (
               <Fontisto name="pause" size={40} color="black" />
             ) : (
               <Entypo name="controller-play" size={55} color="black" />
@@ -361,8 +389,6 @@ export default function Player({ route }: any) {
     "loading" | "error" | "loaded"
   >("loading");
 
-  const playbackState = usePlaybackState();
-
   useEffect(() => {
     (async () => {
       let book = await getBookById(bookId, jwt || "");
@@ -378,13 +404,11 @@ export default function Player({ route }: any) {
 
       setScreenState("loaded");
     })();
-  });
+  }, []);
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
       {book !== null && <LoadedPlayer book={book} />}
-      {(screenState === "loading" ||
-        playbackState.state === PlayState.Buffering ||
-        playbackState.state === PlayState.Loading) && <LoadingOverlay />}
+      {screenState === "loading" && <LoadingOverlay />}
     </View>
   );
 }
