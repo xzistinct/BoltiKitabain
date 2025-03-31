@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BarIndicator } from "react-native-indicators";
 
 import { book } from "@/constants/types";
@@ -32,7 +32,7 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { PrettyPrintSeconds, SecondsToTime } from "@/helpers/time";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppSelector } from "@/state/reduxStore";
 
@@ -57,14 +57,25 @@ function LoadedPlayer({ book }: { book: book }) {
 
   const sliderTouchableRef = useRef<View>(null);
 
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Screen is focused");
+
+      return () => {
+        TrackPlayer.stop();
+      };
+    }, [])
+  );
+
   const loadCurrentChapterToTrack = () => {
     if (!book.chapters || !book.chapters[currentChapter]) {
       return;
     }
     TrackPlayer.load({
-      title: book.name,
+      title: book.name + " - " + book.chapters[currentChapter].name,
       artist: book.author,
       url: getAudioURL(book.chapters[currentChapter].audio_id),
+      artwork: getImageURL(book.image || ""),
     });
   };
 
