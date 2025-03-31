@@ -40,6 +40,8 @@ import {
   ReanimatedLogLevel,
 } from "react-native-reanimated";
 
+import TrackPlayer from "react-native-track-player";
+
 configureReanimatedLogger({ level: ReanimatedLogLevel.INFO, strict: false });
 
 SplashScreen.preventAutoHideAsync();
@@ -75,6 +77,38 @@ const StateContainer = () => {
         setBookStateInitialized(true);
       })
     );
+    (async () => {
+      // Set up the player
+      await TrackPlayer.setupPlayer();
+
+      await TrackPlayer.updateOptions({
+        android: {
+          appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
+        },
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.Stop,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.SeekTo,
+        ],
+        compactCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.Stop,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.SeekTo,
+        ],
+        notificationCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+        ],
+      });
+    })();
   }, []);
 
   useEffect(() => {

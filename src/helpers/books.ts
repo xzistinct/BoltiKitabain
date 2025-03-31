@@ -6,6 +6,10 @@ export function getImageURL(id: string): string {
   return endpoints.image + "/" + id;
 }
 
+export function getAudioURL(id: string): string {
+  return endpoints.audios + "/" + id;
+}
+
 export function parseBookJSON(bookJSON: any): book | tError {
   try {
     const response = {
@@ -170,5 +174,52 @@ export async function searchBooks(
   } catch (error) {
     console.error("Error searching books:", error);
     return errors["Failed to get appropriate response from server"];
+  }
+}
+
+function parseChapterData(chapterJSON: any) {
+  if (typeof chapterJSON !== "object" || !chapterJSON) {
+    return errors["Failed to parse server response"];
+  }
+  return {
+    name: chapterJSON.title,
+    id: chapterJSON._id,
+    tags: chapterJSON.tags,
+    name_urdu: chapterJSON.titleUrdu,
+    audio_id: chapterJSON.audio,
+  };
+}
+
+export async function getBookChapters(
+  id: string,
+  jwt: string
+): Promise<
+  { chapters: book["chapters"]; num: book["numberOfChapters"] } | tError
+> {
+  const response = await fetch(endpoints.chapters + "/" + id, {
+    headers: {
+      "x-auth-token": jwt,
+    },
+    body: null,
+    method: "GET",
+  });
+  if (!response.ok) {
+    return errors["Failed to get appropriate response from server"];
+  }
+
+  try {
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      return errors["Failed to get appropriate response from server"];
+    }
+    return {
+      num: data.length - 1,
+      chapters: data
+        .map(parseChapterData)
+        .filter((result) => typeof result === "object"),
+    };
+  } catch (error) {
+    console.error("Error parsing JSON:", error);
+    return errors["Failed to parse server response"];
   }
 }

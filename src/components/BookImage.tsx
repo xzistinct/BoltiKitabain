@@ -9,6 +9,8 @@ import { endpoints } from "@/constants/endpoints";
 import { GREY } from "@/constants/colors";
 import { getImageURL } from "@/helpers/books";
 
+export const imageRatio = 3 / 4;
+
 export default function BookImage({
   id,
   width,
@@ -21,7 +23,6 @@ export default function BookImage({
   containerStyle?: StyleProp<ViewStyle>;
 }) {
   const swidth = useWindowDimensions().width;
-  const ratio = 3 / 4;
 
   if (!width && !height) {
     return <></>;
@@ -29,10 +30,10 @@ export default function BookImage({
 
   if (!width) {
     // @ts-ignore
-    width = height * ratio;
+    width = height * imageRatio;
   }
   if (!height) {
-    height = width / ratio;
+    height = width / imageRatio;
   }
 
   return (

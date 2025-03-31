@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import { SecondsToTime } from "@/helpers/SecondsToTime";
+import { SecondsToTime } from "@/helpers/time";
 
 import { VERYLIGHTGREY, BABYBLUE } from "@/constants/colors";
 

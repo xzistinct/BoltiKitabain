@@ -7,7 +7,9 @@
     "strict": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "module": "ESNext",
+    "target": "ESNext"
   },
   "exclude": ["node_modules/**/*"]
 }

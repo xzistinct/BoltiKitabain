@@ -8,4 +8,6 @@ export const endpoints = {
   categories: "https://boltikitabain.pk:8443/api/categories",
   filteredBooks: "https://boltikitabain.pk:8443/api/books/filtered",
   searchBooks: "https://boltikitabain.pk:8443/api/books/search",
+  chapters: "https://boltikitabain.pk:8443/api/chapters",
+  audios: "https://boltikitabain.pk:8443/audios",
 } as const;

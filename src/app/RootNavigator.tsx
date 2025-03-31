@@ -53,7 +53,7 @@ function RootNavigator() {
 
     // Navigation bar (bottom) - Android only
     if (Platform.OS === "android") {
-      NavigationBar.setBackgroundColorAsync("white");
+      NavigationBar.setBackgroundColorAsync("rgba(255, 255, 255, 0.87)");
     }
   };
 

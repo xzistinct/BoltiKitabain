@@ -29,6 +29,14 @@ export type tUserPrefs = {
 
 export type tGenres = string;
 
+export type chapter = {
+  name: string;
+  tags?: string[];
+  name_urdu?: string;
+  audio_id: string;
+  id?: string;
+};
+
 export type book = {
   name?: string;
   name_urdu?: string;
@@ -41,7 +49,8 @@ export type book = {
   contributor?: string;
   id?: string;
   tags?: string[];
-  chapters?: Array<{ name: string; length: number }>;
+  chapters?: chapter[];
+  numberOfChapters?: number;
   dateAdded?: tDate;
   narrator?: string;
 };

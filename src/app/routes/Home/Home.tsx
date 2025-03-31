@@ -193,16 +193,12 @@ const NAVBAR = ({
         onModalHide={() => {
           StatusBar.setBackgroundColor("white"); // Reset when closed
           // Navigation bar (bottom) - Android only
-          if (Platform.OS === "android") {
-            NavigationBar.setBackgroundColorAsync("white");
-          }
         }}
         onModalShow={() => {
-          StatusBar.setBackgroundColor("rgba(255, 255, 255, 0.87)"); // Match backdrop opacity
+          StatusBar.setBackgroundColor(
+            `rgb(${255 * 0.9}, ${255 * 0.9}, ${255 * 0.9})`
+          );
           // Navigation bar (bottom) - Android only
-          if (Platform.OS === "android") {
-            NavigationBar.setBackgroundColorAsync("rgba(255, 255, 255, 0.87)");
-          }
         }}
       >
         <View

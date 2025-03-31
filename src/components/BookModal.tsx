@@ -1,6 +1,6 @@
 import { BABYBLUE, GREY, NAVYBLUE } from "@/constants/colors";
 import font from "@/constants/fonts";
-import { SecondsToTime } from "@/helpers/SecondsToTime";
+import { SecondsToTime } from "@/helpers/time";
 import React, { act, useEffect, useState } from "react";
 import {
   View,
@@ -121,7 +121,9 @@ export default function BookModal({
           // Navigation bar (bottom) - Android only
         }}
         onModalShow={() => {
-          StatusBar.setBackgroundColor("rgba(255, 255, 255, 0.87)"); // Match backdrop opacity
+          StatusBar.setBackgroundColor(
+            `rgb(${255 * 0.9}, ${255 * 0.9}, ${255 * 0.9})`
+          ); // Match backdrop opacity
           // Navigation bar (bottom) - Android only
         }}
       >

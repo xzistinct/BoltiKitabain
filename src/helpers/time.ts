@@ -9,3 +9,12 @@ export function SecondsToTime(seconds: number): {
 
   return { hours, minutes, seconds: secondsLeft };
 }
+
+export function PrettyPrintSeconds(seconds: number) {
+  seconds = Math.ceil(seconds);
+  let time = SecondsToTime(seconds);
+  return `${time.hours > 0 ? time.hours + ":" : ""}${
+    time.minutes < 10 ? "0" : ""
+  }${time.minutes}:${time.seconds < 10 ? "0" : ""}${time.seconds}`;
+  ``;
+}

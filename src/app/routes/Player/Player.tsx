@@ -1,15 +1,21 @@
 import {
+  FlatList,
   Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BarIndicator } from "react-native-indicators";
 
 import { book } from "@/constants/types";
-import { getBookById } from "@/helpers/books";
+import {
+  getAudioURL,
+  getBookById,
+  getBookChapters,
+  getImageURL,
+} from "@/helpers/books";
 import font from "@/constants/fonts";
 import {
   BABYBLUE,
@@ -17,105 +23,186 @@ import {
   DARKGREY,
   GREY,
   LIGHTGREY,
+  NAVYBLUE,
 } from "@/constants/colors";
 
 import Slider from "react-native-slider";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { SecondsToTime } from "@/helpers/SecondsToTime";
+import { PrettyPrintSeconds, SecondsToTime } from "@/helpers/time";
 import { useNavigation } from "@react-navigation/native";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppSelector } from "@/state/reduxStore";
 
-import TrackPlayer, {
-  AppKilledPlaybackBehavior,
-  Capability,
-} from "react-native-track-player";
+import BookImage, { imageRatio } from "@/components/BookImage";
+import Chip from "@/components/Chip";
+import { endpoints } from "@/constants/endpoints";
+
+import TrackPlayer, { useProgress } from "react-native-track-player";
 
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
 
-  const jwt = useAppSelector((state) => state.user.token);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentChapter, setCurrentChapter] = useState<number>(0);
+
+  const trackProgress = useProgress();
+
+  const loadCurrentChapterToTrack = () => {
+    if (!book.chapters || !book.chapters[currentChapter]) {
+      return;
+    }
+    TrackPlayer.load({
+      title: book.name,
+      artist: book.author,
+      url: getAudioURL(book.chapters[currentChapter].audio_id),
+    });
+  };
 
   useEffect(() => {
     (async () => {
-      // Set up the player
-      await TrackPlayer.setupPlayer();
-
-      await TrackPlayer.updateOptions({
-        android: {
-          appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
-        },
-        capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.Stop,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-          Capability.SeekTo,
-        ],
-        compactCapabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.Stop,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-          Capability.SeekTo,
-        ],
-        notificationCapabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-        ],
-      });
-
-      // Add a track to the queue
-      await TrackPlayer.add({
-        id: "trackId",
-        url: "https://boltikitabain.pk:8443/audios/1635697397819GK%20class%201%20chapter%201.mp3",
-        title: "Track Title",
-        artist: "Track Artist",
-      });
-
+      if (!book.chapters) {
+        console.error("No chapters found for this book.");
+        return;
+      }
+      loadCurrentChapterToTrack();
       // Start playing it
       await TrackPlayer.play();
     })();
   }, []);
 
-  const [sliderValue, setSliderValue] = useState<number>(0);
+  useEffect(() => {
+    if (isPlaying) {
+      TrackPlayer.play();
+    } else {
+      TrackPlayer.pause();
+    }
+  }, [isPlaying]);
+
   return (
-    <>
-      <TouchableOpacity
-        style={{ marginLeft: width * 0.075, marginTop: height * 0.05 }}
-        onPress={() => navigation.goBack()}
+    <View style={{ paddingTop: height * 0.05 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          marginTop: height * 0.05,
+        }}
       >
-        <Entypo name="chevron-small-left" size={width * 0.125} color="black" />
-      </TouchableOpacity>
-      <View>
+        <TouchableOpacity
+          style={{ marginLeft: width * 0.075 }}
+          onPress={() => navigation.goBack()}
+        >
+          <Entypo
+            name="chevron-small-left"
+            size={width * 0.125}
+            color="black"
+          />
+        </TouchableOpacity>
         <Text
           style={{
             fontFamily: font("Jost", "Regular"),
-            fontSize: 30,
-            textAlign: "center",
-            width: width * 0.8,
-            marginHorizontal: "auto",
+            fontSize: 22,
+
+            maxWidth: width * 0.7,
+            marginLeft: width * 0.005,
           }}
         >
           {book.name}
         </Text>
       </View>
-      <View style={{ marginTop: height * 0.075, alignItems: "center" }}>
-        <View
-          style={{
-            width: width * 0.7,
-            height: height * 0.35,
-            backgroundColor: LIGHTGREY,
-            borderRadius: 10,
+      <View
+        style={{
+          flexDirection: "row",
+          marginLeft: width * 0.15,
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ fontSize: 15, fontFamily: font("Jost", "Regular") }}>
+          {book.author}
+        </Text>
+        <FlatList
+          data={book.genre}
+          horizontal={true}
+          contentContainerStyle={{
+            width: width * 0.45,
+            marginLeft: width * 0.05,
           }}
+          renderItem={(item) => (
+            <Chip
+              content={item.item}
+              textStyle={{}}
+              style={{
+                marginLeft: 2 * (width / 100),
+              }}
+            />
+          )}
         />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: height * 0.1,
+          justifyContent: "center",
+        }}
+      >
+        {book.chapters && (
+          <View
+            style={{
+              width: width * 0.4,
+
+              height: (width * 0.5) / imageRatio,
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontFamily: font("OpenSans", "Regular"),
+                fontSize: 20,
+              }}
+            >
+              Chapters
+            </Text>
+            <View style={{ height: "90%" }}>
+              <FlatList
+                data={book.chapters}
+                persistentScrollbar={true}
+                contentContainerStyle={{
+                  paddingBottom: 20,
+                }}
+                nestedScrollEnabled={true}
+                renderItem={(item) => (
+                  <TouchableOpacity>
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontFamily: font("OpenSans", "Regular"),
+                        fontSize: 15,
+                        marginVertical: height * 0.0075,
+                        color: NAVYBLUE,
+                      }}
+                    >
+                      {item.item.name}
+                    </Text>
+                    <View
+                      style={{
+                        width: "50%",
+                        borderBottomWidth: 1,
+                        marginHorizontal: "auto",
+                        borderColor: LIGHTGREY,
+                      }}
+                    />
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
+        )}
+        <View style={{ alignItems: "center" }}>
+          <BookImage id={book.image} width={width * 0.5} />
+        </View>
       </View>
       <View
         style={{
@@ -138,8 +225,9 @@ function LoadedPlayer({ book }: { book: book }) {
               borderWidth: 1,
             }}
             thumbTintColor={LIGHTGREY}
-            value={sliderValue}
-            onValueChange={(value: number) => setSliderValue(value)}
+            value={trackProgress.position}
+            maximumValue={trackProgress.duration}
+            onValueChange={(value: number) => TrackPlayer.seekTo(value)}
           />
         </View>
 
@@ -151,39 +239,47 @@ function LoadedPlayer({ book }: { book: book }) {
             marginTop: -10, // Added negative margin to reduce vertical space
           }}
         >
-          <Text style={{ color: DARKERGREY, fontSize: 13 }}>0:00</Text>
           <Text style={{ color: DARKERGREY, fontSize: 13 }}>
-            {SecondsToTime(book.length || 0).hours > 0 &&
-              SecondsToTime(book.length || 0).hours + ":"}
-            {SecondsToTime(book.length || 0).minutes}:
-            {SecondsToTime(book.length || 0).seconds}
+            {PrettyPrintSeconds(trackProgress.position)}
+          </Text>
+          <Text style={{ color: DARKERGREY, fontSize: 13 }}>
+            {PrettyPrintSeconds(trackProgress.duration)}
           </Text>
         </View>
         <View
           style={{
             flexDirection: "row",
-
+            alignItems: "center",
             marginTop: height * 0.05,
             justifyContent: "center",
           }}
         >
-          <Ionicons
-            name="play-skip-back"
-            size={45}
-            color="black"
-            style={{ marginRight: width * 0.075 }}
-          />
-          <Fontisto
-            name="pause"
-            size={45}
-            color="black"
-            style={{ marginRight: width * 0.075 }}
-          />
-          <Ionicons name="play-skip-forward" size={45} color="black" />
+          <TouchableOpacity>
+            <Ionicons name="play-skip-back" size={45} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setIsPlaying(!isPlaying)}
+            style={{
+              width: 50,
+              height: 50,
+              alignItems: "center",
+              justifyContent: "center",
+              marginHorizontal: 0.05 * width,
+            }}
+          >
+            {isPlaying ? (
+              <Fontisto name="pause" size={40} color="black" />
+            ) : (
+              <Entypo name="controller-play" size={55} color="black" />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Ionicons name="play-skip-forward" size={45} color="black" />
+          </TouchableOpacity>
         </View>
       </View>
       <View></View>
-    </>
+    </View>
   );
 }
 
@@ -201,9 +297,16 @@ export default function Player({ route }: any) {
   useEffect(() => {
     (async () => {
       let book = await getBookById(bookId, jwt || "");
+
       if (typeof book === "object") {
+        let chapters = await getBookChapters(book.id || "", jwt || "");
+        if (typeof chapters === "object") {
+          book.chapters = chapters.chapters;
+          book.numberOfChapters = chapters.num;
+        }
         setBook(book);
       }
+
       setScreenState("loaded");
     })();
   });
