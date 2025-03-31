@@ -2,6 +2,7 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -39,16 +40,22 @@ import BookImage, { imageRatio } from "@/components/BookImage";
 import Chip from "@/components/Chip";
 import { endpoints } from "@/constants/endpoints";
 
-import TrackPlayer, { useProgress } from "react-native-track-player";
+import TrackPlayer, {
+  useProgress,
+  usePlaybackState,
+  State as PlayState,
+} from "react-native-track-player";
 
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
 
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentChapter, setCurrentChapter] = useState<number>(0);
 
   const trackProgress = useProgress();
+  const playbackState = usePlaybackState();
+
+  const sliderTouchableRef = useRef<View>(null);
 
   const loadCurrentChapterToTrack = () => {
     if (!book.chapters || !book.chapters[currentChapter]) {
@@ -72,14 +79,6 @@ function LoadedPlayer({ book }: { book: book }) {
       await TrackPlayer.play();
     })();
   }, []);
-
-  useEffect(() => {
-    if (isPlaying) {
-      TrackPlayer.play();
-    } else {
-      TrackPlayer.pause();
-    }
-  }, [isPlaying]);
 
   return (
     <View style={{ paddingTop: height * 0.05 }}>
@@ -213,22 +212,37 @@ function LoadedPlayer({ book }: { book: book }) {
         }}
       >
         <View>
-          <Slider
-            minimumTrackTintColor={BABYBLUE}
-            maximumTrackTintColor="white"
-            style={{}}
-            trackStyle={{
-              height: 10,
-              borderRadius: 100,
-              width: width * 0.7,
-              borderColor: BABYBLUE,
-              borderWidth: 1,
+          <TouchableWithoutFeedback
+            onPress={(event) => {
+              const { locationX } = event.nativeEvent;
+              sliderTouchableRef.current?.measure(
+                (x, y, width, height, pageX, pageY) => {
+                  const position = (locationX / width) * trackProgress.duration;
+                  TrackPlayer.seekTo(position);
+                  trackProgress.position = position;
+                }
+              );
             }}
-            thumbTintColor={LIGHTGREY}
-            value={trackProgress.position}
-            maximumValue={trackProgress.duration}
-            onValueChange={(value: number) => TrackPlayer.seekTo(value)}
-          />
+          >
+            <View ref={sliderTouchableRef}>
+              <Slider
+                minimumTrackTintColor={BABYBLUE}
+                maximumTrackTintColor="white"
+                style={{}}
+                trackStyle={{
+                  height: 10,
+                  borderRadius: 100,
+                  width: width * 0.7,
+                  borderColor: BABYBLUE,
+                  borderWidth: 1,
+                }}
+                thumbTintColor={LIGHTGREY}
+                value={trackProgress.position}
+                maximumValue={trackProgress.duration}
+                onValueChange={(value: number) => TrackPlayer.seekTo(value)}
+              />
+            </View>
+          </TouchableWithoutFeedback>
         </View>
 
         <View
@@ -258,7 +272,13 @@ function LoadedPlayer({ book }: { book: book }) {
             <Ionicons name="play-skip-back" size={45} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setIsPlaying(!isPlaying)}
+            onPress={() => {
+              if (playbackState.state === PlayState.Playing) {
+                TrackPlayer.play();
+              } else {
+                TrackPlayer.pause();
+              }
+            }}
             style={{
               width: 50,
               height: 50,
@@ -267,7 +287,7 @@ function LoadedPlayer({ book }: { book: book }) {
               marginHorizontal: 0.05 * width,
             }}
           >
-            {isPlaying ? (
+            {playbackState.state === PlayState.Playing ? (
               <Fontisto name="pause" size={40} color="black" />
             ) : (
               <Entypo name="controller-play" size={55} color="black" />
