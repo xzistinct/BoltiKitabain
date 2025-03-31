@@ -19,7 +19,7 @@ export default function LoadingOverlay() {
           alignItems: "center",
         }}
       >
-        <BarIndicator count={5} color={BABYBLUE} />
+        <BarIndicator count={5} color={"black"} />
       </View>
     </>
   );

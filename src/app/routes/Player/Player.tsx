@@ -25,6 +25,7 @@ import {
   GREY,
   LIGHTGREY,
   NAVYBLUE,
+  VERYLIGHTGREY,
 } from "@/constants/colors";
 
 import Slider from "react-native-slider";
@@ -34,7 +35,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { PrettyPrintSeconds, SecondsToTime } from "@/helpers/time";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import LoadingOverlay from "@/components/LoadingOverlay";
-import { useAppSelector } from "@/state/reduxStore";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 
 import BookImage, { imageRatio } from "@/components/BookImage";
 import Chip from "@/components/Chip";
@@ -44,11 +45,15 @@ import TrackPlayer, {
   useProgress,
   usePlaybackState,
   State as PlayState,
+  useTrackPlayerEvents,
+  Event,
 } from "react-native-track-player";
+import { addToCurrentlyReading } from "@/state/redux-slices/bookSlice";
 
 function LoadedPlayer({ book }: { book: book }) {
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
   const [currentChapter, setCurrentChapter] = useState<number>(0);
 
@@ -89,7 +94,28 @@ function LoadedPlayer({ book }: { book: book }) {
       // Start playing it
       await TrackPlayer.play();
     })();
+
+    setTimeout(() => {
+      dispatch(addToCurrentlyReading(book.id || ""));
+    }, 5000);
   }, []);
+
+  // Inside your LoadedPlayer component
+  useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
+    if (event.type === Event.PlaybackQueueEnded) {
+      console.log("Track ended!");
+      if (!book.chapters) return;
+      // Handle track ending - move to next chapter if available
+      if (currentChapter < book.chapters.length - 1) {
+        setCurrentChapter(currentChapter + 1);
+        loadCurrentChapterToTrack();
+      } else {
+        // Reached the end of the book
+        console.log("End of book reached");
+        // You could display a message or reset to the beginning
+      }
+    }
+  });
 
   return (
     <View style={{ paddingTop: height * 0.05 }}>
@@ -184,7 +210,12 @@ function LoadedPlayer({ book }: { book: book }) {
                 }}
                 nestedScrollEnabled={true}
                 renderItem={(item) => (
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCurrentChapter(item.index);
+                      loadCurrentChapterToTrack();
+                    }}
+                  >
                     <Text
                       style={{
                         textAlign: "center",
@@ -192,6 +223,12 @@ function LoadedPlayer({ book }: { book: book }) {
                         fontSize: 15,
                         marginVertical: height * 0.0075,
                         color: NAVYBLUE,
+                        backgroundColor:
+                          currentChapter === item.index
+                            ? VERYLIGHTGREY
+                            : "white",
+                        marginHorizontal: width * 0.01,
+                        borderRadius: 5,
                       }}
                     >
                       {item.item.name}
@@ -325,6 +362,8 @@ export default function Player({ route }: any) {
     "loading" | "error" | "loaded"
   >("loading");
 
+  const playbackState = usePlaybackState();
+
   useEffect(() => {
     (async () => {
       let book = await getBookById(bookId, jwt || "");
@@ -343,10 +382,10 @@ export default function Player({ route }: any) {
   });
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
-      {screenState === "loaded" && book !== null && (
-        <LoadedPlayer book={book} />
-      )}
-      {screenState === "loading" && <LoadingOverlay />}
+      {book !== null && <LoadedPlayer book={book} />}
+      {(screenState === "loading" ||
+        playbackState.state === PlayState.Buffering ||
+        playbackState.state === PlayState.Loading) && <LoadingOverlay />}
     </View>
   );
 }

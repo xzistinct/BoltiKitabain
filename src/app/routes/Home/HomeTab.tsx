@@ -17,8 +17,10 @@ import { useEffect, useState } from "react";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import {
+  addToCurrentlyReading,
   addToReadingList,
   fetchPopularBooks,
+  removeFromCurrentlyReading,
   removeFromReadingList,
 } from "@/state/redux-slices/bookSlice";
 import { getBookById } from "@/helpers/books";
@@ -90,7 +92,22 @@ export default function HomeTab() {
     })();
   }, [readingList]);
 
-  useEffect(() => {}, [currentlyReading]);
+  useEffect(() => {
+    (async () => {
+      let books: book[] = [];
+      for (let book of currentlyReading) {
+        let bookData = await getBookById(book, jwt || "");
+
+        if (typeof bookData === "object") {
+          books.push(bookData);
+        }
+      }
+      if (books.length === 0 && readingList.length > 0) {
+        return;
+      }
+      setCurrentlyReadingBooks(books);
+    })();
+  }, [currentlyReading]);
 
   const renderBookShelf = (item: tBookShelf[0], index: number) => {
     const ShelfHeaderStyle: StyleProp<TextStyle> = {
@@ -122,6 +139,33 @@ export default function HomeTab() {
       title: "Currently reading",
       behaviour: "Open",
       emptyMessage: "Start reading to fill this shelf",
+      onLongPress: (book) => {
+        dispatch(removeFromCurrentlyReading(book.id || ""));
+        // Configure notifier to show from bottom
+        Notifier.showNotification({
+          description:
+            "Item removed from currently reading. Press notification to undo.",
+          duration: 3000,
+          enterFrom: "bottom",
+          onHidden: () => console.log("Hidden"),
+          onPress: () => console.log("Press"),
+          hideOnPress: false,
+
+          Component: () => (
+            <DefaultNotificationContainer>
+              <Text>Item removed from currently reading.</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(addToCurrentlyReading(book.id || ""));
+                  Notifier.hideNotification();
+                }}
+              >
+                <Text style={{ color: NAVYBLUE }}>Undo</Text>
+              </TouchableOpacity>
+            </DefaultNotificationContainer>
+          ),
+        });
+      },
     },
     {
       books: readingListBooks,

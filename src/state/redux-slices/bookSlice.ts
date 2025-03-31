@@ -12,6 +12,7 @@ import {
 import { endpoints } from "@/constants/endpoints";
 import { errors, getErrorFromCode } from "@/constants/errors";
 import { getPopularBooks } from "@/helpers/books";
+import { remove } from "react-native-track-player/lib/src/trackPlayer";
 
 // Define types
 
@@ -178,6 +179,20 @@ const bookSlice = createSlice({
       );
       AsyncStorage.setItem("readingList", JSON.stringify(state.readingList));
     },
+    removeFromCurrentlyReading: (state, action: PayloadAction<string>) => {
+      if (!state.initialized) return;
+
+      state.currentlyReading = state.currentlyReading.filter(
+        (bookId) => bookId !== action.payload
+      );
+      // Save to AsyncStorage
+      AsyncStorage.setItem(
+        "currentlyReading",
+        JSON.stringify(state.currentlyReading)
+      ).catch((error) =>
+        console.error("Error saving currently reading:", error)
+      );
+    },
     updateBookProgress: (state, action: PayloadAction<BookProgress>) => {
       if (!state.initialized) {
         return;
@@ -247,6 +262,7 @@ const bookSlice = createSlice({
 export const {
   addToCurrentlyReading,
   removeFromReadingList,
+  removeFromCurrentlyReading,
   addToReadingList,
   updateBookProgress,
   addBookmark,
