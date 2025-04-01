@@ -77,12 +77,6 @@ function LoadedPlayer({ book }: { book: book }) {
   const sliderTouchableRef = useRef<View>(null);
 
   const loadChapterToTrack = (chapterNumber: number) => {
-    if (!book.chapters || !book.chapters[chapterNumber] || !audioPlayer) {
-      return;
-    }
-    audioPlayer.replace({
-      uri: getAudioURL(book?.chapters[chapterNumber].audio_id),
-    });
     dispatch(
       updateBookProgress({
         bookId: book.id || "",
@@ -90,11 +84,17 @@ function LoadedPlayer({ book }: { book: book }) {
         currentProgressSeconds: 0,
       })
     );
+    if (!book.chapters || !book.chapters[chapterNumber] || !audioPlayer) {
+      return;
+    }
+    audioPlayer.replace({
+      uri: getAudioURL(book?.chapters[chapterNumber].audio_id),
+    });
   };
 
   const saveBookProgress = (currentTime: number | null) => {
     if (!currentTime) return;
-    console.log("Saving progress", currentTime);
+
     dispatch(
       updateBookProgress({
         bookId: book.id || "",
@@ -145,6 +145,8 @@ function LoadedPlayer({ book }: { book: book }) {
 
   return (
     <View style={{ paddingTop: height * 0.05 }}>
+      {AudioPlayerStatus.isBuffering === true ||
+        (!AudioPlayerStatus.isLoaded && <LoadingOverlay />)}
       <View
         style={{
           flexDirection: "row",
@@ -290,7 +292,8 @@ function LoadedPlayer({ book }: { book: book }) {
               const { locationX } = event.nativeEvent;
               sliderTouchableRef.current?.measure(
                 (x, y, width, height, pageX, pageY) => {
-                  const position = (locationX / width) * audioPlayer.duration;
+                  const position =
+                    (locationX / width) * AudioPlayerStatus.duration;
                   audioPlayer.seekTo(position);
                 }
               );
@@ -348,7 +351,7 @@ function LoadedPlayer({ book }: { book: book }) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              if (audioPlayer.playing) {
+              if (AudioPlayerStatus.playing) {
                 audioPlayer.pause();
               } else {
                 audioPlayer.play();
@@ -362,7 +365,7 @@ function LoadedPlayer({ book }: { book: book }) {
               marginHorizontal: 0.05 * width,
             }}
           >
-            {audioPlayer.playing ? (
+            {AudioPlayerStatus.playing ? (
               <Fontisto name="pause" size={40} color="black" />
             ) : (
               <Entypo name="controller-play" size={55} color="black" />
