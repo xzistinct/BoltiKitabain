@@ -131,17 +131,25 @@ function LoadedPlayer({ book }: { book: book }) {
   }, []);
 
   useEffect(() => {
-    if (AudioPlayerStatus?.playbackState === "ended") {
-      console.log("ended");
-      loadChapterToTrack(bookProgress?.currentChapter + 1 || 0);
-    }
-  }, [AudioPlayerStatus.playbackState]);
-
-  useEffect(() => {
     if (AudioPlayerStatus?.currentTime) {
       saveBookProgress(AudioPlayerStatus.currentTime);
     }
+    if (
+      AudioPlayerStatus.currentTime >= AudioPlayerStatus.duration &&
+      bookProgress.currentChapter < (book?.chapters?.length || 0) &&
+      AudioPlayerStatus.duration > 0
+    ) {
+      loadChapterToTrack(bookProgress?.currentChapter + 1 || 0);
+    }
   }, [AudioPlayerStatus.currentTime]);
+
+  useEffect(() => {
+    // When audio finishes loading (was loading and now is loaded)
+    if (AudioPlayerStatus.isLoaded && !AudioPlayerStatus.isBuffering) {
+      // Play if we just changed chapters
+      audioPlayer.play();
+    }
+  }, [AudioPlayerStatus.isLoaded, AudioPlayerStatus.isBuffering]);
 
   return (
     <View style={{ paddingTop: height * 0.05 }}>
@@ -281,7 +289,7 @@ function LoadedPlayer({ book }: { book: book }) {
       <View
         style={{
           marginTop: height * 0.05,
-          width: width * 0.7,
+          width: width * 0.8,
           marginHorizontal: "auto",
           borderColor: "black",
         }}
@@ -307,7 +315,7 @@ function LoadedPlayer({ book }: { book: book }) {
                 trackStyle={{
                   height: 10,
                   borderRadius: 100,
-                  width: width * 0.7,
+                  width: width * 0.8,
                   borderColor: BABYBLUE,
                   borderWidth: 1,
                 }}
