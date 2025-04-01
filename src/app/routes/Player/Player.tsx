@@ -166,6 +166,13 @@ function LoadedPlayer({ book }: { book: book }) {
     if (bookProgress?.currentProgressSeconds) {
       audioPlayer.seekTo(bookProgress.currentProgressSeconds);
     }
+
+    const addToCurrentlyReadingTimeout = setTimeout(() => {
+      dispatch(addToCurrentlyReading(book.id || ""));
+    }, 5000);
+    return () => {
+      clearTimeout(addToCurrentlyReadingTimeout);
+    };
   }, []);
 
   useEffect(() => {

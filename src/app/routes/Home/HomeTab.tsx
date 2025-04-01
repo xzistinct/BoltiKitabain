@@ -102,7 +102,7 @@ export default function HomeTab() {
           books.push(bookData);
         }
       }
-      if (books.length === 0 && readingList.length > 0) {
+      if (books.length === 0 && currentlyReading.length > 0) {
         return;
       }
       setCurrentlyReadingBooks(books);
