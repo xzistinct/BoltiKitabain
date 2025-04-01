@@ -7,3 +7,4 @@
 7. Fix delay in DiscoverTab carousel changes with activity loader
 
 Toast notification on removing and adding to list
+Readug -> listening

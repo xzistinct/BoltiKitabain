@@ -112,6 +112,7 @@ function LoadedPlayer({ book }: { book: book }) {
       console.error("Chapter number out of bounds:", chapterNumber);
       return;
     }
+    setPlaybackSpeed(1);
     if (!bookmarks || !bookmarks[chapterNumber]) {
       dispatch(initializeBookmark(book.id || ""));
     }

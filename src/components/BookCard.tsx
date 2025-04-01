@@ -1,12 +1,13 @@
 import { book } from "@/constants/types";
 import {
-  TouchableOpacity,
   View,
   Text,
   useWindowDimensions,
   ScrollView,
   TouchableWithoutFeedback,
 } from "react-native";
+
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { SecondsToTime } from "@/helpers/time";
 
@@ -24,7 +25,6 @@ export default function BookCard({
   onPress: () => void;
 }) {
   const { width, height } = useWindowDimensions();
-  const bookLength = SecondsToTime(book.length || 0);
 
   return (
     <TouchableOpacity
@@ -87,7 +87,7 @@ export default function BookCard({
           }}
         >
           <ScrollView horizontal>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={onPress}>
               <Text>{book.description}</Text>
             </TouchableWithoutFeedback>
           </ScrollView>

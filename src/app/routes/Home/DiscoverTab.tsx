@@ -169,6 +169,7 @@ export default function DiscoverTab({}: {}) {
                 <BookCard
                   book={item.item}
                   onPress={() => {
+                    console.log("Pressed", item.item.name);
                     setSelectedBook(item.item);
                     setModalVisible(true);
                   }}

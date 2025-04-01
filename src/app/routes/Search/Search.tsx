@@ -1,9 +1,14 @@
+import BookCard from "@/components/BookCard";
+import LoadingOverlay from "@/components/LoadingOverlay";
 import { DARKGREY, GREY } from "@/constants/colors";
 import font from "@/constants/fonts";
+import { book } from "@/constants/types";
+import { useAppSelector } from "@/state/reduxStore";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  FlatList,
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
@@ -19,13 +24,35 @@ export default function Search({ route }: any) {
   const [searchQuery, setSearchQuery] = useState<string>(
     route.params.searchQuery || ""
   );
-  const [searchResults, setSearchResults] = useState<Array<any>>([]);
+  const [searchResults, setSearchResults] = useState<Array<book>>([]);
+  const popularBooks = useAppSelector(
+    (state) => state.books.fetchedPopularBooks
+  );
 
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "success"
   >("loading");
 
-  const loadSearchResults = async () => {};
+  const loadSearchResults = async (searchQuery: string) => {
+    setSearchResults(
+      popularBooks.filter((book) => (book?.name || "").includes(searchQuery))
+    );
+  };
+
+  useEffect(() => {
+    (async () => {
+      await loadSearchResults(searchQuery);
+      setScreenState("success");
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      setScreenState("loading");
+      await loadSearchResults(searchQuery);
+      setScreenState("success");
+    })();
+  }, [searchQuery]);
 
   return (
     <View
@@ -72,8 +99,18 @@ export default function Search({ route }: any) {
             placeholderTextColor={GREY}
           />
         </View>
-        <View style={{ flex: 1, backgroundColor: "red" }}>
-          {screenState === "loading" && <BarIndicator />}
+        <View
+          style={{ width: width, height: height, paddingTop: height * 0.05 }}
+        >
+          \{screenState === "loading" && <LoadingOverlay />}
+          {screenState === "success" && (
+            <FlatList
+              data={searchResults}
+              renderItem={(item) => (
+                <BookCard book={item.item} onPress={() => {}} />
+              )}
+            />
+          )}
         </View>
       </KeyboardAvoidingView>
     </View>
