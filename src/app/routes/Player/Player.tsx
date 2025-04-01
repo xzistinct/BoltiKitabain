@@ -48,10 +48,17 @@ import {
 } from "expo-audio";
 
 import {
+  addBookmark,
   addToCurrentlyReading,
+  initializeBookmark,
+  removeBookmark,
   updateBookProgress,
 } from "@/state/redux-slices/bookSlice";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+
+import { Dropdown } from "react-native-element-dropdown";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { PrettyPrintName } from "@/helpers/name";
 
 function LoadedPlayer({ book }: { book: book }) {
   if (!book || !book.chapters || book.chapters.length === 0) {
@@ -63,6 +70,9 @@ function LoadedPlayer({ book }: { book: book }) {
 
   const bookProgress = useAppSelector(
     (state) => state.books.bookProgress[book.id || ""]
+  );
+  const bookmarks = useAppSelector(
+    (state) => state.books.bookmarks[book.id || ""]
   );
 
   let audioSource = {
@@ -76,7 +86,35 @@ function LoadedPlayer({ book }: { book: book }) {
 
   const sliderTouchableRef = useRef<View>(null);
 
+  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const speedOptions = [
+    { label: "0.50x", value: 0.5 },
+    { label: "0.75x", value: 0.75 },
+    { label: "1.00x", value: 1.0 },
+    { label: "1.25x", value: 1.25 },
+    { label: "1.50x", value: 1.5 },
+    { label: "1.75x", value: 1.75 },
+    { label: "2.00x", value: 2.0 },
+  ];
+
+  useEffect(() => {
+    if (audioPlayer.isLoaded) {
+      audioPlayer.setPlaybackRate(playbackSpeed);
+    }
+  }, [playbackSpeed]);
+
   const loadChapterToTrack = (chapterNumber: number) => {
+    if (
+      !book.chapters ||
+      chapterNumber >= book.chapters.length ||
+      chapterNumber < 0
+    ) {
+      console.error("Chapter number out of bounds:", chapterNumber);
+      return;
+    }
+    if (!bookmarks || !bookmarks[chapterNumber]) {
+      dispatch(initializeBookmark(book.id || ""));
+    }
     dispatch(
       updateBookProgress({
         bookId: book.id || "",
@@ -136,7 +174,6 @@ function LoadedPlayer({ book }: { book: book }) {
     }
     if (
       AudioPlayerStatus.currentTime >= AudioPlayerStatus.duration &&
-      bookProgress.currentChapter < (book?.chapters?.length || 0) &&
       AudioPlayerStatus.duration > 0
     ) {
       loadChapterToTrack(bookProgress?.currentChapter + 1 || 0);
@@ -193,7 +230,7 @@ function LoadedPlayer({ book }: { book: book }) {
         }}
       >
         <Text style={{ fontSize: 15, fontFamily: font("Jost", "Regular") }}>
-          {book.author}
+          {PrettyPrintName(book?.author || "")}
         </Text>
         <FlatList
           data={book.genre}
@@ -286,15 +323,120 @@ function LoadedPlayer({ book }: { book: book }) {
           <BookImage id={book.image} width={width * 0.5} />
         </View>
       </View>
+
       <View
         style={{
-          marginTop: height * 0.05,
+          flexDirection: "row",
+
+          justifyContent: "space-around",
+          alignItems: "center",
+          marginTop: height * 0.03,
+          width: width * 0.8,
+          marginHorizontal: "auto",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(
+              addBookmark({
+                bookId: book.id || "",
+                chapter: bookProgress?.currentChapter || 0,
+                timeStamp: AudioPlayerStatus.currentTime,
+              })
+            );
+          }}
+        >
+          <MaterialCommunityIcons
+            name="bookmark-plus-outline"
+            size={30}
+            color="black"
+          />
+        </TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
+            style={{
+              fontFamily: font("Jost", "Regular"),
+              fontSize: 14,
+            }}
+          >
+            Speed
+          </Text>
+          <Dropdown
+            style={{
+              width: width * 0.2,
+              height: 32,
+              borderColor: LIGHTGREY,
+              borderWidth: 1,
+              borderRadius: 8,
+              paddingHorizontal: 1,
+              backgroundColor: VERYLIGHTGREY,
+              marginLeft: width * 0.04,
+            }}
+            data={speedOptions}
+            labelField="label"
+            valueField="value"
+            placeholder="1.0x"
+            value={playbackSpeed}
+            onChange={(item) => {
+              setPlaybackSpeed(item.value);
+            }}
+            selectedTextStyle={{
+              fontSize: 14,
+              textAlign: "center",
+              fontFamily: font("Jost", "Regular"),
+            }}
+            containerStyle={{
+              borderRadius: 8,
+            }}
+          />
+        </View>
+      </View>
+
+      <View
+        style={{
+          marginTop: height * 0.035,
           width: width * 0.8,
           marginHorizontal: "auto",
           borderColor: "black",
         }}
       >
-        <View>
+        <View
+          style={{
+            flexDirection: "row",
+            marginBottom: -10,
+            height: 18,
+            zIndex: 10000,
+          }}
+        >
+          {bookmarks && bookmarks[bookProgress?.currentChapter] && (
+            <>
+              {bookmarks[bookProgress?.currentChapter].map(
+                (bookmark, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      console.log("Bookmark pressed", bookmark);
+                      audioPlayer.seekTo(bookmark.timeStamp);
+                    }}
+                    onLongPress={() => {
+                      console.log("Removing bookmark", bookmark);
+                      dispatch(removeBookmark(bookmark));
+                    }}
+                    style={{
+                      position: "absolute",
+                      left:
+                        (bookmark.timeStamp / AudioPlayerStatus.duration) *
+                        (width * 0.8),
+                    }}
+                  >
+                    <FontAwesome name="bookmark" size={20} color="black" />
+                  </TouchableOpacity>
+                )
+              )}
+            </>
+          )}
+        </View>
+        <View style={{}}>
           <TouchableWithoutFeedback
             onPress={(event) => {
               const { locationX } = event.nativeEvent;
@@ -314,6 +456,7 @@ function LoadedPlayer({ book }: { book: book }) {
                 style={{}}
                 trackStyle={{
                   height: 10,
+
                   borderRadius: 100,
                   width: width * 0.8,
                   borderColor: BABYBLUE,
@@ -330,7 +473,6 @@ function LoadedPlayer({ book }: { book: book }) {
             </View>
           </TouchableWithoutFeedback>
         </View>
-
         <View
           style={{
             flexDirection: "row",
@@ -346,45 +488,58 @@ function LoadedPlayer({ book }: { book: book }) {
             {PrettyPrintSeconds(AudioPlayerStatus.duration)}
           </Text>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: height * 0.05,
-            justifyContent: "center",
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: height * 0.05,
+          justifyContent: "center",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            audioPlayer.seekTo(AudioPlayerStatus.currentTime - 10);
+          }}
+          onLongPress={() => {
+            loadChapterToTrack(bookProgress?.currentChapter - 1 || 0);
           }}
         >
-          <TouchableOpacity>
-            <Ionicons name="play-skip-back" size={45} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              if (AudioPlayerStatus.playing) {
-                audioPlayer.pause();
-              } else {
-                audioPlayer.play();
-              }
-            }}
-            style={{
-              width: 50,
-              height: 50,
-              alignItems: "center",
-              justifyContent: "center",
-              marginHorizontal: 0.05 * width,
-            }}
-          >
-            {AudioPlayerStatus.playing ? (
-              <Fontisto name="pause" size={40} color="black" />
-            ) : (
-              <Entypo name="controller-play" size={55} color="black" />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name="play-skip-forward" size={45} color="black" />
-          </TouchableOpacity>
-        </View>
+          <Ionicons name="play-skip-back" size={45} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            if (AudioPlayerStatus.playing) {
+              audioPlayer.pause();
+            } else {
+              audioPlayer.play();
+            }
+          }}
+          style={{
+            width: 50,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            marginHorizontal: 0.05 * width,
+          }}
+        >
+          {AudioPlayerStatus.playing ? (
+            <Fontisto name="pause" size={40} color="black" />
+          ) : (
+            <Entypo name="controller-play" size={55} color="black" />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            audioPlayer.seekTo(AudioPlayerStatus.currentTime + 10);
+          }}
+          onLongPress={() => {
+            loadChapterToTrack(bookProgress?.currentChapter + 1 || 0);
+          }}
+        >
+          <Ionicons name="play-skip-forward" size={45} color="black" />
+        </TouchableOpacity>
       </View>
-      <View></View>
     </View>
   );
 }
@@ -395,6 +550,10 @@ export default function Player({ route }: any) {
   const jwt = useAppSelector((state) => state.user.token);
 
   let [book, setBook] = useState<book | null>(null);
+  const bookProgress = useAppSelector(
+    (state) => state.books.bookProgress[bookId || ""]
+  );
+  const dispatch = useAppDispatch();
 
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "loaded"
@@ -408,9 +567,25 @@ export default function Player({ route }: any) {
         let chapters = await getBookChapters(book.id || "", jwt || "");
         if (typeof chapters === "object") {
           book.chapters = chapters.chapters;
-          book.numberOfChapters = chapters.num;
         }
+
         setBook(book);
+
+        setScreenState("loaded");
+        if (
+          book.chapters &&
+          bookProgress.currentChapter >= book.chapters.length
+        ) {
+          dispatch(
+            updateBookProgress({
+              bookId: book.id || "",
+              currentChapter: 0,
+              currentProgressSeconds: 0,
+            })
+          );
+
+          setScreenState("loaded");
+        }
       }
 
       setScreenState("loaded");

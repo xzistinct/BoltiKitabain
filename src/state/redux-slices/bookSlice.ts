@@ -207,7 +207,12 @@ const bookSlice = createSlice({
       if (!state.initialized) {
         return;
       }
-      state.bookmarks[action.payload.bookId].push(action.payload);
+      if (!state.bookmarks[action.payload.bookId][action.payload.chapter]) {
+        state.bookmarks[action.payload.bookId][action.payload.chapter] = [];
+      }
+      state.bookmarks[action.payload.bookId][action.payload.chapter].push(
+        action.payload
+      );
       // Save to AsyncStorage
       AsyncStorage.setItem("bookmarks", JSON.stringify(state.bookmarks)).catch(
         (error) => console.error("Error saving bookmarks:", error)
@@ -217,13 +222,28 @@ const bookSlice = createSlice({
       if (!state.initialized) {
         return;
       }
-      state.bookmarks[action.payload.bookId] = state.bookmarks[
-        action.payload.bookId
-      ].filter((bookmark) => bookmark.timeStamp === action.payload.timeStamp);
+      if (!state.bookmarks[action.payload.bookId]) {
+        return;
+      }
+      if (!state.bookmarks[action.payload.bookId][action.payload.chapter]) {
+        return;
+      }
+      state.bookmarks[action.payload.bookId][action.payload.chapter] =
+        state.bookmarks[action.payload.bookId][action.payload.chapter].filter(
+          (bookmark) => bookmark.timeStamp !== action.payload.timeStamp
+        );
       // Save to AsyncStorage
       AsyncStorage.setItem("bookmarks", JSON.stringify(state.bookmarks)).catch(
         (error) => console.error("Error saving bookmarks:", error)
       );
+    },
+    initializeBookmark: (state, action: PayloadAction<string>) => {
+      if (!state.initialized) {
+        return;
+      }
+      if (!state.bookmarks[action.payload]) {
+        state.bookmarks[action.payload] = {};
+      }
     },
   },
   extraReducers: (builder) => {
@@ -267,5 +287,6 @@ export const {
   addBookmark,
   removeBookmark,
   clearBookData,
+  initializeBookmark,
 } = bookSlice.actions;
 export default bookSlice.reducer;

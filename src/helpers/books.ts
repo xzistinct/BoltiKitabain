@@ -193,9 +193,7 @@ function parseChapterData(chapterJSON: any) {
 export async function getBookChapters(
   id: string,
   jwt: string
-): Promise<
-  { chapters: book["chapters"]; num: book["numberOfChapters"] } | tError
-> {
+): Promise<{ chapters: book["chapters"] } | tError> {
   const response = await fetch(endpoints.chapters + "/" + id, {
     headers: {
       "x-auth-token": jwt,
@@ -213,7 +211,6 @@ export async function getBookChapters(
       return errors["Failed to get appropriate response from server"];
     }
     return {
-      num: data.length - 1,
       chapters: data
         .map(parseChapterData)
         .filter((result) => typeof result === "object"),

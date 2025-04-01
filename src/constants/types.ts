@@ -50,7 +50,6 @@ export type book = {
   id?: string;
   tags?: string[];
   chapters?: chapter[];
-  numberOfChapters?: number;
   dateAdded?: tDate;
   narrator?: string;
 };
@@ -70,7 +69,7 @@ export interface Bookmark {
   timeStamp: number;
 }
 
-export type Bookmarks = Record<string, Bookmark[]>;
+export type Bookmarks = Record<string, Record<number, Bookmark[]>>;
 
 export type tError = (typeof errors)[keyof typeof errors];
 export type tResponse = {

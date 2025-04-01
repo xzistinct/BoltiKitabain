@@ -39,6 +39,7 @@ export default function Chip({
           //@ts-ignore
           ...textStyle,
         }}
+        numberOfLines={1}
       >
         {content}
       </Text>
