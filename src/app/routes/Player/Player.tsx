@@ -42,7 +42,6 @@ import Chip from "@/components/Chip";
 import { endpoints } from "@/constants/endpoints";
 
 import {
-  AudioPlayer,
   useAudioPlayer,
   setAudioModeAsync,
   useAudioPlayerStatus,
@@ -55,6 +54,9 @@ import {
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 function LoadedPlayer({ book }: { book: book }) {
+  if (!book || !book.chapters || book.chapters.length === 0) {
+    return <></>;
+  }
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -64,28 +66,40 @@ function LoadedPlayer({ book }: { book: book }) {
   );
 
   let audioSource = {
-    uri: getAudioURL(book?.chapters[0].audio_id),
+    uri: getAudioURL(
+      book?.chapters[bookProgress?.currentChapter || 0].audio_id
+    ),
   };
 
-  let AudioPlayer = useAudioPlayer(audioSource, 250);
-  const AudioPlayerStatus = useAudioPlayerStatus(AudioPlayer);
+  let audioPlayer = useAudioPlayer(audioSource, 250);
+  const AudioPlayerStatus = useAudioPlayerStatus(audioPlayer);
 
   const sliderTouchableRef = useRef<View>(null);
 
   const loadChapterToTrack = (chapterNumber: number) => {
-    if (!book.chapters || !book.chapters[chapterNumber] || !AudioPlayer) {
+    if (!book.chapters || !book.chapters[chapterNumber] || !audioPlayer) {
       return;
     }
-    try {
-      AudioPlayer.replace({
-        uri: getAudioURL(book.chapters[chapterNumber].audio_id),
-      });
-    } catch (e) {}
+    audioPlayer.replace({
+      uri: getAudioURL(book?.chapters[chapterNumber].audio_id),
+    });
     dispatch(
       updateBookProgress({
         bookId: book.id || "",
         currentChapter: chapterNumber,
         currentProgressSeconds: 0,
+      })
+    );
+  };
+
+  const saveBookProgress = (currentTime: number | null) => {
+    if (!currentTime) return;
+    console.log("Saving progress", currentTime);
+    dispatch(
+      updateBookProgress({
+        bookId: book.id || "",
+        currentChapter: bookProgress?.currentChapter || 0,
+        currentProgressSeconds: currentTime,
       })
     );
   };
@@ -103,36 +117,28 @@ function LoadedPlayer({ book }: { book: book }) {
         })
       );
     }
-
-    (async () => {
-      if (!book.chapters) {
-        console.error("No chapters found for this book.");
-        return;
-      }
-      // Start playing it
-      AudioPlayer.play();
-      if (bookProgress?.currentProgressSeconds) {
-        AudioPlayer.seekTo(bookProgress.currentProgressSeconds);
-      }
-    })();
+    if (!book.chapters) {
+      console.error("No chapters found for this book.");
+      return;
+    }
+    loadChapterToTrack(bookProgress?.currentChapter || 0);
+    // Start playing it
+    audioPlayer.play();
+    console.log("Progress", bookProgress?.currentProgressSeconds);
+    if (bookProgress?.currentProgressSeconds) {
+      audioPlayer.seekTo(bookProgress.currentProgressSeconds);
+    }
 
     setTimeout(() => {
       dispatch(addToCurrentlyReading(book.id || ""));
     }, 5000);
-    setInterval(() => {
-      if (AudioPlayer.currentTime && AudioPlayer.duration) {
-        dispatch(
-          updateBookProgress({
-            bookId: book.id || "",
-            currentChapter: bookProgress?.currentChapter || 0,
-            currentProgressSeconds: AudioPlayer.currentTime,
-          })
-        );
-      }
-    }, 5000);
+    const saveProgressInterval = setInterval(
+      () => saveBookProgress(AudioPlayerStatus?.currentTime || null),
+      5000
+    );
 
     return () => {
-      AudioPlayer.release();
+      clearInterval(saveProgressInterval);
     };
   }, []);
 
@@ -290,8 +296,8 @@ function LoadedPlayer({ book }: { book: book }) {
               const { locationX } = event.nativeEvent;
               sliderTouchableRef.current?.measure(
                 (x, y, width, height, pageX, pageY) => {
-                  const position = (locationX / width) * AudioPlayer.duration;
-                  AudioPlayer.seekTo(position);
+                  const position = (locationX / width) * audioPlayer.duration;
+                  audioPlayer.seekTo(position);
                 }
               );
             }}
@@ -312,7 +318,7 @@ function LoadedPlayer({ book }: { book: book }) {
                 value={AudioPlayerStatus.currentTime}
                 maximumValue={AudioPlayerStatus.duration}
                 onValueChange={(value: number) => {
-                  AudioPlayer.seekTo(value);
+                  audioPlayer.seekTo(value);
                   console.log("changed");
                 }}
               />
@@ -348,10 +354,10 @@ function LoadedPlayer({ book }: { book: book }) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              if (AudioPlayer.playing) {
-                AudioPlayer.pause();
+              if (audioPlayer.playing) {
+                audioPlayer.pause();
               } else {
-                AudioPlayer.play();
+                audioPlayer.play();
               }
             }}
             style={{
@@ -362,7 +368,7 @@ function LoadedPlayer({ book }: { book: book }) {
               marginHorizontal: 0.05 * width,
             }}
           >
-            {AudioPlayer.playing ? (
+            {audioPlayer.playing ? (
               <Fontisto name="pause" size={40} color="black" />
             ) : (
               <Entypo name="controller-play" size={55} color="black" />
