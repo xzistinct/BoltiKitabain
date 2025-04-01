@@ -128,18 +128,6 @@ function LoadedPlayer({ book }: { book: book }) {
     if (bookProgress?.currentProgressSeconds) {
       audioPlayer.seekTo(bookProgress.currentProgressSeconds);
     }
-
-    setTimeout(() => {
-      dispatch(addToCurrentlyReading(book.id || ""));
-    }, 5000);
-    const saveProgressInterval = setInterval(
-      () => saveBookProgress(AudioPlayerStatus?.currentTime || null),
-      5000
-    );
-
-    return () => {
-      clearInterval(saveProgressInterval);
-    };
   }, []);
 
   useEffect(() => {
@@ -148,6 +136,12 @@ function LoadedPlayer({ book }: { book: book }) {
       loadChapterToTrack(bookProgress?.currentChapter + 1 || 0);
     }
   }, [AudioPlayerStatus.playbackState]);
+
+  useEffect(() => {
+    if (AudioPlayerStatus?.currentTime) {
+      saveBookProgress(AudioPlayerStatus.currentTime);
+    }
+  }, [AudioPlayerStatus.currentTime]);
 
   return (
     <View style={{ paddingTop: height * 0.05 }}>
