@@ -7,7 +7,6 @@ import {
   useWindowDimensions,
   StyleProp,
   ViewStyle,
-  FlatList,
   Modal,
   StyleSheet,
   ScrollView,
@@ -15,6 +14,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import font from "@/constants/fonts";
+
+import { FlatList } from "react-native-gesture-handler";
 
 import Carousel from "react-native-reanimated-carousel";
 
