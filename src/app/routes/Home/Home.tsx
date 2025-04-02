@@ -70,6 +70,8 @@ const NAVBAR = ({
     color: DARKGREY,
     borderRadius: 5,
   };
+
+  console.log("language", language);
   return (
     <View
       style={{
@@ -99,7 +101,7 @@ const NAVBAR = ({
                   : NAVBARTEXTSTYLE
               }
             >
-              {item}
+              {language === "Urdu" ? translationTable[item] : item}
             </Text>
           </TouchableOpacity>
         ))}
@@ -180,9 +182,9 @@ const NAVBAR = ({
                 }}
               >
                 <Text style={{ fontFamily: font("Jost", "Regular") }}>
-                  {language === "English"
-                    ? "Logout"
-                    : translationTable["Log out"]}
+                  {language === "Urdu"
+                    ? translationTable["Log out"]
+                    : "Log out"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -278,6 +280,7 @@ function Home() {
 
   const [currentTab, setCurrentTab] = useState<tTabs>("Home");
   const navigation = useNavigation();
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -327,7 +330,11 @@ function Home() {
                 paddingLeft: 3 * (width / 100),
                 justifyContent: "flex-end",
               }}
-              placeholder="Search the catalogue"
+              placeholder={
+                language === "Urdu"
+                  ? translationTable["Search"]
+                  : "Search the catalogue"
+              }
               placeholderTextColor={GREY}
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}

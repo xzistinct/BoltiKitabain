@@ -21,6 +21,7 @@ export const translationTable = {
   "Log out": "لاگ آؤٹ",
   "Start listening": "سننا شروع کریں",
   "Add to list": "فہرست میں شامل کریں",
+  "Added to list": "فہرست میں شامل کر دیا گیا",
   Undo: "کالعدم",
   Narrator: "راوی",
   "Item added to reading list": "آئٹم کو پڑھنے کی فہرست میں شامل کیا گیا۔",
@@ -51,4 +52,9 @@ export const translationTable = {
   "Sorry, we encountered an error while creating your account.":
     "معذرت، آپ کا اکاؤنٹ بناتے وقت ہمیں ایک خامی کا سامنا کرنا پڑا۔",
   "Go back": "پیچھے جاؤ",
+  Contributor: "تعاون",
+  Author: "مصنف",
+  "Start reading": "پڑھنا شروع کریں",
+  "Add to your reading list": "اپنی پڑھنے کی فہرست میں شامل کریں",
+  "No popular books found": "کوئی مشہور کتابیں نہیں ملیں۔",
 } as const;

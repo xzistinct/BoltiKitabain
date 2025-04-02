@@ -28,6 +28,7 @@ import { useSelector } from "react-redux";
 import { Notifier, Easing } from "react-native-notifier";
 import { NAVYBLUE } from "@/constants/colors";
 import DefaultNotificationContainer from "@/components/DefaultNotificationContainer";
+import { translationTable } from "@/constants/translation-table";
 
 type tBookShelf = {
   books: book[] | null;
@@ -43,6 +44,7 @@ export default function HomeTab() {
   const popularBooks = useAppSelector(
     (state) => state.books.fetchedPopularBooks
   );
+  const language = useAppSelector((state) => state.user.userInfo?.language);
   const readingList = useAppSelector((state) => state.books.readingList);
   const currentlyReading = useAppSelector(
     (state) => state.books.currentlyReading
@@ -136,9 +138,15 @@ export default function HomeTab() {
   const bookShelf: tBookShelf = [
     {
       books: currentlyReadingBooks,
-      title: "Currently reading",
+      title:
+        language === "Urdu"
+          ? translationTable["Currently reading"]
+          : "Currently reading",
       behaviour: "Open",
-      emptyMessage: "Start reading to fill this shelf",
+      emptyMessage:
+        language === "Urdu"
+          ? translationTable["Start listening"]
+          : "Start reading to fill this shelf",
       onLongPress: (book) => {
         dispatch(removeFromCurrentlyReading(book.id || ""));
         // Configure notifier to show from bottom
@@ -153,14 +161,20 @@ export default function HomeTab() {
 
           Component: () => (
             <DefaultNotificationContainer>
-              <Text>Item removed from currently reading.</Text>
+              <Text>
+                {language === "Urdu"
+                  ? translationTable["Item removed from reading list"]
+                  : "Item removed from currently reading."}
+              </Text>
               <TouchableOpacity
                 onPress={() => {
                   dispatch(addToCurrentlyReading(book.id || ""));
                   Notifier.hideNotification();
                 }}
               >
-                <Text style={{ color: NAVYBLUE }}>Undo</Text>
+                <Text style={{ color: NAVYBLUE }}>
+                  {language === "Urdu" ? translationTable["Undo"] : "Undo"}
+                </Text>
               </TouchableOpacity>
             </DefaultNotificationContainer>
           ),
@@ -169,9 +183,15 @@ export default function HomeTab() {
     },
     {
       books: readingListBooks,
-      title: "In your reading list",
+      title:
+        language === "Urdu"
+          ? translationTable["Your reading list"]
+          : "In your reading list",
       behaviour: "Open",
-      emptyMessage: "Add to your reading list to fill this shelf",
+      emptyMessage:
+        language === "Urdu"
+          ? translationTable["Add to your reading list"]
+          : "Add to your reading list to fill this shelf",
       onLongPress: (book) => {
         dispatch(removeFromReadingList(book.id || ""));
         // Configure notifier to show from bottom
@@ -186,14 +206,20 @@ export default function HomeTab() {
 
           Component: () => (
             <DefaultNotificationContainer>
-              <Text>Item removed from reading list.</Text>
+              <Text>
+                {language === "Urdu"
+                  ? translationTable["Item removed from reading list"]
+                  : "Item removed from reading list."}
+              </Text>
               <TouchableOpacity
                 onPress={() => {
                   dispatch(addToReadingList(book.id || ""));
                   Notifier.hideNotification();
                 }}
               >
-                <Text style={{ color: NAVYBLUE }}>Undo</Text>
+                <Text style={{ color: NAVYBLUE }}>
+                  {language === "Urdu" ? translationTable["Undo"] : "Undo"}
+                </Text>
               </TouchableOpacity>
             </DefaultNotificationContainer>
           ),
@@ -202,9 +228,12 @@ export default function HomeTab() {
     },
     {
       books: popularBooks,
-      title: "Popular",
+      title: language === "Urdu" ? translationTable["Popular"] : "Popular",
       behaviour: "Modal",
-      emptyMessage: "No popular books found",
+      emptyMessage:
+        language === "Urdu"
+          ? translationTable["No popular books found"]
+          : "No popular books found",
     },
   ];
 

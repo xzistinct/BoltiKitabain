@@ -33,6 +33,7 @@ import {
 import * as NavigationBar from "expo-navigation-bar";
 import DefaultNotificationContainer from "./DefaultNotificationContainer";
 import { Notifier } from "react-native-notifier";
+import { translationTable } from "@/constants/translation-table";
 
 export default function BookModal({
   book,
@@ -48,6 +49,7 @@ export default function BookModal({
   const dispatch = useAppDispatch();
   const readingList = useAppSelector((state) => state.books.readingList);
   const [addedToReadingList, setAddedToReadingList] = useState<boolean>(false);
+  const language = useAppSelector((state) => state.user.userInfo?.language);
   const checkIfBookInReadingList = () => {
     const isBookInReadingList = readingList.some((item) => {
       if (item == book?.id) {
@@ -188,7 +190,11 @@ export default function BookModal({
                       fontFamily: font("OpenSans", "Regular"),
                     }}
                   >
-                    {book.name}
+                    {language === "Urdu" &&
+                    book.name_urdu &&
+                    book.name_urdu.length > 0
+                      ? book.name_urdu
+                      : book.name}
                   </Text>
                 )}
 
@@ -230,7 +236,8 @@ export default function BookModal({
                   fontFamily: font("OpenSans", "Regular"),
                 }}
               >
-                By: {book.author}
+                {language === "Urdu" ? translationTable["Author"] : "By"}:{" "}
+                {book.author}
               </Text>
               {book.narrator && (
                 <Text
@@ -239,7 +246,10 @@ export default function BookModal({
                     fontFamily: font("OpenSans", "Regular"),
                   }}
                 >
-                  Narrator: {book.narrator}
+                  {language === "Urdu"
+                    ? translationTable["Narrator"]
+                    : "Narrator"}
+                  : {book.narrator}
                 </Text>
               )}
               {book.contributor && (
@@ -249,7 +259,11 @@ export default function BookModal({
                     fontFamily: font("OpenSans", "Regular"),
                   }}
                 >
-                  Contributor: {book.contributor}
+                  {language === "Urdu"
+                    ? translationTable["Contributor"]
+                    : "Contributor"}
+                  {":"}
+                  {book.contributor}
                 </Text>
               )}
             </View>
@@ -298,7 +312,11 @@ export default function BookModal({
                 style={actionButtonStyle}
                 onPress={startReading}
               >
-                <Text style={actionButtonTextStyle}>Start listening</Text>
+                <Text style={actionButtonTextStyle}>
+                  {language === "Urdu"
+                    ? translationTable["Start listening"]
+                    : "Start listening"}
+                </Text>
               </TouchableOpacity>
               {!addedToReadingList ? (
                 <TouchableOpacity
@@ -317,21 +335,33 @@ export default function BookModal({
 
                       Component: () => (
                         <DefaultNotificationContainer>
-                          <Text>Item added to reading list.</Text>
+                          <Text>
+                            {language === "Urdu"
+                              ? translationTable["Item added to reading list"]
+                              : "Item added to reading list."}
+                          </Text>
                           <TouchableOpacity
                             onPress={() => {
                               dispatch(removeFromReadingList(book.id || ""));
                               Notifier.hideNotification();
                             }}
                           >
-                            <Text style={{ color: NAVYBLUE }}>Undo</Text>
+                            <Text style={{ color: NAVYBLUE }}>
+                              {language === "Urdu"
+                                ? translationTable["Undo"]
+                                : "Undo"}
+                            </Text>
                           </TouchableOpacity>
                         </DefaultNotificationContainer>
                       ),
                     });
                   }}
                 >
-                  <Text style={actionButtonTextStyle}>Add to list</Text>
+                  <Text style={actionButtonTextStyle}>
+                    {language === "Urdu"
+                      ? translationTable["Add to list"]
+                      : "Add to list"}
+                  </Text>
                 </TouchableOpacity>
               ) : (
                 <View
@@ -340,7 +370,11 @@ export default function BookModal({
                     backgroundColor: GREY,
                   }}
                 >
-                  <Text style={actionButtonTextStyle}>Added to list</Text>
+                  <Text style={actionButtonTextStyle}>
+                    {language === "Urdu"
+                      ? translationTable["Added to list"]
+                      : "Added to list"}
+                  </Text>
                 </View>
               )}
             </View>

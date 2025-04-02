@@ -266,6 +266,9 @@ export const userSlice = createSlice({
         return;
       }
       state.userInfo.language = action.payload;
+      if (state.userInfo) {
+        AsyncStorage.setItem("userInformation", JSON.stringify(state.userInfo));
+      }
     },
   },
   extraReducers: (builder) => {
@@ -274,17 +277,24 @@ export const userSlice = createSlice({
       if (!action.payload) {
         return;
       }
-      if (action.payload.isGuest === true && action.payload.userInfo) {
+      if (!action.payload.userInfo) {
+        return;
+      }
+
+      state.userInfo = {
+        ...state.userInfo,
+        ...Object.fromEntries(
+          Object.entries(action.payload.userInfo).filter(
+            ([_, value]) => value !== null && value !== undefined
+          )
+        ),
+      };
+
+      if (action.payload.isGuest === true) {
         state.isGuest = true;
-        state.userInfo = action.payload.userInfo;
-      } else if (
-        action.payload.username &&
-        action.payload.token &&
-        action.payload.userInfo
-      ) {
+      } else if (action.payload.username && action.payload.token) {
         state.username = action.payload.username || null;
         state.token = action.payload.token || null;
-        state.userInfo = action.payload.userInfo || null;
       }
     });
     builder.addCase(initializeUser.rejected, (state, action) => {});
@@ -298,7 +308,14 @@ export const userSlice = createSlice({
       state.token = action.payload.token;
 
       if (action.payload.userInfo) {
-        state.userInfo = action.payload.userInfo;
+        state.userInfo = {
+          ...state.userInfo,
+          ...Object.fromEntries(
+            Object.entries(action.payload.userInfo).filter(
+              ([_, value]) => value !== null && value !== undefined
+            )
+          ),
+        };
       }
     });
     builder.addCase(login.rejected, (state, action) => {});

@@ -64,7 +64,11 @@ export default function BookCard({
                     fontSize: 2.75 * (height / 100),
                   }}
                 >
-                  {language === "English" ? book.name : book.name_urdu}
+                  {language === "Urdu" &&
+                  book.name_urdu &&
+                  book.name_urdu?.length > 0
+                    ? book.name_urdu
+                    : book.name}
                 </Text>
               </View>
             </TouchableWithoutFeedback>
