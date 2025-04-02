@@ -16,6 +16,7 @@ import { VERYLIGHTGREY, BABYBLUE } from "@/constants/colors";
 import Chip from "./Chip";
 
 import font from "@/constants/fonts";
+import { useAppSelector } from "@/state/reduxStore";
 
 export default function BookCard({
   book,
@@ -25,6 +26,7 @@ export default function BookCard({
   onPress: () => void;
 }) {
   const { width, height } = useWindowDimensions();
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   return (
     <TouchableOpacity
@@ -62,7 +64,7 @@ export default function BookCard({
                     fontSize: 2.75 * (height / 100),
                   }}
                 >
-                  {book.name}
+                  {language === "English" ? book.name : book.name_urdu}
                 </Text>
               </View>
             </TouchableWithoutFeedback>

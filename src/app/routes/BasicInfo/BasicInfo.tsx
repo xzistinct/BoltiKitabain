@@ -33,14 +33,16 @@ import {
 } from "@/constants/styles";
 import DualText from "@/components/DualText";
 import { tResponse, tUserInformation } from "@/constants/types";
-import { useAppDispatch } from "@/state/reduxStore";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 
 import { continueAsGuest } from "@/state/redux-slices/userSlice";
+import { translationTable } from "@/constants/translation-table";
 
 export default function BasicInfo({ route }: any) {
   const { width, height } = useWindowDimensions();
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   const userType = route.params.userType as "Guest" | "Authorized";
 
@@ -168,7 +170,9 @@ export default function BasicInfo({ route }: any) {
               ...SCREENHEADER.textStyle(width, height),
             }}
           >
-            First Things First
+            {language === "Urdu"
+              ? translationTable["Tell us about yourself"]
+              : "Tell Us About Yourself"}
           </Text>
           <Text
             style={{
@@ -177,19 +181,27 @@ export default function BasicInfo({ route }: any) {
               fontSize: 15,
             }}
           >
-            We need some basic information to improve your experience
+            {language === "Urdu"
+              ? translationTable[
+                  "We need some basic information to improve your experience"
+                ]
+              : "We need some basic information to improve your experience"}
           </Text>
 
           <View
             style={{
-              marginTop: 7.5 * (height / 100),
+              marginTop: 5 * (height / 100),
               display: "flex",
 
               width: width,
             }}
           >
             <DualText
-              originalContent="Full Name"
+              originalContent={
+                language === "Urdu"
+                  ? translationTable["Full Name"]
+                  : "Full Name"
+              }
               dualContent={fullNameHeaderDual}
               style={INPUTHEADER.textStyle(width, height)}
               dualStyle={INPUTHEADER.dualTextStyle()}
@@ -226,7 +238,11 @@ export default function BasicInfo({ route }: any) {
             />
 
             <DualText
-              originalContent="Date of Birth"
+              originalContent={
+                language === "Urdu"
+                  ? translationTable["Date of Birth"]
+                  : "Date of Birth"
+              }
               dualContent={dobHeaderDual}
               style={{
                 //@ts-ignore
@@ -391,7 +407,11 @@ export default function BasicInfo({ route }: any) {
               }}
             >
               <DualText
-                originalContent="Gender"
+                originalContent={
+                  language === "Urdu"
+                    ? translationTable["Date of Birth"]
+                    : "Date of Birth"
+                }
                 dualContent={genderHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
@@ -447,7 +467,7 @@ export default function BasicInfo({ route }: any) {
                       fontFamily: "RobotoFlex",
                     }}
                   >
-                    Male
+                    {language === "Urdu" ? translationTable["Male"] : "Male"}
                   </Text>
                 </Pressable>
                 <Pressable
@@ -472,7 +492,9 @@ export default function BasicInfo({ route }: any) {
                       textAlign: "center",
                     }}
                   >
-                    Female
+                    {language === "Urdu"
+                      ? translationTable["Female"]
+                      : "Female"}
                   </Text>
                 </Pressable>
               </View>
@@ -480,7 +502,7 @@ export default function BasicInfo({ route }: any) {
           </View>
 
           <ArrowButton
-            content="Next"
+            content={language === "Urdu" ? translationTable["Next"] : "Next"}
             onPress={handleNext}
             font={ONBOARDINGNEXTCSS.font}
             style={ONBOARDINGNEXTCSS.style(width, height)}

@@ -253,13 +253,19 @@ export const userSlice = createSlice({
       state.isGuest = false;
       state.username = null;
       state.token = null;
-      state.userInfo = null;
+      state.userInfo = {
+        gender: state.userInfo?.gender || "Male",
+        language: state.userInfo?.language || "English",
+      };
       state.initialized = false;
 
       clearUserFromStorage();
     },
-    setLanguage: (state, action: { payload: "English" | "Urdu" }) => {
-      state.userInfo!.language = action.payload;
+    setAppLanguage: (state, action: { payload: "English" | "Urdu" }) => {
+      if (!state.userInfo) {
+        return;
+      }
+      state.userInfo.language = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -311,6 +317,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, setAppLanguage } = userSlice.actions;
 
 export default userSlice.reducer;

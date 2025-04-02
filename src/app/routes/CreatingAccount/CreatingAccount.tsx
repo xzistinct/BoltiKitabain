@@ -9,12 +9,13 @@ import { BarIndicator as ActivityIndicator } from "react-native-indicators";
 
 import font from "@/constants/fonts";
 import { useEffect, useState } from "react";
-import { useAppDispatch } from "@/state/reduxStore";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
 import { createAccount, login } from "@/state/redux-slices/userSlice";
 import { tResponse, tUser, tUserInformation } from "@/constants/types";
 import { getErrorFromCode } from "@/constants/errors";
+import { translationTable } from "@/constants/translation-table";
 
 export default function CreatingAccount({ route }: any) {
   const { width, height } = useWindowDimensions();
@@ -23,6 +24,7 @@ export default function CreatingAccount({ route }: any) {
 
   const user = route.params.user as tUser;
   const userInformation = route.params.userInformation as tUserInformation;
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "success"
@@ -84,7 +86,9 @@ export default function CreatingAccount({ route }: any) {
           <Text
             style={{ fontFamily: font("OpenSans", "Medium"), fontSize: 15 }}
           >
-            Creating your account, hold tight!
+            {language === "Urdu"
+              ? translationTable["Creating your account, hold tight!"]
+              : "Creating your account, hold tight!"}
           </Text>
         </>
       )}
@@ -93,7 +97,11 @@ export default function CreatingAccount({ route }: any) {
           <Text
             style={{ fontFamily: font("OpenSans", "Medium"), fontSize: 20 }}
           >
-            Sorry, we encountered an error while creating your account.
+            {language === "Urdu"
+              ? translationTable[
+                  "Sorry, we encountered an error while creating your account."
+                ]
+              : "Sorry, we encountered an error while creating your account."}
           </Text>
           <Text
             style={{
@@ -126,7 +134,7 @@ export default function CreatingAccount({ route }: any) {
                   textAlign: "center",
                 }}
               >
-                Go back
+                {language === "Urdu" ? translationTable["Go back"] : "Go back"}
               </Text>
             </TouchableOpacity>
           </View>

@@ -19,6 +19,8 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  StyleProp,
+  TextStyle,
 } from "react-native";
 import { BarIndicator } from "react-native-indicators";
 import { useNavigation } from "@react-navigation/native";
@@ -31,6 +33,7 @@ import NumberPad from "@/components/NumberPad";
 import DualText from "@/components/DualText";
 import { SCREENTOPMARGIN } from "../Welcome/Welcome";
 import { errors, getErrorFromCode } from "@/constants/errors";
+import { translationTable } from "@/constants/translation-table";
 
 export default function SignIn() {
   const { width, height } = useWindowDimensions();
@@ -51,7 +54,7 @@ export default function SignIn() {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
 
-  const token = useAppSelector((state) => state.user.token);
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   const handleNext = () => {
     setLoginErr(null);
@@ -93,13 +96,13 @@ export default function SignIn() {
     return;
   };
 
-  const TextInputStyle = {
+  const TextInputStyle: StyleProp<TextStyle> = {
     borderBottomColor: "black",
     borderBottomWidth: 1,
     width: 70 * (width / 100),
     height: 4.5 * (height / 100),
     paddingVertical: 0,
-
+    textAlign: "left",
     fontSize: 20,
     paddingHorizontal: 15,
     fontFamily: "Roboto",
@@ -165,7 +168,7 @@ export default function SignIn() {
                 lineHeight: undefined,
               }}
             >
-              Sign In
+              {language === "Urdu" ? translationTable["Sign in"] : "Sign In"}
             </Text>
             <Text
               style={{
@@ -175,7 +178,9 @@ export default function SignIn() {
                 width: "40%",
               }}
             >
-              Good to have you back!
+              {language === "Urdu"
+                ? translationTable["Good to have you back"]
+                : "Good to have you back"}
             </Text>
           </View>
 
@@ -200,7 +205,9 @@ export default function SignIn() {
             </View>
             <View style={{ width: width }}>
               <DualText
-                originalContent="Email"
+                originalContent={
+                  language === "Urdu" ? translationTable["Email"] : "Email"
+                }
                 dualContent={emailHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
@@ -234,7 +241,11 @@ export default function SignIn() {
 
             <View style={{ marginTop: 4 * (height / 100), width: width }}>
               <DualText
-                originalContent="Password"
+                originalContent={
+                  language === "Urdu"
+                    ? translationTable["Password"]
+                    : "Password"
+                }
                 dualContent={passwordHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
@@ -247,17 +258,17 @@ export default function SignIn() {
                     changePasswordHeaderDual(null);
                     setPassword(value);
                   }}
-                  placeholder="8 characters or more"
+                  placeholder={
+                    language === "Urdu"
+                      ? translationTable["8 characters or more"]
+                      : "8 characters or more"
+                  }
                   placeholderTextColor={"gray"}
                 />
               </View>
             </View>
           </View>
-          <TouchableOpacity style={{ marginTop: 2 * (height / 100) }}>
-            <Text style={{ color: BABYBLUE, textDecorationLine: "underline" }}>
-              Forgot password? Get OTP
-            </Text>
-          </TouchableOpacity>
+
           <ArrowButton
             onPress={handleNext}
             style={{

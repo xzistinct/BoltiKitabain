@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   Platform,
+  TextStyle,
+  StyleProp,
 } from "react-native";
 
 import Entypo from "@expo/vector-icons/Entypo";
@@ -26,6 +28,8 @@ import {
 import DualText from "@/components/DualText";
 import NumberPad from "@/components/NumberPad";
 import { tUser, tUserInformation } from "@/constants/types";
+import { useAppSelector } from "@/state/reduxStore";
+import { translationTable } from "@/constants/translation-table";
 
 export default function CreateAccount({ route }: any) {
   let userInformation = route.params.userInformation as tUserInformation;
@@ -34,6 +38,7 @@ export default function CreateAccount({ route }: any) {
   }
   const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   const [emailHeaderDual, changeEmailHeaderDual] = useState<string | null>(
     null
@@ -59,17 +64,29 @@ export default function CreateAccount({ route }: any) {
   const handleNext = () => {
     let err = false;
     if (email === "") {
-      changeEmailHeaderDual("Please fill out email");
+      changeEmailHeaderDual(
+        language === "Urdu"
+          ? translationTable["Please fill out email"]
+          : "Please fill out email"
+      );
       err = true;
     }
 
     if (password === null || password.length < 8) {
-      changePasswordHeaderDual("Password must be at least 8 characters");
+      changePasswordHeaderDual(
+        language === "Urdu"
+          ? translationTable["Password must be at least 8 characters"]
+          : "Password must be at least 8 characters"
+      );
       err = true;
     }
 
     if (retypePassword === null || retypePassword !== password) {
-      changeRetypePasswordHeaderDual("Passwords do not match");
+      changeRetypePasswordHeaderDual(
+        language === "Urdu"
+          ? translationTable["Passwords do not match"]
+          : "Passwords do not match"
+      );
       err = true;
     }
 
@@ -83,13 +100,13 @@ export default function CreateAccount({ route }: any) {
     });
   };
 
-  const TextInputStyle = {
+  const TextInputStyle: StyleProp<TextStyle> = {
     borderBottomColor: "black",
     borderBottomWidth: 1,
     width: 70 * (width / 100),
     height: 4.5 * (height / 100),
     paddingVertical: 0,
-
+    textAlign: "left",
     fontSize: 20,
     paddingHorizontal: 15,
     fontFamily: "Roboto",
@@ -117,7 +134,9 @@ export default function CreateAccount({ route }: any) {
               textAlign: "center",
             }}
           >
-            Create account
+            {language === "English"
+              ? "Create an account"
+              : translationTable["Create account"]}
           </Text>
           <Text
             style={{
@@ -127,15 +146,20 @@ export default function CreateAccount({ route }: any) {
               width: 55 * (width / 100),
             }}
           >
-            Access more audiobooks with a library card & engage with the
-            community
+            {language === "Urdu"
+              ? translationTable[
+                  "Access more audiobooks with a library card & engage with the community"
+                ]
+              : "Access more audiobooks with a library card & engage with the community"}
           </Text>
 
           <View>
             <View style={{ marginTop: 5 * (height / 100) }}>
               <View style={{ width: width }}>
                 <DualText
-                  originalContent="Email"
+                  originalContent={
+                    language === "Urdu" ? translationTable["Email"] : "Email"
+                  }
                   dualContent={emailHeaderDual}
                   style={INPUTHEADER.textStyle(width, height)}
                   dualStyle={INPUTHEADER.dualTextStyle()}
@@ -173,7 +197,11 @@ export default function CreateAccount({ route }: any) {
             </View>
             <View style={{ marginTop: 3 * (height / 100), width: width }}>
               <DualText
-                originalContent="Password"
+                originalContent={
+                  language === "Urdu"
+                    ? translationTable["Password"]
+                    : "Password"
+                }
                 dualContent={passwordHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
@@ -192,7 +220,11 @@ export default function CreateAccount({ route }: any) {
                     changePasswordHeaderDual(null);
                     setPassword(value);
                   }}
-                  placeholder="8 characters or more"
+                  placeholder={
+                    language === "Urdu"
+                      ? translationTable["8 characters or more"]
+                      : "8 characters or more"
+                  }
                   placeholderTextColor={"gray"}
                 />
                 <TouchableOpacity
@@ -209,7 +241,11 @@ export default function CreateAccount({ route }: any) {
             </View>
             <View style={{ marginTop: 3 * (height / 100), width: width }}>
               <DualText
-                originalContent="Retype Password"
+                originalContent={
+                  language === "Urdu"
+                    ? translationTable["Retype password"]
+                    : "Retype Password"
+                }
                 dualContent={retypePasswordHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
                 dualStyle={INPUTHEADER.dualTextStyle()}
@@ -227,7 +263,9 @@ export default function CreateAccount({ route }: any) {
             </View>
           </View>
           <ArrowButton
-            content="Create"
+            content={
+              language === "Urdu" ? translationTable["Create"] : "Create"
+            }
             onPress={handleNext}
             font={ONBOARDINGNEXTCSS.font}
             style={ONBOARDINGNEXTCSS.style(width, height)}

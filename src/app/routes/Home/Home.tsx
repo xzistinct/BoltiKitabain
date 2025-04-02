@@ -40,6 +40,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import * as NavigationBar from "expo-navigation-bar";
 import { clearBookData } from "@/state/redux-slices/bookSlice";
+import { translationTable } from "@/constants/translation-table";
 
 const tabs = ["Home", "Discover"] as const;
 
@@ -55,6 +56,7 @@ const NAVBAR = ({
   const { width, height } = useWindowDimensions();
   const dispatch = useAppDispatch();
   const gender = useAppSelector((state) => state.user.userInfo?.gender);
+  const language = useAppSelector((state) => state.user.userInfo?.language);
   const navigation = useNavigation();
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -178,7 +180,9 @@ const NAVBAR = ({
                 }}
               >
                 <Text style={{ fontFamily: font("Jost", "Regular") }}>
-                  Logout
+                  {language === "English"
+                    ? "Logout"
+                    : translationTable["Log out"]}
                 </Text>
               </TouchableOpacity>
             </View>

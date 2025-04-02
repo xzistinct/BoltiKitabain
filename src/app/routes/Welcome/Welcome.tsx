@@ -5,7 +5,6 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { useSelector } from "react-redux";
 
 import {
   BABYBLUE as NAVYBLUE,
@@ -17,6 +16,9 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import font from "@/constants/fonts";
 import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
+import { setAppLanguage } from "@/state/redux-slices/userSlice";
+import { translationTable } from "@/constants/translation-table";
 
 export const SCREENTOPMARGIN = () => {
   const { height } = useWindowDimensions();
@@ -28,8 +30,9 @@ export const SCREENTOPMARGIN = () => {
 function Welcome() {
   const { height, width } = useWindowDimensions();
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
-  const [language, setLanguage] = useState<"English" | "Urdu">("English");
+  const language = useAppSelector((state) => state.user.userInfo?.language);
 
   return (
     <View
@@ -46,9 +49,14 @@ function Welcome() {
           top: height * 0.075,
           right: width * 0.1,
         }}
-        onPress={() =>
-          language === "English" ? setLanguage("Urdu") : setLanguage("English")
-        }
+        onPress={() => {
+          console.log("Switching language");
+          if (language === "English") {
+            dispatch(setAppLanguage("Urdu"));
+          } else {
+            dispatch(setAppLanguage("English"));
+          }
+        }}
       >
         <Text
           style={{
@@ -59,7 +67,7 @@ function Welcome() {
           }}
         >
           {language === "English"
-            ? "اردو میں ایپ استعمال کریں"
+            ? translationTable["Use app in english"]
             : "Use app in English"}
         </Text>
       </TouchableOpacity>
@@ -83,7 +91,7 @@ function Welcome() {
           marginBottom: 0,
         }}
       >
-        Welcome to
+        {language === "English" ? "Welcome to" : translationTable["Welcome to"]}
       </Text>
 
       <Text
@@ -94,9 +102,15 @@ function Welcome() {
           marginTop: 0,
         }}
       >
-        Bolti Kitabain
+        {language === "English"
+          ? "Bolti Kitabain"
+          : translationTable["Bolti Kitabain"]}
       </Text>
-      <Text>Listen to the voices of Pakistan</Text>
+      <Text>
+        {language === "English"
+          ? "Listen to the voices of Pakistan"
+          : translationTable["Listen to the voices of Pakistan"]}
+      </Text>
       <View
         style={{ marginTop: 5 * (height / 100), width: 50 * (width / 100) }}
       >
@@ -121,7 +135,9 @@ function Welcome() {
               marginVertical: "auto",
             }}
           >
-            Create an account
+            {language === "English"
+              ? "Create account"
+              : translationTable["Create account"]}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -146,7 +162,7 @@ function Welcome() {
               marginVertical: "auto",
             }}
           >
-            Sign In
+            {language === "English" ? "Sign In" : translationTable["Sign in"]}
           </Text>
         </TouchableOpacity>
       </View>
@@ -159,7 +175,9 @@ function Welcome() {
         }}
       >
         <Text style={{ color: GREY, marginVertical: "auto", marginRight: 10 }}>
-          A project of
+          {language === "English"
+            ? "A project of"
+            : translationTable["A project of"]}
         </Text>
         <Image
           source={require("../../../assets/images/pitb.png")}
