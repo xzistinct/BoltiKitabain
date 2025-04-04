@@ -223,9 +223,15 @@ const NAVBAR = ({
               textAlign: "center",
             }}
           >
-            Are you sure?{" "}
+            {language === "Urdu"
+              ? translationTable["Are you sure?"]
+              : "Are you sure?"}
             <Text style={{ fontFamily: font("OpenSans", "SemiBold") }}>
-              This will erase your preferences and saved data.
+              {language === "Urdu"
+                ? translationTable[
+                    "This will erase your preferences and saved data."
+                  ]
+                : "This will erase your preferences and saved data."}
             </Text>
           </Text>
           <View
@@ -248,7 +254,7 @@ const NAVBAR = ({
                   setLogoutModalVisible(false);
                 }}
               >
-                Cancel
+                {language === "Urdu" ? translationTable["Cancel"] : "Cancel"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -265,7 +271,7 @@ const NAVBAR = ({
                   color: RED,
                 }}
               >
-                Logout
+                {language === "Urdu" ? translationTable["Log out"] : "Log out"}
               </Text>
             </TouchableOpacity>
           </View>

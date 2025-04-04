@@ -57,4 +57,8 @@ export const translationTable = {
   "Start reading": "پڑھنا شروع کریں",
   "Add to your reading list": "اپنی پڑھنے کی فہرست میں شامل کریں",
   "No popular books found": "کوئی مشہور کتابیں نہیں ملیں۔",
+  "This is a required field": "اس کی ضرورت ہے۔",
+  "Please enter a valid name": "ایک درست نام درج کریں۔",
+  "Enter your full name": "اپنا پورا نام درج کریں۔",
+  "Enter a valid date": "ایک درست تاریخ درج کریں۔",
 } as const;

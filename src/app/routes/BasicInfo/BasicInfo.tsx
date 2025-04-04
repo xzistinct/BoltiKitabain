@@ -69,21 +69,37 @@ export default function BasicInfo({ route }: any) {
   const handleNext = () => {
     let err = false;
     if (gender === null) {
-      changeGenderHeaderDual("This is a required field");
+      changeGenderHeaderDual(
+        language === "Urdu"
+          ? translationTable["This is a required field"]
+          : "This is a required field"
+      );
       err = true;
     }
     if (fullName[0] === " " || /[^a-zA-Z\s]/.test(fullName)) {
-      changeFullNameHeaderDual("Please enter a valid name");
+      changeFullNameHeaderDual(
+        language === "Urdu"
+          ? translationTable["Please enter a valid name"]
+          : "Please enter a valid name"
+      );
       err = true;
     } else if (
       fullName.split(" ").length < 2 ||
       !fullName.split(" ").every((str: string) => str.length >= 3)
     ) {
-      changeFullNameHeaderDual("Please enter your full name");
+      changeFullNameHeaderDual(
+        language === "Urdu"
+          ? translationTable["Enter your full name"]
+          : "Please enter your full name"
+      );
       err = true;
     }
     if (fullName.length < 3) {
-      changeFullNameHeaderDual("Name must be at least 3 characters long");
+      changeFullNameHeaderDual(
+        language === "Urdu"
+          ? translationTable["Enter your full name"]
+          : "Name must be at least 3 characters long"
+      );
       err = true;
     }
 
@@ -94,11 +110,19 @@ export default function BasicInfo({ route }: any) {
       //@ts-ignore
       dobYear > new Date().getFullYear() - 5
     ) {
-      changeDOBHeaderDual("Please input a valid date");
+      changeDOBHeaderDual(
+        language === "Urdu"
+          ? translationTable["Enter a valid date"]
+          : "Please input a valid date"
+      );
       err = true;
     }
     if (dobMonth === null || dobDay === null || dobYear === null) {
-      changeDOBHeaderDual("This is a required field");
+      changeDOBHeaderDual(
+        language === "Urdu"
+          ? translationTable["This is a required field"]
+          : "This is a required field"
+      );
       err = true;
     }
     if (err) {
@@ -408,9 +432,7 @@ export default function BasicInfo({ route }: any) {
             >
               <DualText
                 originalContent={
-                  language === "Urdu"
-                    ? translationTable["Date of Birth"]
-                    : "Date of Birth"
+                  language === "Urdu" ? translationTable["Gender"] : "Gender"
                 }
                 dualContent={genderHeaderDual}
                 style={INPUTHEADER.textStyle(width, height)}
