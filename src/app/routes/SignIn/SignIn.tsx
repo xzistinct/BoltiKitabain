@@ -88,7 +88,7 @@ export default function SignIn() {
             return;
           }
 
-          setLoginErr(getErrorFromCode(message.error) + ` (${message.error})`);
+          setLoginErr(message.error + ` (${errors[message.error]})`);
         },
       })
     );

@@ -41,12 +41,12 @@ export const login = async (
     const text = await response.text();
 
     if (text === "Password incorrect") {
-      loginResponse.error = errors["Invalid credentials"];
+      loginResponse.error = "Invalid credentials";
       loginResponse.success = false;
       return loginResponse;
     }
     if (text === "This email is not registered") {
-      loginResponse.error = errors["Email not registered"];
+      loginResponse.error = "Email not registered";
       loginResponse.success = false;
       return loginResponse;
     }
@@ -66,10 +66,10 @@ export const login = async (
     }
   } catch (e) {
     console.error("Error while logging in:", e);
-    return { token: null, success: false, error: errors["Unknown error"] };
+    return { token: null, success: false, error:"Unknown error" };
   }
 
-  loginResponse.error = errors["Unknown error"];
+  loginResponse.error = "Unknown error";
   loginResponse.success = false;
   return loginResponse;
 };
@@ -79,7 +79,7 @@ export const createUserAccount = async (
   userInformation: tUserInformation
 ): Promise<tResponse> => {
   if (!user.username || !user.password || !userInformation.name) {
-    return { success: false, error: errors["Insufficient information"] };
+    return { success: false, error: "Insufficient information"};
   }
 
   try {
@@ -99,9 +99,9 @@ export const createUserAccount = async (
     const text = await response.text();
 
     if (response.status === 400 && text.includes("already exist")) {
-      return { success: false, error: errors["Email already registered"] };
+      return { success: false, error: "Email already registered" };
     } else if (!response.ok) {
-      return { success: false, error: errors["Unknown error"] };
+      return { success: false, error: "Unknown error" };
     }
 
     const data = await JSON.parse(text);
@@ -110,9 +110,9 @@ export const createUserAccount = async (
       return { success: true };
     }
   } catch (e) {
-    return { success: false, error: errors["Unknown error"] };
+    return { success: false, error:"Unknown error" };
   }
-  return { success: false, error: errors["Unknown error"] };
+  return { success: false, error: "Unknown error" };
 };
 
 export const getCredentialsFromStorage = async (): Promise<
@@ -130,12 +130,12 @@ export const getCredentialsFromStorage = async (): Promise<
     password = await SecureStore.getItemAsync("password");
   } catch (e) {
     console.error("Error while getting credentials from storage:", e);
-    return errors["Unknown error"];
+    return "Unknown error";
   }
 
   if (!username || !password) {
     console.log("Got username:", username, "Got password:", password);
-    return errors["Failed to get credentials from storage"];
+    return "Failed to get credentials from storage";
   }
 
   return { username, password };
@@ -151,7 +151,7 @@ export const setCredentialsInStorage = async (
     return { success: true };
   } catch (e) {
     console.error("Error while storing credentials:", e);
-    return { success: false, error: errors["Failed to store credentials"] };
+    return { success: false, error: "Failed to store credentials" };
   }
 };
 
@@ -166,11 +166,11 @@ export const getUserInformationFromStorage = async (): Promise<
     );
   } catch (e) {
     console.error("Error while getting user information:", e);
-    return errors["Unknown error"];
+    return "Unknown error";
   }
 
   if (!userInformation) {
-    return errors["Unknown error"];
+    return "Unknown error";
   }
 
   return userInformation;
@@ -192,7 +192,7 @@ export const setUserInformationInStorage = async (
     return { success: true };
   } catch (e) {
     console.error("Error while storing user information:", e);
-    return { success: false, error: errors["Unknown error"] };
+    return { success: false, error:"Unknown error" };
   }
 };
 
@@ -207,6 +207,6 @@ export const clearUserFromStorage = async (): Promise<tResponse> => {
     return { success: true };
   } catch (e) {
     console.error("Error while clearing user from storage:", e);
-    return { success: false, error: errors["Unknown error"] };
+    return { success: false, error: "Unknown error" };
   }
 };

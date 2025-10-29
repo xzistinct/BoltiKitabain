@@ -30,33 +30,33 @@ export function parseBookJSON(bookJSON: any): book | tError {
     return response;
   } catch (error) {
     console.error("Error parsing book JSON:", error);
-    return errors["Failed to parse server response"];
+    return "Failed to parse server response";
   }
 }
 
 export async function getPopularBooks(): Promise<book[] | tError> {
   const response = await fetch(endpoints.books);
   if (!response.ok) {
-    return errors["Failed to get appropriate response from server"];
+    return "Failed to get appropriate response from server";
   }
 
   try {
     const data = await response.json();
     if (!Array.isArray(data)) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     const books: book[] = data
       .map((bookData: any) => parseBookJSON(bookData))
       .filter((result) => typeof result === "object");
 
     if (books.length === 0) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
 
     return books;
   } catch (error) {
     console.error("Error parsing JSON:", error);
-    return errors["Failed to parse server response"];
+    return "Failed to parse server response";
   }
 }
 
@@ -72,44 +72,44 @@ export async function getBookById(
     method: "GET",
   });
   if (!response.ok) {
-    return errors["Failed to get appropriate response from server"];
+    return"Failed to get appropriate response from server";
   }
 
   try {
     const data = await response.json();
     if (!data) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     return parseBookJSON(data);
   } catch (error) {
     console.error("Error parsing JSON:", error);
-    return errors["Failed to parse server response"];
+    return "Failed to parse server response";
   }
 }
 
 export async function getBookCategories(): Promise<string[] | tError> {
   const response = await fetch(endpoints.categories);
   if (!response.ok) {
-    return errors["Failed to get appropriate response from server"];
+    return "Failed to get appropriate response from server";
   }
 
   try {
     const data = await response.json();
     if (!Array.isArray(data)) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     const categories = data
       .map((category: any) => category.name)
       .filter((name: string | undefined) => name !== "" && name !== undefined);
 
     if (categories.length === 0) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
 
     return categories;
   } catch (error) {
     console.error("Error parsing JSON:", error);
-    return errors["Failed to parse server response"];
+    return "Failed to parse server response";
   }
 }
 
@@ -127,12 +127,12 @@ export async function getBooksByCategory(
       body: JSON.stringify({ parentVal: category, genreVal: "", subVal: "" }),
     });
     if (!response.ok) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     let books: book[] = data
       .map((bookData: any) => parseBookJSON(bookData))
@@ -141,7 +141,7 @@ export async function getBooksByCategory(
     return books;
   } catch (error) {
     console.error("Error fetching books by category:", error);
-    return errors["Failed to get appropriate response from server"];
+    return "Failed to get appropriate response from server";
   }
 }
 
@@ -159,12 +159,12 @@ export async function searchBooks(
       body: JSON.stringify({ searchVal: query }),
     });
     if (!response.ok) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     let books: book[] = data
       .map((bookData: any) => parseBookJSON(bookData))
@@ -173,7 +173,7 @@ export async function searchBooks(
     return books;
   } catch (error) {
     console.error("Error searching books:", error);
-    return errors["Failed to get appropriate response from server"];
+    return "Failed to get appropriate response from server";
   }
 }
 
@@ -202,13 +202,13 @@ export async function getBookChapters(
     method: "GET",
   });
   if (!response.ok) {
-    return errors["Failed to get appropriate response from server"];
+    return "Failed to get appropriate response from server";
   }
 
   try {
     const data = await response.json();
     if (!Array.isArray(data)) {
-      return errors["Failed to get appropriate response from server"];
+      return "Failed to get appropriate response from server";
     }
     return {
       chapters: data
@@ -217,6 +217,6 @@ export async function getBookChapters(
     };
   } catch (error) {
     console.error("Error parsing JSON:", error);
-    return errors["Failed to parse server response"];
+    return "Failed to parse server response";
   }
 }

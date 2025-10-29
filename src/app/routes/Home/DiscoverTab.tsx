@@ -74,7 +74,7 @@ export default function DiscoverTab({}: {}) {
   useEffect(() => {
     (async () => {
       const categoriesGotten = await getBookCategories();
-      if (typeof categoriesGotten === "number") {
+      if (typeof categoriesGotten === "string") {
         return;
       }
       setCategories(categoriesGotten);
@@ -86,7 +86,7 @@ export default function DiscoverTab({}: {}) {
     (async () => {
       if (!booksByCategoryRef.current[currentCategory]) {
         const books = await getBooksByCategory(currentCategory, jwt || "");
-        if (typeof books === "number") {
+        if (typeof books === "string") {
           return;
         }
         booksByCategoryRef.current[currentCategory] = books;

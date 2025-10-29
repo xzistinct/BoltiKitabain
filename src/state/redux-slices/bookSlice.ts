@@ -65,9 +65,9 @@ export const initializeBookState = createAsyncThunk(
       console.error("Error initializing book state:", error);
       callback({
         success: false,
-        error: errors["Failed to initialize book state"],
+        error: "Failed to initialize book state",
       });
-      return rejectWithValue(errors["Failed to initialize book state"]);
+      return rejectWithValue("Failed to initialize book state");
     }
   }
 );
@@ -89,23 +89,22 @@ export const fetchPopularBooks = createAsyncThunk(
     if (!state.initialized) {
       callback({
         success: false,
-        error: errors["Redux state not initialized"],
+        error: "Redux state not initialized",
       });
-      return rejectWithValue(errors["Redux state not initialized"]);
+      return rejectWithValue("Redux state not initialized");
     }
     if (state.fetchedPopularBooks.length > 0) {
       console.log("Already fetched popular books");
       callback({
         success: false,
-        error: errors["Data already exists"],
+        error:"Data already exists",
       });
       return rejectWithValue(
-        errors["Data already exists"] || errors["Unknown error"]
-      );
+        "Data already exists");
     }
     try {
       const books = await getPopularBooks();
-      if (typeof books === "number") {
+      if (typeof books === "string") {
         callback({ success: false, error: books });
         return rejectWithValue(books);
       }
@@ -113,8 +112,8 @@ export const fetchPopularBooks = createAsyncThunk(
       return books;
     } catch (error) {
       console.error("Error fetching popular books:", error);
-      callback({ success: false, error: errors["Unknown error"] });
-      return rejectWithValue(errors["Unknown error"]);
+      callback({ success: false, error: "Unknown error" });
+      return rejectWithValue("Unknown error");
     }
   }
 );
@@ -271,7 +270,7 @@ const bookSlice = createSlice({
       .addCase(fetchPopularBooks.rejected, (state, action) => {
         console.log(
           "action.payload of fetching books",
-          getErrorFromCode(action.payload as tError)
+          action.payload,
         );
       });
   },

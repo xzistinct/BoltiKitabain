@@ -1,3 +1,5 @@
+import React from "react";
+
 import { BABYBLUE } from "@/constants/colors";
 import { useWindowDimensions, View } from "react-native";
 import { BarIndicator } from "react-native-indicators";

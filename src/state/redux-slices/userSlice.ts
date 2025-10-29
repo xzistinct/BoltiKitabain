@@ -35,7 +35,7 @@ const initialState: UserState = {
 export const initializeUser = createAsyncThunk(
   "user/initializeUser",
   async (
-    callback: (isGuest: boolean, isLoggedIn: boolean) => void,
+    callback: (isGuest: boolean, isLoggedIn: boolean, error?: tError) => void,
     { rejectWithValue }: { rejectWithValue: (error: tError) => void }
   ): Promise<void | {
     isGuest: boolean;
@@ -47,9 +47,9 @@ export const initializeUser = createAsyncThunk(
       const userInfo = await getUserInformationFromStorage();
       if (!userInfo) {
         callback(false, false);
-        return rejectWithValue(errors["Failed to retrieve user information"]);
+        return rejectWithValue("Failed to retrieve user information");
       } else if (typeof userInfo !== "object") {
-        callback(false, false);
+        callback(false, false, "Failed to retrieve user information");
         return rejectWithValue(userInfo);
       }
       const credentials = await getCredentialsFromStorage();
@@ -60,29 +60,29 @@ export const initializeUser = createAsyncThunk(
       }
 
       if (typeof credentials !== "object") {
-        callback(false, false);
+        callback(false, false, credentials);
         return rejectWithValue(credentials);
       }
 
       const { username, password } = credentials;
 
       if (!username || !password) {
-        callback(false, false);
+        callback(false, false, "Failed to get credentials from storage");
         return rejectWithValue(
-          errors["Failed to get credentials from storage"]
+          "Failed to get credentials from storage"
         );
       }
 
       const attempt = await authLogin(username, password);
 
-      if (attempt.error === errors["Invalid credentials"]) {
-        callback(false, false);
+      if (attempt.error === "Invalid credentials") {
+        callback(false, false, attempt.error);
 
         return rejectWithValue(
           (await clearUserFromStorage()).error || attempt.error
         );
       } else if (attempt.error) {
-        callback(false, false);
+        callback(false, false, attempt.error);
         return rejectWithValue(attempt.error);
       }
 
@@ -95,7 +95,7 @@ export const initializeUser = createAsyncThunk(
       };
     } catch (error) {
       callback(false, false);
-      return rejectWithValue(errors["Unknown error"]);
+      return rejectWithValue("Unknown error");
     }
   }
 );
@@ -120,8 +120,8 @@ export const login = createAsyncThunk(
     try {
       const state = getState() as { user: typeof initialState };
       if (state.user.isGuest || state.user.token) {
-        callback({ success: false, error: errors["Already authenticated"] });
-        return rejectWithValue(errors["Already authenticated"]);
+        callback({ success: false, error: "Already authenticated" });
+        return rejectWithValue("Already authenticated");
       }
 
       const attempt = await authLogin(username, password);
@@ -133,7 +133,7 @@ export const login = createAsyncThunk(
         attempt.error ||
         !attempt.userInformation
       ) {
-        return rejectWithValue(attempt.error || errors["Invalid credentials"]);
+        return rejectWithValue(attempt.error || "Invalid credentials");
       }
 
       await setCredentialsInStorage(username, password);
@@ -146,9 +146,9 @@ export const login = createAsyncThunk(
     } catch (error) {
       callback({
         success: false,
-        error: errors["Unknown error"],
+        error: "Unknown error",
       });
-      return rejectWithValue(errors["Unknown error"]);
+      return rejectWithValue("Unknown error");
     }
   }
 );
@@ -174,13 +174,13 @@ export const createAccount = createAsyncThunk(
       const state = getState() as { user: typeof initialState };
 
       if (!state.user || state.user.isGuest || state.user.token) {
-        callback({ success: false, error: errors["Already authenticated"] });
-        return rejectWithValue(errors["Already authenticated"]);
+        callback({ success: false, error: "Already authenticated" });
+        return rejectWithValue("Already authenticated");
       }
 
       if (!user.username || !user.password || !userInformation.name) {
-        callback({ success: false, error: errors["Insufficient information"] });
-        return rejectWithValue(errors["Insufficient information"]);
+        callback({ success: false, error: "Insufficient information" });
+        return rejectWithValue("Insufficient information");
       }
 
       const createAccountAttempt = await createUserAccount(
@@ -190,7 +190,7 @@ export const createAccount = createAsyncThunk(
 
       if (!createAccountAttempt.success) {
         callback({ success: false, error: createAccountAttempt.error });
-        return rejectWithValue(errors["Unknown error"]);
+        return rejectWithValue("Unknown error");
       }
 
       const credentials = await setCredentialsInStorage(
@@ -199,15 +199,15 @@ export const createAccount = createAsyncThunk(
       );
       if (!credentials.success) {
         callback({ success: false, error: credentials.error });
-        return rejectWithValue(credentials.error || errors["Unknown error"]);
+        return rejectWithValue(credentials.error || "Unknown error");
       }
 
       callback({ success: true });
 
       return;
     } catch (error) {
-      callback({ success: false, error: errors["Unknown error"] });
-      return rejectWithValue(errors["Unknown error"]);
+      callback({ success: false, error: "Unknown error" });
+      return rejectWithValue("Unknown error");
     }
   }
 );
@@ -231,16 +231,16 @@ export const continueAsGuest = createAsyncThunk(
       const state = getState() as { user: typeof initialState };
 
       if (state.user.isGuest || state.user.token) {
-        callback({ success: false, error: errors["Already authenticated"] });
-        return rejectWithValue(errors["Already authenticated"]);
+        callback({ success: false, error: "Already authenticated" });
+        return rejectWithValue("Already authenticated");
       }
 
       await AsyncStorage.setItem("IsGuest", "true");
       callback({ success: true });
       return userInfo;
     } catch (error) {
-      callback({ success: false, error: errors["Unknown error"] });
-      return rejectWithValue(errors["Unknown error"]);
+      callback({ success: false, error: "Unknown error" });
+      return rejectWithValue("Unknown error");
     }
   }
 );

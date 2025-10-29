@@ -71,7 +71,7 @@ export interface Bookmark {
 
 export type Bookmarks = Record<string, Record<number, Bookmark[]>>;
 
-export type tError = (typeof errors)[keyof typeof errors];
+export type tError = keyof typeof errors;
 export type tResponse = {
   success: boolean;
   error?: tError;

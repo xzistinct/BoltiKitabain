@@ -25,7 +25,7 @@ import {
 
 import * as SplashScreen from "expo-splash-screen";
 
-import store from "./state/reduxStore";
+import store, { useAppDispatch } from "./state/reduxStore";
 import { Provider, useDispatch } from "react-redux";
 import { initializeUser } from "./state/redux-slices/userSlice";
 import { initializeBookState } from "./state/redux-slices/bookSlice";
@@ -40,12 +40,12 @@ import {
   ReanimatedLogLevel,
 } from "react-native-reanimated";
 
-configureReanimatedLogger({ level: ReanimatedLogLevel.INFO, strict: false });
+configureReanimatedLogger({ level: ReanimatedLogLevel.error, strict: false });
 
 SplashScreen.preventAutoHideAsync();
 
 const StateContainer = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [fontsLoaded, fontsErr] = useFonts({
     Jost_400Regular,
@@ -59,17 +59,11 @@ const StateContainer = () => {
     OpenSans_600SemiBold,
     OpenSans_700Bold,
   });
-  const [authInitialized, setAuthInitialized] = useState(false);
   const [bookStateInitialized, setBookStateInitialized] = useState(false);
 
   // Disabled for now
 
   useEffect(() => {
-    dispatch(
-      initializeUser(() => {
-        setAuthInitialized(true);
-      })
-    );
     dispatch(
       initializeBookState(() => {
         setBookStateInitialized(true);
@@ -78,12 +72,12 @@ const StateContainer = () => {
   }, []);
 
   useEffect(() => {
-    if ((fontsLoaded || fontsErr) && authInitialized && bookStateInitialized) {
+    if ((fontsLoaded || fontsErr) && bookStateInitialized) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontsErr, authInitialized, bookStateInitialized]);
+  }, [fontsLoaded, fontsErr, bookStateInitialized]);
 
-  if ((!fontsLoaded && !fontsErr) || !authInitialized) {
+  if ((!fontsLoaded && !fontsErr) || !bookStateInitialized) {
     return null;
   }
 

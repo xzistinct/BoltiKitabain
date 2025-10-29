@@ -1,3 +1,5 @@
+import { tError } from "./types";
+
 // Define error codes with a check for uniqueness
 export const errors = {
   "No Internet": 0,
@@ -47,7 +49,7 @@ export const errors = {
 type ValuesOf<T> = T[keyof T];
 type ErrorValues = ValuesOf<typeof errors>;
 
-export const getErrorFromCode = (code: number) => {
-  const error = Object.entries(errors).find(([, value]) => value === code);
+export const getErrorFromCode = (code: number): tError => {
+  const error = Object.entries(errors).find(([, value]) => value === code) as [tError, number] | undefined;
   return error ? error[0] : "Unknown error";
 };

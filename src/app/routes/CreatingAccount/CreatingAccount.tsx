@@ -13,9 +13,11 @@ import { useAppDispatch, useAppSelector } from "@/state/reduxStore";
 import { useNavigation } from "@react-navigation/native";
 import { BABYBLUE } from "@/constants/colors";
 import { createAccount, login } from "@/state/redux-slices/userSlice";
-import { tResponse, tUser, tUserInformation } from "@/constants/types";
-import { getErrorFromCode } from "@/constants/errors";
+import { tError, tResponse, tUser, tUserInformation } from "@/constants/types";
+import { errors, getErrorFromCode } from "@/constants/errors";
 import { translationTable } from "@/constants/translation-table";
+import LoadingScreen from "@/components/LoadingScreen";
+import ErrorScreen from "@/components/ErrorScreen";
 
 export default function CreatingAccount({ route }: any) {
   const { width, height } = useWindowDimensions();
@@ -29,7 +31,7 @@ export default function CreatingAccount({ route }: any) {
   const [screenState, setScreenState] = useState<
     "loading" | "error" | "success"
   >("loading");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<tError | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -44,7 +46,7 @@ export default function CreatingAccount({ route }: any) {
             console.log("create account success", success);
             if (!success.success && success.error) {
               setScreenState("error");
-              setError(getErrorFromCode(success.error));
+              setError(success.error);
               return;
             }
             dispatch(
@@ -58,7 +60,7 @@ export default function CreatingAccount({ route }: any) {
                   }
                   if (message.error) {
                     setScreenState("error");
-                    setError(getErrorFromCode(message.error));
+                    setError(message.error);
                   }
                 },
               })
@@ -79,66 +81,32 @@ export default function CreatingAccount({ route }: any) {
       }}
     >
       {screenState === "loading" && (
-        <>
-          <View style={{ height: height * 0.1 }}>
-            <ActivityIndicator color="#000" count={5} />
-          </View>
-          <Text
-            style={{ fontFamily: font("OpenSans", "Medium"), fontSize: 15 }}
-          >
-            {language === "Urdu"
+        <LoadingScreen
+          content={
+            language === "Urdu"
               ? translationTable["Creating your account, hold tight!"]
-              : "Creating your account, hold tight!"}
-          </Text>
-        </>
+              : "Creating your account, hold tight!"
+          }
+        />
       )}
-      {screenState === "error" && (
-        <View style={{ width: width * 0.8 }}>
-          <Text
-            style={{ fontFamily: font("OpenSans", "Medium"), fontSize: 20 }}
-          >
-            {language === "Urdu"
+      {screenState === "error" && error && (
+        <ErrorScreen
+          error={error}
+          content={
+            language === "Urdu"
               ? translationTable[
                   "Sorry, we encountered an error while creating your account."
                 ]
-              : "Sorry, we encountered an error while creating your account."}
-          </Text>
-          <Text
-            style={{
-              fontFamily: font("Roboto", "Regular"),
-              fontSize: 10,
-              marginTop: height * 0.005,
-            }}
-          >
-            {error}
-          </Text>
-          <View style={{ marginTop: height * 0.05, alignItems: "center" }}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: BABYBLUE,
-                width: width * 0.4,
-                height: height * 0.065,
-                borderRadius: 10,
-                justifyContent: "center",
-              }}
-              onPress={() => {
-                //@ts-ignore
-                navigation.navigate("Welcome");
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: font("OpenSans", "Medium"),
-                  fontSize: 17,
-                  color: "white",
-                  textAlign: "center",
-                }}
-              >
-                {language === "Urdu" ? translationTable["Go back"] : "Go back"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+              : "Sorry, we encountered an error while creating your account."
+          }
+          onPress={() => {
+            //@ts-ignore
+            navigation.navigate("Welcome");
+          }}
+          buttonContent={
+            language === "Urdu" ? translationTable["Go back"] : "Go back"
+          }
+        />
       )}
       {screenState === "success" && (
         <View style={{ width: width * 0.8 }}>
